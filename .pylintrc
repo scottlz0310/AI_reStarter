@@ -1,0 +1,103 @@
+[MASTER]
+# Python 3.8+ をサポート
+py-version = 3.8
+
+# 並列処理を有効化
+jobs = 0
+
+# 設定ファイルの場所
+rcfile = .pylintrc
+
+[MESSAGES CONTROL]
+# 無視する警告
+disable = 
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    R0903,  # too-few-public-methods
+    R0913,  # too-many-arguments
+    W0621,  # redefined-outer-name
+    W0703,  # broad-except
+
+[REPORTS]
+# 出力形式
+output-format = text
+
+# 評価を表示
+score = yes
+
+# 統計情報を表示
+reports = yes
+
+[BASIC]
+# 良い変数名のパターン
+good-names = i,j,k,ex,Run,_,id
+
+# 悪い変数名のパターン
+bad-names = foo,bar,baz,toto,tutu,tata
+
+# 名前の正規表現パターン
+name-group = 
+
+# 関数名の正規表現パターン
+function-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# 変数名の正規表現パターン
+variable-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# 定数名の正規表現パターン
+const-rgx = (([A-Z_][A-Z0-9_]*)|(__.*__))$
+
+# 属性名の正規表現パターン
+attr-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# 引数名の正規表現パターン
+argument-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# クラス名の正規表現パターン
+class-rgx = [A-Z_][a-zA-Z0-9]+$
+
+# モジュール名の正規表現パターン
+module-rgx = (([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+
+# メソッド名の正規表現パターン
+method-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# 関数名の正規表現パターン
+func-rgx = [a-z_][a-z0-9_]{2,30}$
+
+# 行の最大長
+max-line-length = 88
+
+[SIMILARITIES]
+# 最小行数
+min-similarity-lines = 4
+
+# 無視するコメント
+ignore-comments = yes
+
+# 無視するドキュメント文字列
+ignore-docstrings = yes
+
+# 無視するインポート
+ignore-imports = yes
+
+[FORMAT]
+# 最大行長
+max-line-length = 88
+
+# インデントサイズ
+indent-size = 4
+
+# インデント文字
+indent-string = '    '
+
+# インデント後の行の最大長
+indent-after-paren = 4
+
+# 期待される行の最大長
+expected-line-ending-format = 
+
+[MISCELLANEOUS]
+# 注釈の正規表現
+notes = FIXME,XXX,TODO
