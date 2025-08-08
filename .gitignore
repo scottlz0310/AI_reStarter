@@ -168,6 +168,7 @@ kiro_recovery.log
 *.png
 *.jpg
 *.jpeg
+test_scripts/
 
 # IDE
 .vscode/

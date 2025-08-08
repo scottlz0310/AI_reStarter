@@ -28,6 +28,9 @@ dependencies = [
     "numpy>=1.26.0",
     "pyautogui>=0.9.54",
     "Pillow>=10.0.0",
+    "keyboard>=0.13.5",
+    "pywin32>=306; sys_platform == 'win32'",
+    "pyperclip>=1.8.2",
 ]
 
 [project.optional-dependencies]

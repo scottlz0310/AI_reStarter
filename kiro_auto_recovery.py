@@ -15,6 +15,43 @@ from typing import Optional, Tuple
 import cv2
 import numpy as np
 
+# pyperclipライブラリを条件付きでインポート（クリップボード入力用）
+try:
+    import pyperclip
+    PYPERCLIP_AVAILABLE = True
+except ImportError:
+    PYPERCLIP_AVAILABLE = False
+    print("警告: pyperclipが利用できません。クリップボード入力機能は無効です。")
+except Exception as e:
+    PYPERCLIP_AVAILABLE = False
+    print(f"警告: pyperclipの初期化に失敗しました: {e}")
+    print("クリップボード入力機能は無効です。")
+
+# keyboardライブラリを条件付きでインポート
+try:
+    import keyboard
+    KEYBOARD_AVAILABLE = True
+except ImportError:
+    KEYBOARD_AVAILABLE = False
+    print("警告: keyboardライブラリが利用できません。ホットキー機能は無効です。")
+except Exception as e:
+    KEYBOARD_AVAILABLE = False
+    print(f"警告: keyboardライブラリの初期化に失敗しました: {e}")
+    print("ホットキー機能は無効です。")
+
+# win32guiライブラリを条件付きでインポート（Windows環境でのフォーカス制御）
+try:
+    import win32gui
+    import win32con
+    WIN32GUI_AVAILABLE = True
+except ImportError:
+    WIN32GUI_AVAILABLE = False
+    print("警告: win32guiが利用できません。強制フォーカス機能は無効です。")
+except Exception as e:
+    WIN32GUI_AVAILABLE = False
+    print(f"警告: win32guiの初期化に失敗しました: {e}")
+    print("強制フォーカス機能は無効です。")
+
 # pyautoguiは条件付きでインポート（WSL環境での問題回避）
 try:
     import pyautogui
@@ -75,6 +112,11 @@ class KiroAutoRecovery:
                 "エラーを修正して続行",
                 "タスクを再開してください",
             ],
+            "custom_commands": {
+                "compilation_error": "コンパイルエラーを修正して続行してください",
+                "runtime_error": "ランタイムエラーを解決して再実行してください",
+                "timeout_error": "タイムアウトエラー、再度実行してください",
+            },
             "chat_input_position": None,  # [x, y] 座標
             "monitor_region": None,  # [x, y, width, height]
             "template_threshold": 0.8,
@@ -157,6 +199,55 @@ class KiroAutoRecovery:
 
         return None
 
+    def force_focus_kiro_window(self) -> bool:
+        """
+        Kiro-IDEウィンドウに強制フォーカス
+        Returns:
+            フォーカス成功フラグ
+        """
+        if not WIN32GUI_AVAILABLE:
+            logger.warning("win32guiが利用できません。強制フォーカスをスキップします。")
+            return False
+        
+        try:
+            # Kiro-IDEウィンドウを探す
+            windows = pyautogui.getAllWindows()
+            kiro_windows = [w for w in windows if 'kiro' in w.title.lower()]
+            
+            # Qt-Theme-StudioのKiroウィンドウを優先
+            target_window = None
+            for window in kiro_windows:
+                if 'qt-theme-studio' in window.title.lower() or 'qt-theme' in window.title.lower():
+                    target_window = window
+                    break
+            
+            if not target_window and kiro_windows:
+                target_window = kiro_windows[0]
+            
+            if not target_window:
+                logger.warning("Kiro-IDEウィンドウが見つかりません")
+                return False
+            
+            # ウィンドウを前面に移動
+            target_window.activate()
+            time.sleep(0.5)
+            
+            # ウィンドウハンドルを取得して強制フォーカス
+            hwnd = win32gui.FindWindow(None, target_window.title)
+            if hwnd:
+                win32gui.SetForegroundWindow(hwnd)
+                win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                time.sleep(0.5)
+                logger.info(f"Kiro-IDEウィンドウに強制フォーカス: {target_window.title}")
+                return True
+            else:
+                logger.warning(f"ウィンドウハンドルが見つかりません: {target_window.title}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"強制フォーカスエラー: {e}")
+            return False
+
     def send_recovery_command(self, error_type: Optional[str] = None) -> bool:
         """
         復旧コマンドを送信
@@ -175,9 +266,26 @@ class KiroAutoRecovery:
                     logger.error("チャット入力欄が見つかりません")
                     return False
 
-            # チャット入力欄をクリック
+            # Kiro-IDEウィンドウを探す（フォーカスは行わない）
+            windows = pyautogui.getAllWindows()
+            kiro_windows = [w for w in windows if 'kiro' in w.title.lower()]
+            
+            target_hwnd = None
+            for window in kiro_windows:
+                if 'qt-theme-studio' in window.title.lower() or 'qt-theme' in window.title.lower():
+                    target_hwnd = win32gui.FindWindow(None, window.title)
+                    break
+            
+            if not target_hwnd and kiro_windows:
+                target_hwnd = win32gui.FindWindow(None, kiro_windows[0].title)
+
+            if not target_hwnd:
+                logger.error("Kiro-IDEウィンドウが見つかりません")
+                return False
+
+            # チャット入力欄をクリック（フォーカスは行わない）
             pyautogui.click(chat_position[0], chat_position[1])
-            time.sleep(0.5)
+            time.sleep(1.0)
 
             # 復旧コマンドを選択
             recovery_commands = self.config["recovery_commands"]
@@ -187,12 +295,16 @@ class KiroAutoRecovery:
             if error_type and error_type in self.config.get("custom_commands", {}):
                 command = self.config["custom_commands"][error_type]
 
-            # コマンドを入力
-            pyautogui.write(command, interval=0.05)
+            # PostMessageを使用してテキストを送信
+            for char in command:
+                win32gui.PostMessage(target_hwnd, win32con.WM_CHAR, ord(char), 0)
+                time.sleep(0.1)
+            
             time.sleep(0.5)
 
-            # Enterキーで送信
-            pyautogui.press("enter")
+            # Enterキーで送信（PostMessageを使用）
+            win32gui.PostMessage(target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
+            win32gui.PostMessage(target_hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
 
             logger.info(f"復旧コマンド送信: {command}")
             return True
@@ -322,6 +434,77 @@ class KiroAutoRecovery:
         self.monitoring = False
         logger.info("監視停止要求")
 
+    def setup_hotkeys(self):
+        """ホットキーを設定"""
+        if not KEYBOARD_AVAILABLE:
+            logger.warning("keyboardライブラリが利用できません。ホットキー機能は無効です。")
+            return
+
+        try:
+            # 既存のホットキーをクリア
+            keyboard.unhook_all()
+            
+            # Ctrl + Alt + S: テンプレート保存
+            keyboard.add_hotkey('ctrl+alt+s', self.hotkey_save_template, suppress=True)
+            logger.info("ホットキー設定: Ctrl+Alt+S (テンプレート保存)")
+
+            # Ctrl + Alt + R: 手動復旧コマンド送信
+            keyboard.add_hotkey('ctrl+alt+r', self.hotkey_send_recovery, suppress=True)
+            logger.info("ホットキー設定: Ctrl+Alt+R (復旧コマンド送信)")
+
+            # Ctrl + Alt + P: 一時停止/再開
+            keyboard.add_hotkey('ctrl+alt+p', self.hotkey_toggle_pause, suppress=True)
+            logger.info("ホットキー設定: Ctrl+Alt+P (一時停止/再開)")
+
+            # Ctrl + Alt + Q: 監視停止
+            keyboard.add_hotkey('ctrl+alt+q', self.hotkey_stop_monitoring, suppress=True)
+            logger.info("ホットキー設定: Ctrl+Alt+Q (監視停止)")
+            
+            logger.info("✅ ホットキー設定完了")
+
+        except Exception as e:
+            logger.error(f"ホットキー設定エラー: {e}")
+            logger.error("ホットキー機能は無効です")
+
+    def hotkey_save_template(self):
+        """ホットキー: テンプレート保存"""
+        try:
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            template_name = f"hotkey_template_{timestamp}"
+            self.save_error_template(template_name)
+            print(f"ホットキー: テンプレート '{template_name}' を保存しました")
+        except Exception as e:
+            logger.error(f"ホットキーテンプレート保存エラー: {e}")
+
+    def hotkey_send_recovery(self):
+        """ホットキー: 手動復旧コマンド送信"""
+        try:
+            success = self.send_recovery_command()
+            if success:
+                print("ホットキー: 復旧コマンドを送信しました")
+            else:
+                print("ホットキー: 復旧コマンド送信に失敗しました")
+        except Exception as e:
+            logger.error(f"ホットキー復旧コマンド送信エラー: {e}")
+
+    def hotkey_toggle_pause(self):
+        """ホットキー: 一時停止/再開"""
+        try:
+            self.monitoring = not self.monitoring
+            status = "一時停止" if not self.monitoring else "再開"
+            print(f"ホットキー: 監視を{status}しました")
+            logger.info(f"監視{status}")
+        except Exception as e:
+            logger.error(f"ホットキー一時停止/再開エラー: {e}")
+
+    def hotkey_stop_monitoring(self):
+        """ホットキー: 監視停止"""
+        try:
+            self.stop_monitoring()
+            print("ホットキー: 監視停止要求を送信しました")
+        except Exception as e:
+            logger.error(f"ホットキー監視停止エラー: {e}")
+
     def save_error_template(
         self, template_name: str, region: Optional[Tuple[int, int, int, int]] = None
     ):
@@ -329,9 +512,17 @@ class KiroAutoRecovery:
         現在の画面からエラーテンプレートを保存
         Args:
             template_name: テンプレート名
-            region: キャプチャする領域
+            region: キャプチャする領域（Noneの場合は設定ファイルのmonitor_regionを使用）
         """
         try:
+            # regionが指定されていない場合は設定ファイルのmonitor_regionを使用
+            if region is None:
+                region = self.config.get("monitor_region")
+                if region:
+                    logger.info(f"設定ファイルの監視エリアを使用: {region}")
+                else:
+                    logger.warning("監視エリアが設定されていません。画面全体をキャプチャします。")
+            
             screenshot = self.capture_screen(region)
 
             template_path = os.path.join(
@@ -406,6 +597,15 @@ if __name__ == "__main__":
     try:
         print("Kiro-IDE自動復旧システムを開始します...")
         print("Ctrl+Cで停止")
+        print("\n=== ホットキー一覧 ===")
+        print("Ctrl+Alt+S: テンプレート保存")
+        print("Ctrl+Alt+R: 復旧コマンド送信")
+        print("Ctrl+Alt+P: 一時停止/再開")
+        print("Ctrl+Alt+Q: 監視停止")
+        print("==================\n")
+
+        # ホットキーを設定
+        recovery_system.setup_hotkeys()
 
         monitor_thread = recovery_system.start_monitoring()
 
