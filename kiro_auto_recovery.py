@@ -184,7 +184,7 @@ class KiroAutoRecovery:
         screenshot_np = np.array(screenshot)
         screenshot_gray = cv2.cvtColor(screenshot_np, cv2.COLOR_RGB2GRAY)
 
-        return screenshot_gray  # type: ignore[no-any-return]
+        return screenshot_gray
 
     def detect_error(self, screenshot: np.ndarray) -> Optional[str]:
         """
