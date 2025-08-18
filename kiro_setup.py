@@ -9,6 +9,7 @@ import os
 import time
 import tkinter as tk
 from tkinter import messagebox
+from typing import Optional
 
 import pyautogui
 import win32con
@@ -23,8 +24,8 @@ class KiroSetupApp:
         self.root.resizable(False, False)
 
         # 設定値
-        self.monitor_region = None  # [x, y, width, height]
-        self.chat_input_position = None  # [x, y]
+        self.monitor_region: Optional[list[int]] = None  # [x, y, width, height]
+        self.chat_input_position: Optional[list[int]] = None  # [x, y]
         self.config_file = "kiro_config.json"
 
         # 現在の設定を読み込み
@@ -256,6 +257,7 @@ class KiroSetupApp:
                     win32gui.SetForegroundWindow(hwnd)
                     win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
                     time.sleep(0.5)
+                    return
 
         except Exception as e:
             print(f"フォーカスエラー: {e}")
