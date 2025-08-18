@@ -76,7 +76,7 @@ class KiroAutoRecovery:
         """
         self.config = self.load_config(config_file)
         self.monitoring = False
-        self.error_templates = {}
+        self.error_templates: dict[str, np.ndarray] = {}
         self.last_error_time = 0
         self.recovery_attempts = 0
         self.max_recovery_attempts = self.config.get("max_recovery_attempts", 3)
@@ -92,7 +92,7 @@ class KiroAutoRecovery:
         # エラーテンプレート画像を読み込み
         self.load_error_templates()
 
-    def _log_library_status(self):
+    def _log_library_status(self) -> None:
         """ライブラリの利用可能性をログ出力"""
         if not PYPERCLIP_AVAILABLE:
             logger.warning(
@@ -140,7 +140,7 @@ class KiroAutoRecovery:
 
         return default_config
 
-    def load_error_templates(self):
+    def load_error_templates(self) -> None:
         """エラー検出用のテンプレート画像を読み込み"""
         templates_dir = self.config["error_templates_dir"]
         if not os.path.exists(templates_dir):
@@ -383,7 +383,7 @@ class KiroAutoRecovery:
 
         return True
 
-    def monitor_loop(self):
+    def monitor_loop(self) -> None:
         """メインの監視ループ"""
         logger.info("監視開始")
         monitor_region = self.config.get("monitor_region")
@@ -404,7 +404,7 @@ class KiroAutoRecovery:
                         logger.info(f"復旧を試行: {error_type}")
 
                         if self.send_recovery_command(error_type):
-                            self.last_error_time = current_time
+                            self.last_error_time = int(current_time)
                             self.recovery_attempts += 1
                             logger.info(
                                 f"復旧試行回数: "
@@ -453,7 +453,7 @@ class KiroAutoRecovery:
         self.monitoring = False
         logger.info("監視停止要求")
 
-    def setup_hotkeys(self):
+    def setup_hotkeys(self) -> None:
         """ホットキーを設定"""
         if not KEYBOARD_AVAILABLE:
             logger.warning(
@@ -489,7 +489,7 @@ class KiroAutoRecovery:
             logger.error(f"ホットキー設定エラー: {e}")
             logger.error("ホットキー機能は無効です")
 
-    def hotkey_save_template(self):
+    def hotkey_save_template(self) -> None:
         """ホットキー: テンプレート保存"""
         try:
             timestamp = time.strftime("%Y%m%d_%H%M%S")
@@ -499,7 +499,7 @@ class KiroAutoRecovery:
         except Exception as e:
             logger.error(f"ホットキーテンプレート保存エラー: {e}")
 
-    def hotkey_send_recovery(self):
+    def hotkey_send_recovery(self) -> None:
         """ホットキー: 手動復旧コマンド送信"""
         try:
             success = self.send_recovery_command()
@@ -510,7 +510,7 @@ class KiroAutoRecovery:
         except Exception as e:
             logger.error(f"ホットキー復旧コマンド送信エラー: {e}")
 
-    def hotkey_toggle_pause(self):
+    def hotkey_toggle_pause(self) -> None:
         """ホットキー: 一時停止/再開"""
         try:
             self.monitoring = not self.monitoring
@@ -520,7 +520,7 @@ class KiroAutoRecovery:
         except Exception as e:
             logger.error(f"ホットキー一時停止/再開エラー: {e}")
 
-    def hotkey_stop_monitoring(self):
+    def hotkey_stop_monitoring(self) -> None:
         """ホットキー: 監視停止"""
         try:
             self.stop_monitoring()
@@ -564,7 +564,7 @@ class KiroAutoRecovery:
             logger.error(f"テンプレート保存エラー: {e}")
 
 
-def create_sample_config():
+def create_sample_config() -> None:
     """サンプル設定ファイルを作成"""
     config = {
         "monitor_interval": 2.0,

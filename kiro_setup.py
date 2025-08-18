@@ -33,7 +33,7 @@ class KiroSetupApp:
         # UI作成
         self.create_ui()
 
-    def load_current_config(self):
+    def load_current_config(self) -> None:
         """現在の設定ファイルを読み込み"""
         try:
             if os.path.exists(self.config_file):
@@ -44,7 +44,7 @@ class KiroSetupApp:
         except Exception as e:
             print(f"設定ファイル読み込みエラー: {e}")
 
-    def create_ui(self):
+    def create_ui(self) -> None:
         """UIを作成"""
         # メインフレーム
         main_frame = tk.Frame(self.root, padx=20, pady=20)
@@ -140,7 +140,7 @@ class KiroSetupApp:
         # 現在の設定を表示
         self.update_display()
 
-    def set_monitor_region(self):
+    def set_monitor_region(self) -> None:
         """監視エリアを設定"""
         try:
             # ウィンドウを最小化
@@ -193,7 +193,7 @@ class KiroSetupApp:
             self.root.deiconify()
             messagebox.showerror("エラー", f"監視エリア設定エラー: {e}")
 
-    def set_chat_position(self):
+    def set_chat_position(self) -> None:
         """チャット欄位置を設定"""
         try:
             # ウィンドウを最小化
@@ -229,7 +229,7 @@ class KiroSetupApp:
             self.root.deiconify()
             messagebox.showerror("エラー", f"チャット欄設定エラー: {e}")
 
-    def force_focus_kiro(self):
+    def force_focus_kiro(self) -> None:
         """Kiro-IDEウィンドウに強制フォーカス"""
         try:
             windows = pyautogui.getAllWindows()
@@ -261,7 +261,7 @@ class KiroSetupApp:
         except Exception as e:
             print(f"フォーカスエラー: {e}")
 
-    def update_display(self):
+    def update_display(self) -> None:
         """表示を更新"""
         # 監視エリア表示
         if self.monitor_region:
@@ -285,7 +285,7 @@ class KiroSetupApp:
         else:
             self.save_btn.config(state=tk.DISABLED)
 
-    def save_config(self):
+    def save_config(self) -> None:
         """設定を保存"""
         try:
             # 現在の設定を読み込み
@@ -307,7 +307,7 @@ class KiroSetupApp:
         except Exception as e:
             messagebox.showerror("エラー", f"設定保存エラー: {e}")
 
-    def test_recovery(self):
+    def test_recovery(self) -> None:
         """復旧コマンドテスト"""
         if not self.chat_input_position:
             messagebox.showwarning("警告", "チャット欄位置が設定されていません")
@@ -349,12 +349,12 @@ class KiroSetupApp:
             self.root.deiconify()
             messagebox.showerror("エラー", f"テストエラー: {e}")
 
-    def run(self):
+    def run(self) -> None:
         """アプリを実行"""
         self.root.mainloop()
 
 
-def main():
+def main() -> None:
     """メイン関数"""
     app = KiroSetupApp()
     app.run()
