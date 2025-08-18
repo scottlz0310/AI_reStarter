@@ -9,7 +9,7 @@ import logging
 import os
 import threading
 import time
-from typing import Optional, Tuple
+from typing import Optional
 
 import cv2
 import numpy as np
@@ -161,7 +161,7 @@ class KiroAutoRecovery:
                     logger.error(f"テンプレート読み込みエラー {filename}: {e}")
 
     def capture_screen(
-        self, region: Optional[Tuple[int, int, int, int]] = None
+        self, region: Optional[tuple[int, int, int, int]] = None
     ) -> np.ndarray:
         """
         画面をキャプチャ
@@ -184,7 +184,7 @@ class KiroAutoRecovery:
         screenshot_np = np.array(screenshot)
         screenshot_gray = cv2.cvtColor(screenshot_np, cv2.COLOR_RGB2GRAY)
 
-        return screenshot_gray
+        return screenshot_gray  # type: ignore[no-any-return]
 
     def detect_error(self, screenshot: np.ndarray) -> Optional[str]:
         """
@@ -332,7 +332,7 @@ class KiroAutoRecovery:
             logger.error(f"復旧コマンド送信エラー: {e}")
             return False
 
-    def find_chat_input(self) -> Optional[Tuple[int, int]]:
+    def find_chat_input(self) -> Optional[tuple[int, int]]:
         """
         チャット入力欄を自動検出
         Returns:
@@ -353,7 +353,7 @@ class KiroAutoRecovery:
                 )
                 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-                if max_val >= 0.7:
+                if max_val >= 0.7 and chat_template is not None:
                     # テンプレートの中心座標を返す
                     h, w = chat_template.shape
                     center_x = max_loc[0] + w // 2
@@ -428,15 +428,15 @@ class KiroAutoRecovery:
 
         logger.info("監視終了")
 
-    def start_monitoring(self):
+    def start_monitoring(self) -> Optional[threading.Thread]:
         """監視開始"""
         if self.monitoring:
             logger.warning("既に監視中です")
-            return
+            return None
 
         if not self.error_templates:
             logger.warning("エラーテンプレートが読み込まれていません")
-            return
+            return None
 
         self.monitoring = True
         self.recovery_attempts = 0
@@ -448,7 +448,7 @@ class KiroAutoRecovery:
 
         return monitor_thread
 
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> None:
         """監視停止"""
         self.monitoring = False
         logger.info("監視停止要求")
@@ -529,8 +529,8 @@ class KiroAutoRecovery:
             logger.error(f"ホットキー監視停止エラー: {e}")
 
     def save_error_template(
-        self, template_name: str, region: Optional[Tuple[int, int, int, int]] = None
-    ):
+        self, template_name: str, region: Optional[tuple[int, int, int, int]] = None
+    ) -> None:
         """
         現在の画面からエラーテンプレートを保存
         Args:
