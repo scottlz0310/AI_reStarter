@@ -16,7 +16,7 @@ import win32gui
 
 
 class KiroSetupApp:
-    def __init__(self):
+    def __init__(self) -> None:
         self.root = tk.Tk()
         self.root.title("Kiro-IDE自動復旧システム設定")
         self.root.geometry("600x500")
