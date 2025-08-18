@@ -219,8 +219,7 @@ class KiroSetupApp:
 
             messagebox.showinfo(
                 "設定完了",
-                f"チャット欄位置を設定しました:\n"
-                f"位置: ({chat_pos.x}, {chat_pos.y})",
+                f"チャット欄位置を設定しました:\n位置: ({chat_pos.x}, {chat_pos.y})",
             )
 
             self.update_display()
@@ -323,8 +322,7 @@ class KiroSetupApp:
 
             messagebox.showinfo(
                 "テスト実行",
-                "復旧コマンドテストを実行します\n"
-                "OKを押すと3秒後にテストを開始します",
+                "復旧コマンドテストを実行します\nOKを押すと3秒後にテストを開始します",
             )
 
             time.sleep(3)
