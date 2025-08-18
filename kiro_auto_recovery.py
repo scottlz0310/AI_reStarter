@@ -595,6 +595,7 @@ def create_sample_config() -> None:
 
 if __name__ == "__main__":
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(description="Kiro-IDE自動復旧システム")
     parser.add_argument(
@@ -607,7 +608,7 @@ if __name__ == "__main__":
 
     if args.create_config:
         create_sample_config()
-        exit(0)
+        sys.exit(0)
 
     # 自動復旧システムを初期化
     recovery_system = KiroAutoRecovery(args.config)
@@ -617,7 +618,7 @@ if __name__ == "__main__":
         time.sleep(5)
         recovery_system.save_error_template(args.template)
         logger.info("テンプレート保存完了")
-        exit(0)
+        sys.exit(0)
 
     try:
         logger.info("Kiro-IDE自動復旧システムを開始します...")
