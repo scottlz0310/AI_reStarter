@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 KiroAutoRecoveryクラスのテスト
 """
@@ -159,7 +158,7 @@ class TestCreateSampleConfig(unittest.TestCase):
                 self.assertTrue(os.path.exists("kiro_config.json"))
 
                 # 設定内容を確認
-                with open("kiro_config.json", "r", encoding="utf-8") as f:
+                with open("kiro_config.json", encoding="utf-8") as f:
                     config = json.load(f)
 
                 self.assertEqual(config["monitor_interval"], 2.0)

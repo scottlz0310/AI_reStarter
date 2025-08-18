@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Kiro-IDE自動復旧システム
 エラー発生時に画面キャプチャで検知し、自動でチャット再開指示を送信
@@ -18,39 +17,33 @@ import numpy as np
 # pyperclipライブラリを条件付きでインポート（クリップボード入力用）
 try:
     import pyperclip
+
     PYPERCLIP_AVAILABLE = True
 except ImportError:
     PYPERCLIP_AVAILABLE = False
-    print("警告: pyperclipが利用できません。クリップボード入力機能は無効です。")
-except Exception as e:
+except Exception:
     PYPERCLIP_AVAILABLE = False
-    print(f"警告: pyperclipの初期化に失敗しました: {e}")
-    print("クリップボード入力機能は無効です。")
 
 # keyboardライブラリを条件付きでインポート
 try:
     import keyboard
+
     KEYBOARD_AVAILABLE = True
 except ImportError:
     KEYBOARD_AVAILABLE = False
-    print("警告: keyboardライブラリが利用できません。ホットキー機能は無効です。")
-except Exception as e:
+except Exception:
     KEYBOARD_AVAILABLE = False
-    print(f"警告: keyboardライブラリの初期化に失敗しました: {e}")
-    print("ホットキー機能は無効です。")
 
 # win32guiライブラリを条件付きでインポート（Windows環境でのフォーカス制御）
 try:
-    import win32gui
     import win32con
+    import win32gui
+
     WIN32GUI_AVAILABLE = True
 except ImportError:
     WIN32GUI_AVAILABLE = False
-    print("警告: win32guiが利用できません。強制フォーカス機能は無効です。")
-except Exception as e:
+except Exception:
     WIN32GUI_AVAILABLE = False
-    print(f"警告: win32guiの初期化に失敗しました: {e}")
-    print("強制フォーカス機能は無効です。")
 
 # pyautoguiは条件付きでインポート（WSL環境での問題回避）
 try:
@@ -59,11 +52,8 @@ try:
     PYAUTOGUI_AVAILABLE = True
 except ImportError:
     PYAUTOGUI_AVAILABLE = False
-    print("警告: pyautoguiが利用できません。画面キャプチャ機能は無効です。")
-except Exception as e:
+except Exception:
     PYAUTOGUI_AVAILABLE = False
-    print(f"警告: pyautoguiの初期化に失敗しました: {e}")
-    print("画面キャプチャ機能は無効です。")
 
 # ログ設定
 logging.basicConfig(
@@ -91,6 +81,9 @@ class KiroAutoRecovery:
         self.recovery_attempts = 0
         self.max_recovery_attempts = self.config.get("max_recovery_attempts", 3)
 
+        # ライブラリ利用可能性をログ出力
+        self._log_library_status()
+
         # PyAutoGUIの設定
         if PYAUTOGUI_AVAILABLE:
             pyautogui.PAUSE = self.config.get("action_delay", 0.5)
@@ -98,6 +91,21 @@ class KiroAutoRecovery:
 
         # エラーテンプレート画像を読み込み
         self.load_error_templates()
+
+    def _log_library_status(self):
+        """ライブラリの利用可能性をログ出力"""
+        if not PYPERCLIP_AVAILABLE:
+            logger.warning(
+                "pyperclipが利用できません。クリップボード入力機能は無効です。"
+            )
+        if not KEYBOARD_AVAILABLE:
+            logger.warning(
+                "keyboardライブラリが利用できません。ホットキー機能は無効です。"
+            )
+        if not WIN32GUI_AVAILABLE:
+            logger.warning("win32guiが利用できません。強制フォーカス機能は無効です。")
+        if not PYAUTOGUI_AVAILABLE:
+            logger.warning("pyautoguiが利用できません。画面キャプチャ機能は無効です。")
 
     def load_config(self, config_file: str) -> dict:
         """設定ファイルを読み込み"""
@@ -124,7 +132,7 @@ class KiroAutoRecovery:
 
         try:
             if os.path.exists(config_file):
-                with open(config_file, "r", encoding="utf-8") as f:
+                with open(config_file, encoding="utf-8") as f:
                     user_config = json.load(f)
                     default_config.update(user_config)
         except Exception as e:
@@ -206,44 +214,50 @@ class KiroAutoRecovery:
             フォーカス成功フラグ
         """
         if not WIN32GUI_AVAILABLE:
-            logger.warning("win32guiが利用できません。強制フォーカスをスキップします。")
             return False
-        
+
         try:
             # Kiro-IDEウィンドウを探す
             windows = pyautogui.getAllWindows()
-            kiro_windows = [w for w in windows if 'kiro' in w.title.lower()]
-            
+            kiro_windows = [w for w in windows if "kiro" in w.title.lower()]
+
             # Qt-Theme-StudioのKiroウィンドウを優先
             target_window = None
             for window in kiro_windows:
-                if 'qt-theme-studio' in window.title.lower() or 'qt-theme' in window.title.lower():
+                if (
+                    "qt-theme-studio" in window.title.lower()
+                    or "qt-theme" in window.title.lower()
+                ):
                     target_window = window
                     break
-            
+
             if not target_window and kiro_windows:
                 target_window = kiro_windows[0]
-            
+
             if not target_window:
                 logger.warning("Kiro-IDEウィンドウが見つかりません")
                 return False
-            
+
             # ウィンドウを前面に移動
             target_window.activate()
             time.sleep(0.5)
-            
+
             # ウィンドウハンドルを取得して強制フォーカス
             hwnd = win32gui.FindWindow(None, target_window.title)
             if hwnd:
                 win32gui.SetForegroundWindow(hwnd)
                 win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
                 time.sleep(0.5)
-                logger.info(f"Kiro-IDEウィンドウに強制フォーカス: {target_window.title}")
+                logger.info(
+                    f"Kiro-IDEウィンドウに強制フォーカス: {target_window.title}"
+                )
                 return True
             else:
-                logger.warning(f"ウィンドウハンドルが見つかりません: {target_window.title}")
+                logger.warning(
+                    f"ウィンドウハンドルが見つかりません: {target_window.title}"
+                )
                 return False
-                
+
         except Exception as e:
             logger.error(f"強制フォーカスエラー: {e}")
             return False
@@ -268,14 +282,17 @@ class KiroAutoRecovery:
 
             # Kiro-IDEウィンドウを探す（フォーカスは行わない）
             windows = pyautogui.getAllWindows()
-            kiro_windows = [w for w in windows if 'kiro' in w.title.lower()]
-            
+            kiro_windows = [w for w in windows if "kiro" in w.title.lower()]
+
             target_hwnd = None
             for window in kiro_windows:
-                if 'qt-theme-studio' in window.title.lower() or 'qt-theme' in window.title.lower():
+                if (
+                    "qt-theme-studio" in window.title.lower()
+                    or "qt-theme" in window.title.lower()
+                ):
                     target_hwnd = win32gui.FindWindow(None, window.title)
                     break
-            
+
             if not target_hwnd and kiro_windows:
                 target_hwnd = win32gui.FindWindow(None, kiro_windows[0].title)
 
@@ -299,11 +316,13 @@ class KiroAutoRecovery:
             for char in command:
                 win32gui.PostMessage(target_hwnd, win32con.WM_CHAR, ord(char), 0)
                 time.sleep(0.1)
-            
+
             time.sleep(0.5)
 
             # Enterキーで送信（PostMessageを使用）
-            win32gui.PostMessage(target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
+            win32gui.PostMessage(
+                target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0
+            )
             win32gui.PostMessage(target_hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
 
             logger.info(f"復旧コマンド送信: {command}")
@@ -437,29 +456,33 @@ class KiroAutoRecovery:
     def setup_hotkeys(self):
         """ホットキーを設定"""
         if not KEYBOARD_AVAILABLE:
-            logger.warning("keyboardライブラリが利用できません。ホットキー機能は無効です。")
+            logger.warning(
+                "keyboardライブラリが利用できません。ホットキー機能は無効です。"
+            )
             return
 
         try:
             # 既存のホットキーをクリア
             keyboard.unhook_all()
-            
+
             # Ctrl + Alt + S: テンプレート保存
-            keyboard.add_hotkey('ctrl+alt+s', self.hotkey_save_template, suppress=True)
+            keyboard.add_hotkey("ctrl+alt+s", self.hotkey_save_template, suppress=True)
             logger.info("ホットキー設定: Ctrl+Alt+S (テンプレート保存)")
 
             # Ctrl + Alt + R: 手動復旧コマンド送信
-            keyboard.add_hotkey('ctrl+alt+r', self.hotkey_send_recovery, suppress=True)
+            keyboard.add_hotkey("ctrl+alt+r", self.hotkey_send_recovery, suppress=True)
             logger.info("ホットキー設定: Ctrl+Alt+R (復旧コマンド送信)")
 
             # Ctrl + Alt + P: 一時停止/再開
-            keyboard.add_hotkey('ctrl+alt+p', self.hotkey_toggle_pause, suppress=True)
+            keyboard.add_hotkey("ctrl+alt+p", self.hotkey_toggle_pause, suppress=True)
             logger.info("ホットキー設定: Ctrl+Alt+P (一時停止/再開)")
 
             # Ctrl + Alt + Q: 監視停止
-            keyboard.add_hotkey('ctrl+alt+q', self.hotkey_stop_monitoring, suppress=True)
+            keyboard.add_hotkey(
+                "ctrl+alt+q", self.hotkey_stop_monitoring, suppress=True
+            )
             logger.info("ホットキー設定: Ctrl+Alt+Q (監視停止)")
-            
+
             logger.info("✅ ホットキー設定完了")
 
         except Exception as e:
@@ -472,7 +495,7 @@ class KiroAutoRecovery:
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             template_name = f"hotkey_template_{timestamp}"
             self.save_error_template(template_name)
-            print(f"ホットキー: テンプレート '{template_name}' を保存しました")
+            logger.info(f"ホットキー: テンプレート '{template_name}' を保存しました")
         except Exception as e:
             logger.error(f"ホットキーテンプレート保存エラー: {e}")
 
@@ -481,9 +504,9 @@ class KiroAutoRecovery:
         try:
             success = self.send_recovery_command()
             if success:
-                print("ホットキー: 復旧コマンドを送信しました")
+                logger.info("ホットキー: 復旧コマンドを送信しました")
             else:
-                print("ホットキー: 復旧コマンド送信に失敗しました")
+                logger.warning("ホットキー: 復旧コマンド送信に失敗しました")
         except Exception as e:
             logger.error(f"ホットキー復旧コマンド送信エラー: {e}")
 
@@ -492,7 +515,7 @@ class KiroAutoRecovery:
         try:
             self.monitoring = not self.monitoring
             status = "一時停止" if not self.monitoring else "再開"
-            print(f"ホットキー: 監視を{status}しました")
+            logger.info(f"ホットキー: 監視を{status}しました")
             logger.info(f"監視{status}")
         except Exception as e:
             logger.error(f"ホットキー一時停止/再開エラー: {e}")
@@ -501,7 +524,7 @@ class KiroAutoRecovery:
         """ホットキー: 監視停止"""
         try:
             self.stop_monitoring()
-            print("ホットキー: 監視停止要求を送信しました")
+            logger.info("ホットキー: 監視停止要求を送信しました")
         except Exception as e:
             logger.error(f"ホットキー監視停止エラー: {e}")
 
@@ -521,8 +544,10 @@ class KiroAutoRecovery:
                 if region:
                     logger.info(f"設定ファイルの監視エリアを使用: {region}")
                 else:
-                    logger.warning("監視エリアが設定されていません。画面全体をキャプチャします。")
-            
+                    logger.warning(
+                        "監視エリアが設定されていません。画面全体をキャプチャします。"
+                    )
+
             screenshot = self.capture_screen(region)
 
             template_path = os.path.join(
@@ -565,7 +590,7 @@ def create_sample_config():
     with open("kiro_config.json", "w", encoding="utf-8") as f:
         json.dump(config, f, ensure_ascii=False, indent=2)
 
-    print("サンプル設定ファイル 'kiro_config.json' を作成しました")
+    logger.info("サンプル設定ファイル 'kiro_config.json' を作成しました")
 
 
 if __name__ == "__main__":
@@ -588,21 +613,21 @@ if __name__ == "__main__":
     recovery_system = KiroAutoRecovery(args.config)
 
     if args.template:
-        print(f"5秒後にエラーテンプレート '{args.template}' を保存します...")
+        logger.info(f"5秒後にエラーテンプレート '{args.template}' を保存します...")
         time.sleep(5)
         recovery_system.save_error_template(args.template)
-        print("テンプレート保存完了")
+        logger.info("テンプレート保存完了")
         exit(0)
 
     try:
-        print("Kiro-IDE自動復旧システムを開始します...")
-        print("Ctrl+Cで停止")
-        print("\n=== ホットキー一覧 ===")
-        print("Ctrl+Alt+S: テンプレート保存")
-        print("Ctrl+Alt+R: 復旧コマンド送信")
-        print("Ctrl+Alt+P: 一時停止/再開")
-        print("Ctrl+Alt+Q: 監視停止")
-        print("==================\n")
+        logger.info("Kiro-IDE自動復旧システムを開始します...")
+        logger.info("Ctrl+Cで停止")
+        logger.info("\n=== ホットキー一覧 ===")
+        logger.info("Ctrl+Alt+S: テンプレート保存")
+        logger.info("Ctrl+Alt+R: 復旧コマンド送信")
+        logger.info("Ctrl+Alt+P: 一時停止/再開")
+        logger.info("Ctrl+Alt+Q: 監視停止")
+        logger.info("==================\n")
 
         # ホットキーを設定
         recovery_system.setup_hotkeys()
@@ -614,9 +639,9 @@ if __name__ == "__main__":
             time.sleep(1)
 
     except KeyboardInterrupt:
-        print("\n停止中...")
+        logger.info("\n停止中...")
         recovery_system.stop_monitoring()
     except Exception as e:
         logger.error(f"システムエラー: {e}")
 
-    print("システムを終了しました")
+    logger.info("システムを終了しました")

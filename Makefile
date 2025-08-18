@@ -18,15 +18,18 @@ test-cov: ## カバレッジ付きでテストを実行
 	pytest --cov=kiro_auto_recovery --cov-report=html --cov-report=term-missing
 
 lint: ## コード品質チェックを実行
+	ruff check .
 	flake8 kiro_auto_recovery.py
 	pylint kiro_auto_recovery.py
 	mypy kiro_auto_recovery.py
 
 format: ## コードフォーマットを実行
+	ruff format .
 	black kiro_auto_recovery.py
 	isort kiro_auto_recovery.py
 
 format-check: ## フォーマットチェックを実行
+	ruff check --diff .
 	black --check kiro_auto_recovery.py
 	isort --check-only kiro_auto_recovery.py
 
