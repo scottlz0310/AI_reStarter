@@ -1,6 +1,7 @@
 """
 コア機能のテスト（カバレッジ向上）
 """
+
 import os
 import tempfile
 import threading
@@ -26,13 +27,13 @@ class TestCoreFunctions:
         mock_pyautogui.screenshot.return_value = mock_screenshot
         mock_array = np.zeros((100, 100, 3), dtype=np.uint8)
         mock_gray = np.zeros((100, 100), dtype=np.uint8)
-        
+
         with patch("numpy.array", return_value=mock_array):
             mock_cv2.cvtColor.return_value = mock_gray
-            
+
             recovery = KiroAutoRecovery()
             result = recovery.capture_screen((10, 20, 100, 200))
-            
+
             mock_pyautogui.screenshot.assert_called_once_with(region=(10, 20, 100, 200))
             mock_cv2.cvtColor.assert_called_once()
             assert isinstance(result, np.ndarray)
@@ -46,13 +47,13 @@ class TestCoreFunctions:
         mock_pyautogui.screenshot.return_value = mock_screenshot
         mock_array = np.zeros((100, 100, 3), dtype=np.uint8)
         mock_gray = np.zeros((100, 100), dtype=np.uint8)
-        
+
         with patch("numpy.array", return_value=mock_array):
             mock_cv2.cvtColor.return_value = mock_gray
-            
+
             recovery = KiroAutoRecovery()
             result = recovery.capture_screen()
-            
+
             mock_pyautogui.screenshot.assert_called_once_with()
             assert isinstance(result, np.ndarray)
 
@@ -60,7 +61,7 @@ class TestCoreFunctions:
     def test_capture_screen_unavailable(self):
         """pyautogui利用不可時のテスト"""
         recovery = KiroAutoRecovery()
-        
+
         with pytest.raises(RuntimeError, match="pyautoguiが利用できません"):
             recovery.capture_screen()
 
@@ -68,17 +69,15 @@ class TestCoreFunctions:
     def test_detect_error_found(self, mock_cv2):
         """エラー検出（発見）のテスト"""
         recovery = KiroAutoRecovery()
-        recovery.error_templates = {
-            "test_error": np.zeros((50, 50), dtype=np.uint8)
-        }
-        
+        recovery.error_templates = {"test_error": np.zeros((50, 50), dtype=np.uint8)}
+
         # マッチング結果をモック
         mock_cv2.matchTemplate.return_value = np.array([[0.9]])
         mock_cv2.minMaxLoc.return_value = (0.1, 0.9, (0, 0), (10, 10))
-        
+
         screenshot = np.zeros((100, 100), dtype=np.uint8)
         result = recovery.detect_error(screenshot)
-        
+
         assert result == "test_error"
         mock_cv2.matchTemplate.assert_called_once()
 
@@ -86,17 +85,15 @@ class TestCoreFunctions:
     def test_detect_error_not_found(self, mock_cv2):
         """エラー検出（未発見）のテスト"""
         recovery = KiroAutoRecovery()
-        recovery.error_templates = {
-            "test_error": np.zeros((50, 50), dtype=np.uint8)
-        }
-        
+        recovery.error_templates = {"test_error": np.zeros((50, 50), dtype=np.uint8)}
+
         # 低い信頼度でモック
         mock_cv2.matchTemplate.return_value = np.array([[0.5]])
         mock_cv2.minMaxLoc.return_value = (0.1, 0.5, (0, 0), (10, 10))
-        
+
         screenshot = np.zeros((100, 100), dtype=np.uint8)
         result = recovery.detect_error(screenshot)
-        
+
         assert result is None
 
     def test_should_attempt_recovery_cooldown(self):
@@ -104,7 +101,7 @@ class TestCoreFunctions:
         recovery = KiroAutoRecovery()
         recovery.last_error_time = time.time()  # 現在時刻
         recovery.recovery_attempts = 0
-        
+
         result = recovery.should_attempt_recovery()
         assert result is False
 
@@ -114,7 +111,7 @@ class TestCoreFunctions:
         recovery.last_error_time = 0  # 十分古い時刻
         recovery.recovery_attempts = 3  # 最大値
         recovery.max_recovery_attempts = 3
-        
+
         result = recovery.should_attempt_recovery()
         assert result is False
 
@@ -124,7 +121,7 @@ class TestCoreFunctions:
         recovery.last_error_time = 0  # 十分古い時刻
         recovery.recovery_attempts = 1
         recovery.max_recovery_attempts = 3
-        
+
         result = recovery.should_attempt_recovery()
         assert result is True
 
@@ -136,15 +133,15 @@ class TestCoreFunctions:
         """復旧コマンド送信（成功）のテスト"""
         recovery = KiroAutoRecovery()
         recovery.config["chat_input_position"] = [100, 200]
-        
+
         # ウィンドウ検索のモック
         mock_window = Mock()
         mock_window.title = "Kiro Test Window"
         mock_pyautogui.getAllWindows.return_value = [mock_window]
         mock_win32gui.FindWindow.return_value = 12345
-        
+
         result = recovery.send_recovery_command("test_error")
-        
+
         assert result is True
         mock_pyautogui.click.assert_called_once_with(100, 200)
 
@@ -154,11 +151,11 @@ class TestCoreFunctions:
         """復旧コマンド送信（チャット位置なし）のテスト"""
         recovery = KiroAutoRecovery()
         recovery.config["chat_input_position"] = None
-        
+
         # find_chat_inputが失敗するようにモック
         with patch.object(recovery, "find_chat_input", return_value=None):
             result = recovery.send_recovery_command()
-            
+
             assert result is False
 
     @patch("kiro_auto_recovery.os.path.exists")
@@ -167,18 +164,22 @@ class TestCoreFunctions:
         """チャット入力欄検出（成功）のテスト"""
         recovery = KiroAutoRecovery()
         mock_exists.return_value = True
-        
+
         # テンプレート読み込みのモック
         mock_template = np.zeros((30, 100), dtype=np.uint8)
         mock_cv2.imread.return_value = mock_template
-        
+
         # マッチング結果のモック
         mock_cv2.matchTemplate.return_value = np.array([[0.8]])
         mock_cv2.minMaxLoc.return_value = (0.1, 0.8, (0, 0), (50, 15))
-        
-        with patch.object(recovery, "capture_screen", return_value=np.zeros((200, 300), dtype=np.uint8)):
+
+        with patch.object(
+            recovery,
+            "capture_screen",
+            return_value=np.zeros((200, 300), dtype=np.uint8),
+        ):
             result = recovery.find_chat_input()
-            
+
             assert result == (100, 30)  # 中心座標
 
     @patch("kiro_auto_recovery.os.path.exists")
@@ -186,7 +187,7 @@ class TestCoreFunctions:
         """チャット入力欄検出（テンプレートなし）のテスト"""
         recovery = KiroAutoRecovery()
         mock_exists.return_value = False
-        
+
         result = recovery.find_chat_input()
         assert result is None
 
@@ -194,7 +195,7 @@ class TestCoreFunctions:
         """監視開始（既に実行中）のテスト"""
         recovery = KiroAutoRecovery()
         recovery.monitoring = True
-        
+
         result = recovery.start_monitoring()
         assert result is None
 
@@ -203,7 +204,7 @@ class TestCoreFunctions:
         recovery = KiroAutoRecovery()
         recovery.monitoring = False
         recovery.error_templates = {}
-        
+
         result = recovery.start_monitoring()
         assert result is None
 
@@ -212,10 +213,10 @@ class TestCoreFunctions:
         recovery = KiroAutoRecovery()
         recovery.monitoring = False
         recovery.error_templates = {"test": np.zeros((10, 10))}
-        
+
         with patch.object(recovery, "monitor_loop"):
             result = recovery.start_monitoring()
-            
+
             assert isinstance(result, threading.Thread)
             assert recovery.monitoring is True
             assert recovery.recovery_attempts == 0
@@ -224,7 +225,7 @@ class TestCoreFunctions:
         """監視停止のテスト"""
         recovery = KiroAutoRecovery()
         recovery.monitoring = True
-        
+
         recovery.stop_monitoring()
         assert recovery.monitoring is False
 
@@ -234,12 +235,12 @@ class TestCoreFunctions:
         with tempfile.TemporaryDirectory() as temp_dir:
             recovery = KiroAutoRecovery()
             recovery.config["error_templates_dir"] = temp_dir
-            
+
             mock_screenshot = np.zeros((100, 100), dtype=np.uint8)
-            
+
             with patch.object(recovery, "capture_screen", return_value=mock_screenshot):
                 recovery.save_error_template("test_template", (10, 20, 100, 200))
-                
+
                 mock_cv2.imwrite.assert_called_once()
                 assert "test_template" in recovery.error_templates
 
@@ -250,10 +251,10 @@ class TestCoreFunctions:
             recovery = KiroAutoRecovery()
             recovery.config["error_templates_dir"] = temp_dir
             recovery.config["monitor_region"] = [0, 0, 800, 600]
-            
+
             mock_screenshot = np.zeros((100, 100), dtype=np.uint8)
-            
+
             with patch.object(recovery, "capture_screen", return_value=mock_screenshot):
                 recovery.save_error_template("test_template")
-                
+
                 mock_cv2.imwrite.assert_called_once()
