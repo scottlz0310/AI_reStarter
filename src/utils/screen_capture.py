@@ -22,14 +22,14 @@ except Exception:
 
 class ScreenCapture:
     """画面キャプチャ機能クラス"""
-    
+
     def __init__(self):
         """初期化"""
         if not PYAUTOGUI_AVAILABLE:
             logger.warning("pyautoguiが利用できません。画面キャプチャ機能は無効です。")
         else:
             logger.info("画面キャプチャ機能を初期化しました")
-    
+
     def capture_screen(
         self, region: Optional[tuple[int, int, int, int]] = None
     ) -> np.ndarray:
@@ -58,11 +58,11 @@ class ScreenCapture:
             screenshot_gray = self._convert_to_grayscale(screenshot_np)
 
             return cast(np.ndarray, screenshot_gray)
-            
+
         except Exception as e:
             logger.error(f"画面キャプチャエラー: {e}")
             raise
-    
+
     def _convert_to_grayscale(self, image: np.ndarray) -> np.ndarray:
         """画像をグレースケールに変換"""
         try:
@@ -78,16 +78,16 @@ class ScreenCapture:
         except Exception as e:
             logger.error(f"グレースケール変換エラー: {e}")
             return image
-    
+
     def is_available(self) -> bool:
         """画面キャプチャ機能が利用可能かチェック"""
         return PYAUTOGUI_AVAILABLE
-    
+
     def get_screen_size(self) -> Optional[tuple[int, int]]:
         """画面サイズを取得"""
         if not PYAUTOGUI_AVAILABLE:
             return None
-        
+
         try:
             width, height = pyautogui.size()
             return (width, height)

@@ -30,7 +30,7 @@ def main():
         
         # ルートウィンドウの作成
         root = tk.Tk()
-        root.title("AI reStarter - Kiro-IDE自動復旧システム")
+        root.title("AI reStarter - AI-IDE自動復旧システム")
         root.geometry("800x600")
         
         # メインウィンドウの作成
