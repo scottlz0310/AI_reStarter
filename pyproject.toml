@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kiro-auto-recovery"
+name = "ai-restarter"
 version = "0.1.0"
-description = "Kiro-IDE自動復旧システム"
+description = "AI reStarter - Kiro-IDE自動復旧システム"
 authors = [{name = "Kiro Development Team"}]
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 
 
-keywords = ["kiro", "auto-recovery", "screen-capture", "error-detection"]
+keywords = ["ai", "restarter", "kiro", "auto-recovery", "screen-capture", "error-detection"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

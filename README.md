@@ -1,4 +1,4 @@
-# Kiro-IDE自動復旧システム
+# AI reStarter - Kiro-IDE自動復旧システム
 
 Kiro-IDEでエラーが発生した際に、画面キャプチャでエラーを自動検知し、チャットに復旧コマンドを自動送信するシステムです。
 
@@ -23,7 +23,7 @@ Kiro-IDEでエラーが発生した際に、画面キャプチャでエラーを
 1. リポジトリをクローン
 ```bash
 git clone <repository-url>
-cd Kiro-Auto_Recovery
+cd AI_reStarter
 ```
 
 2. 仮想環境を作成・有効化
@@ -191,7 +191,7 @@ make help
 ## プロジェクト構造
 
 ```
-Kiro-Auto_Recovery/
+AI_reStarter/
 ├── kiro_auto_recovery.py    # メインスクリプト
 ├── kiro_setup.py           # 設定GUIアプリケーション
 ├── kiro_config.json        # 設定ファイル
