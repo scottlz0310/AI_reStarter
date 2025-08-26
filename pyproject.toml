@@ -31,6 +31,7 @@ dependencies = [
     "keyboard>=0.13.5",
     "pywin32>=306; sys_platform == 'win32'",
     "pyperclip>=1.8.2",
+
 ]
 
 [project.optional-dependencies]
@@ -50,6 +51,7 @@ dev = [
     "sphinx-rtd-theme>=2.0.0",
     "ipython>=8.21.0",
     "memory-profiler>=0.61.0",
+
 ]
 test = [
     "pytest>=8.0.0",
