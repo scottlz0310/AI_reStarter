@@ -26,7 +26,20 @@ class TemplateManager:
         self.template_folder = self.config_manager.get("screenshot_folder", "error_templates")
         self.templates: list[dict[str, Any]] = []
 
+        self.active_tab_mode = "kiro"  # デフォルトはKiro-IDEタブ
         logger.debug("テンプレート管理GUIを初期化しました")
+    
+    def set_active_tab(self, tab_mode: str):
+        """アクティブにするタブを設定
+        
+        Args:
+            tab_mode: アクティブにするタブ ("kiro" or "amazonq")
+        """
+        if tab_mode in ["kiro", "amazonq"]:
+            self.active_tab_mode = tab_mode
+            logger.debug(f"アクティブタブを設定: {tab_mode}")
+        else:
+            logger.warning(f"無効なタブモード: {tab_mode}")
 
     def create_tab_control(self, parent):
         """タブコントロールを作成"""
@@ -45,6 +58,13 @@ class TemplateManager:
         
         # ステータスバー
         self.create_status_bar(parent)
+        
+        # アクティブタブを設定
+        if hasattr(self, 'active_tab_mode'):
+            if self.active_tab_mode == "amazonq":
+                self.notebook.select(1)  # AmazonQタブを選択
+            else:
+                self.notebook.select(0)  # Kiro-IDEタブを選択
     
     def setup_kiro_tab(self):
         """従来のKiro-IDEタブのセットアップ"""

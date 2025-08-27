@@ -444,7 +444,7 @@ class KiroRecovery:
         region: Optional[tuple[int, int, int, int]] = None
     ) -> bool:
         """
-        現在の画面からエラーテンプレートを保存
+        現在の画面からテンプレートを保存（モードに応じたディレクトリを使用）
         Args:
             template_name: テンプレート名
             region: キャプチャする領域（Noneの場合は設定ファイルのmonitor_regionを使用）
@@ -466,15 +466,33 @@ class KiroRecovery:
 
             screenshot = self.screen_capture.capture_screen(region)
 
-            templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
-            template_path = os.path.join(templates_dir, f"{template_name}.png")
-
-            if self.image_processor.save_template(screenshot, template_path):
-                # テンプレートを再読み込み
-                self.reload_error_templates()
-                return True
+            # 現在のモードに応じてテンプレート保存先を決定
+            current_mode = self.mode_manager.get_current_mode()
+            if current_mode == "amazonq":
+                # AmazonQモードの場合はamazonq_templatesディレクトリを使用
+                templates_dir = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+                # AmazonQ検出器にテンプレートを追加
+                amazonq_detector = self.mode_manager.get_detector("amazonq")
+                if amazonq_detector:
+                    success = amazonq_detector.add_template(template_name, screenshot)
+                    if success:
+                        logger.info(f"AmazonQテンプレート保存成功: {template_name}")
+                    return success
+                else:
+                    logger.error("AmazonQ検出器が見つかりません")
+                    return False
             else:
-                return False
+                # Kiroモードまたは自動モードの場合はerror_templatesディレクトリを使用
+                templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+                template_path = os.path.join(templates_dir, f"{template_name}.png")
+
+                if self.image_processor.save_template(screenshot, template_path):
+                    # テンプレートを再読み込み
+                    self.reload_error_templates()
+                    logger.info(f"Kiroテンプレート保存成功: {template_name}")
+                    return True
+                else:
+                    return False
 
         except Exception as e:
             logger.error(f"テンプレート保存エラー: {e}")
@@ -482,26 +500,47 @@ class KiroRecovery:
 
     def delete_error_template(self, template_name: str) -> bool:
         """
-        エラーテンプレートを削除
+        テンプレートを削除（モードに応じたディレクトリから）
         Args:
             template_name: 削除するテンプレート名
         Returns:
             削除成功フラグ
         """
         try:
-            templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
-            template_path = os.path.join(templates_dir, f"{template_name}.png")
-            
-            if os.path.exists(template_path):
-                os.remove(template_path)
-                logger.info(f"テンプレート削除: {template_path}")
+            # 現在のモードに応じてテンプレート削除先を決定
+            current_mode = self.mode_manager.get_current_mode()
+            if current_mode == "amazonq":
+                # AmazonQモードの場合はamazonq_templatesディレクトリから削除
+                templates_dir = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+                template_path = os.path.join(templates_dir, f"{template_name}.png")
                 
-                # テンプレートを再読み込み
-                self.reload_error_templates()
-                return True
+                if os.path.exists(template_path):
+                    os.remove(template_path)
+                    logger.info(f"AmazonQテンプレート削除: {template_path}")
+                    
+                    # AmazonQ検出器のテンプレートを再読み込み
+                    amazonq_detector = self.mode_manager.get_detector("amazonq")
+                    if amazonq_detector:
+                        amazonq_detector._load_run_button_templates()
+                    return True
+                else:
+                    logger.warning(f"AmazonQテンプレートファイルが存在しません: {template_path}")
+                    return False
             else:
-                logger.warning(f"テンプレートファイルが存在しません: {template_path}")
-                return False
+                # Kiroモードまたは自動モードの場合はerror_templatesディレクトリから削除
+                templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+                template_path = os.path.join(templates_dir, f"{template_name}.png")
+                
+                if os.path.exists(template_path):
+                    os.remove(template_path)
+                    logger.info(f"Kiroテンプレート削除: {template_path}")
+                    
+                    # テンプレートを再読み込み
+                    self.reload_error_templates()
+                    return True
+                else:
+                    logger.warning(f"Kiroテンプレートファイルが存在しません: {template_path}")
+                    return False
                 
         except Exception as e:
             logger.error(f"テンプレート削除エラー: {e}")

@@ -203,19 +203,36 @@ class MainWindow:
             logger.error(f"監視停止エラー: {e}")
 
     def save_template(self):
-        """テンプレート保存"""
+        """テンプレート保存（現在のモードに応じたテンプレートを保存）"""
         try:
+            # 現在のモードを取得
+            current_mode = self.mode_manager.get_current_mode()
+            
+            # モードに応じたメッセージを表示
+            if current_mode == "amazonq":
+                dialog_title = "AmazonQテンプレート保存"
+                dialog_message = "▶RUNボタンテンプレート名を入力してください:"
+            else:
+                dialog_title = "Kiroエラーテンプレート保存"
+                dialog_message = "エラーテンプレート名を入力してください:"
+            
             # テンプレート名の入力
-            template_name = simpledialog.askstring("テンプレート保存", "テンプレート名を入力してください:")
+            template_name = simpledialog.askstring(dialog_title, dialog_message)
 
             if template_name:
                 if self.kiro_recovery.save_error_template(template_name):
-                    self.monitor_widget.add_log(f"テンプレート '{template_name}' を保存しました")
-                    logger.info(f"テンプレート '{template_name}' を保存しました")
+                    if current_mode == "amazonq":
+                        success_msg = f"AmazonQテンプレート '{template_name}' をamazonq_templates/に保存しました"
+                    else:
+                        success_msg = f"Kiroテンプレート '{template_name}' をerror_templates/に保存しました"
+                    
+                    self.monitor_widget.add_log(success_msg)
+                    logger.info(success_msg)
                 else:
-                    self.monitor_widget.add_log(f"テンプレート '{template_name}' の保存に失敗しました")
-                    messagebox.showwarning("警告", f"テンプレート '{template_name}' の保存に失敗しました")
-                    logger.error(f"テンプレート '{template_name}' の保存に失敗しました")
+                    error_msg = f"テンプレート '{template_name}' の保存に失敗しました"
+                    self.monitor_widget.add_log(error_msg)
+                    messagebox.showwarning("警告", error_msg)
+                    logger.error(error_msg)
         except Exception as e:
             self.monitor_widget.add_log(f"テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート保存エラー: {e}")
@@ -247,11 +264,23 @@ class MainWindow:
             messagebox.showerror("エラー", f"設定ダイアログの表示に失敗しました: {e}")
 
     def open_template_manager(self):
-        """テンプレート管理を開く"""
+        """テンプレート管理を開く（現在のモードに応じたタブをアクティブに）"""
         try:
             template_manager = TemplateManager(self.root, self.config_manager)
+            
+            # 現在のモードに応じてアクティブタブを設定
+            current_mode = self.mode_manager.get_current_mode()
+            if current_mode == "amazonq":
+                # AmazonQモードの場合はAmazonQタブをアクティブに
+                template_manager.set_active_tab("amazonq")
+                logger.info("AmazonQテンプレート管理を開きました")
+            else:
+                # Kiroモードまたは自動モードの場合はKiro-IDEタブをアクティブに
+                template_manager.set_active_tab("kiro")
+                logger.info("Kiro-IDEテンプレート管理を開きました")
+            
             template_manager.show()
-            logger.info("テンプレート管理を開きました")
+            
         except Exception as e:
             logger.error(f"テンプレート管理表示エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート管理の表示に失敗しました: {e}")
@@ -310,8 +339,10 @@ class MainWindow:
 
     # ホットキーハンドラー
     def hotkey_save_template(self):
-        """ホットキー: テンプレート保存"""
-        self.monitor_widget.add_log("ホットキー: テンプレート保存要求")
+        """ホットキー: テンプレート保存（現在のモードに応じたテンプレート）"""
+        current_mode = self.mode_manager.get_current_mode()
+        mode_name = "AmazonQ" if current_mode == "amazonq" else "Kiro"
+        self.monitor_widget.add_log(f"ホットキー: {mode_name}テンプレート保存要求")
         self.save_template()
 
     def hotkey_send_recovery(self):
