@@ -3,6 +3,20 @@
 # 基本設定
 target-version = "py38"
 line-length = 88
+include = ["src/**/*.py", "tests/**/*.py", "main.py"]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "archive",
+]
+
+[lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -17,20 +31,7 @@ ignore = [
     "E501",  # line-too-long (blackが処理)
     "E203",  # whitespace-before-punctuation (blackと競合)
     "B008",  # function-call-in-default-argument
-]
-
-# 対象ファイル
-include = ["src/**/*.py", "tests/**/*.py", "main.py"]
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".ruff_cache",
-    ".venv",
-    "venv",
-    "__pycache__",
-    "build",
-    "dist",
-    "archive",
+    "F401",  # unused-import (条件付きインポートで必要)
 ]
 
 [format]
@@ -46,5 +47,5 @@ known-first-party = ["src"]
 
 [lint.per-file-ignores]
 # ファイル別の例外設定
-"tests/**/*.py" = ["B011"]  # テストでの例外を緩和
-"main.py" = ["E402"]       # メインファイルでのインポート順序を緩和
+"tests/**/*.py" = ["B011", "E999"]  # テストでの例外を緩和、Python3.8構文エラーを無視
+"main.py" = ["E402"]                # メインファイルでのインポート順序を緩和
