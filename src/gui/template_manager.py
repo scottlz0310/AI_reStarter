@@ -336,11 +336,11 @@ class TemplateManager:
     def show_template_info(self, template_info):
         """テンプレート情報を表示"""
         try:
-            info_text = f"""ファイル名: {template_info['name']}
-パス: {template_info['path']}
-サイズ: {template_info['size']} バイト
-作成日: {self.format_date(template_info['created'])}
-更新日: {self.format_date(template_info['modified'])}"""
+            info_text = f"""ファイル名: {template_info["name"]}
+パス: {template_info["path"]}
+サイズ: {template_info["size"]} バイト
+作成日: {self.format_date(template_info["created"])}
+更新日: {self.format_date(template_info["modified"])}"""
 
             self.info_text.delete(1.0, tk.END)
             self.info_text.insert(1.0, info_text)

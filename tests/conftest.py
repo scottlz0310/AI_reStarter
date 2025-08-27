@@ -166,7 +166,6 @@ def mock_win32gui():
         patch("win32gui.SetForegroundWindow") as mock_set_foreground,
         patch("win32gui.GetWindowRect") as mock_get_rect,
     ):
-
         # デフォルトの戻り値を設定
         mock_find_window.return_value = 12345  # ダミーのウィンドウハンドル
         mock_get_rect.return_value = (100, 100, 800, 600)  # ダミーの座標

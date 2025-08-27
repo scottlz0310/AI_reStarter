@@ -47,7 +47,6 @@ class TestScreenCapture:
             patch("src.utils.screen_capture.np.array", return_value=mock_array),
             patch.object(capture, "_convert_to_grayscale") as mock_convert,
         ):
-
             mock_convert.return_value = np.random.randint(
                 0, 255, (600, 800), dtype=np.uint8
             )
@@ -72,7 +71,6 @@ class TestScreenCapture:
             patch("src.utils.screen_capture.np.array", return_value=mock_array),
             patch.object(capture, "_convert_to_grayscale") as mock_convert,
         ):
-
             mock_convert.return_value = np.random.randint(
                 0, 255, (200, 300), dtype=np.uint8
             )
@@ -220,7 +218,6 @@ class TestScreenCapture:
                 return_value=np.random.randint(0, 255, (100, 100), dtype=np.uint8),
             ),
         ):
-
             capture.capture_screen()
 
         mock_logger.debug.assert_called_with("画面全体をキャプチャ")
@@ -245,7 +242,6 @@ class TestScreenCapture:
                 return_value=np.random.randint(0, 255, (100, 100), dtype=np.uint8),
             ),
         ):
-
             capture.capture_screen(region=region)
 
         mock_logger.debug.assert_called_with(f"指定領域をキャプチャ: {region}")

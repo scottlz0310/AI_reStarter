@@ -369,7 +369,9 @@ class TemplateCaptureDialog:
             # 結果を設定
             self.selected_region = (selected_image, template_name)
 
-            logger.info(f"テンプレート範囲選択完了: {template_name} ({x2-x1}x{y2-y1})")
+            logger.info(
+                f"テンプレート範囲選択完了: {template_name} ({x2 - x1}x{y2 - y1})"
+            )
 
             # ダイアログを閉じる
             self.dialog.destroy()

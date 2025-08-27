@@ -279,7 +279,6 @@ class TestImageProcessor:
             patch("src.utils.image_processing.cv2.matchTemplate") as mock_match,
             patch("src.utils.image_processing.cv2.minMaxLoc") as mock_min_max_loc,
         ):
-
             mock_match.return_value = np.array([[0.5]])
             mock_min_max_loc.return_value = (0.1, 0.5, (10, 10), (20, 20))
 

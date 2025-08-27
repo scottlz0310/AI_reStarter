@@ -584,7 +584,7 @@ class MonitorAreaDialog:
                 self.preview_canvas.create_text(
                     x + width // 2,
                     y - 10,
-                    text=area.get("name", f"エリア{i+1}"),
+                    text=area.get("name", f"エリア{i + 1}"),
                     anchor=tk.CENTER,
                     fill="red",
                     tags="area_label",

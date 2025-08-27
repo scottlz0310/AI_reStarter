@@ -48,7 +48,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(mock_config_manager)
 
             assert detector.config_manager == mock_config_manager
@@ -72,7 +71,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(config_manager)
 
             assert detector.is_enabled() is False
@@ -153,7 +151,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(config_manager)
             screenshot = np.random.randint(0, 255, (400, 600, 3), dtype=np.uint8)
 
@@ -222,7 +219,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(config_manager)
 
             assert detector.is_enabled() is False
@@ -285,7 +281,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(config_manager)
 
             assert detector.detection_threshold == 0.95
@@ -307,7 +302,6 @@ class TestAmazonQDetector:
             patch("src.plugins.amazonq_detector.os.path.exists", return_value=True),
             patch("src.plugins.amazonq_detector.os.listdir", return_value=[]),
         ):
-
             detector = AmazonQDetector(config_manager)
 
             assert detector.templates_dir == str(custom_templates_dir)
