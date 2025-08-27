@@ -76,15 +76,15 @@ class MonitorWidget(ttk.Frame):
         # ボタンフレームを先に作成
         button_frame1 = ttk.Frame(self.control_group)
         button_frame1.pack(fill=tk.X, padx=5, pady=2)
-        
+
         button_frame2 = ttk.Frame(self.control_group)
         button_frame2.pack(fill=tk.X, padx=5, pady=2)
-        
+
         # 制御ボタン（適切なフレームに配置）
         self.start_button = ttk.Button(button_frame1, text="監視開始", command=self._on_start_clicked)
         self.stop_button = ttk.Button(button_frame1, text="監視停止", command=self._on_stop_clicked)
         self.monitor_area_button = ttk.Button(button_frame1, text="監視エリア設定", command=self._on_monitor_area_clicked)
-        
+
         self.save_template_button = ttk.Button(button_frame2, text="テンプレート保存", command=self._on_save_template_clicked)
         self.save_template_selection_button = ttk.Button(button_frame2, text="範囲選択で保存", command=self._on_save_template_with_selection_clicked)
         self.send_recovery_button = ttk.Button(button_frame2, text="復旧コマンド送信", command=self._on_send_recovery_clicked)
@@ -96,7 +96,7 @@ class MonitorWidget(ttk.Frame):
         self.start_button.pack(side=tk.LEFT, padx=2)
         self.stop_button.pack(side=tk.LEFT, padx=2)
         self.monitor_area_button.pack(side=tk.LEFT, padx=2)
-        
+
         self.save_template_button.pack(side=tk.LEFT, padx=2)
         self.save_template_selection_button.pack(side=tk.LEFT, padx=2)
         self.send_recovery_button.pack(side=tk.LEFT, padx=2)
@@ -168,7 +168,7 @@ class MonitorWidget(ttk.Frame):
         """監視エリア設定ボタンクリック時の処理"""
         if self.monitor_area_callback:
             self.monitor_area_callback()
-    
+
     def _on_save_template_with_selection_clicked(self):
         """範囲選択でテンプレート保存ボタンクリック時の処理"""
         if self.save_template_with_selection_callback:

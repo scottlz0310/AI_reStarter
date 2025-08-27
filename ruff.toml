@@ -20,6 +20,7 @@ ignore = [
     "S101",  # use of assert
     "T201",  # print found (we use logging)
     "F401",  # unused import (conditional imports)
+    "S603",  # subprocess call without shell=True check (intentional in test runner)
 ]
 
 [lint.per-file-ignores]

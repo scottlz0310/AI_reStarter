@@ -8,8 +8,9 @@ import json
 import logging
 import os
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Dict, Any, Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import numpy as np
@@ -25,7 +26,7 @@ def temp_dir() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def sample_config() -> Dict[str, Any]:
+def sample_config() -> dict[str, Any]:
     """テスト用のサンプル設定を提供するフィクスチャ"""
     return {
         "monitor_interval": 2.0,
@@ -53,7 +54,7 @@ def sample_config() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def config_file(temp_dir: Path, sample_config: Dict[str, Any]) -> Path:
+def config_file(temp_dir: Path, sample_config: dict[str, Any]) -> Path:
     """テスト用の設定ファイルを作成するフィクスチャ"""
     config_path = temp_dir / "test_config.json"
     with open(config_path, "w", encoding="utf-8") as f:
@@ -73,11 +74,11 @@ def sample_image() -> np.ndarray:
 def sample_template_image(temp_dir: Path) -> Path:
     """テスト用のテンプレート画像ファイルを作成するフィクスチャ"""
     template_path = temp_dir / "test_template.png"
-    
+
     # 50x50の赤い四角形を作成
     image = Image.new("RGB", (50, 50), color="red")
     image.save(template_path)
-    
+
     return template_path
 
 
@@ -87,7 +88,7 @@ def mock_screen_capture():
     # デフォルトで100x100の画像を返すモック関数
     def mock_capture_func(*args, **kwargs):
         return np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
-    
+
     yield mock_capture_func
 
 
@@ -140,7 +141,7 @@ def setup_test_logging():
     """テスト実行時のログ設定を行うフィクスチャ"""
     # テスト用のログレベルを設定
     logging.getLogger().setLevel(logging.DEBUG)
-    
+
     # テスト用のハンドラーを追加
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG)
@@ -148,13 +149,13 @@ def setup_test_logging():
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     handler.setFormatter(formatter)
-    
+
     # ルートロガーにハンドラーを追加
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
-    
+
     yield
-    
+
     # テスト後にハンドラーを削除
     root_logger.removeHandler(handler)
 
@@ -165,11 +166,11 @@ def mock_win32gui():
     with patch("win32gui.FindWindow") as mock_find_window, \
          patch("win32gui.SetForegroundWindow") as mock_set_foreground, \
          patch("win32gui.GetWindowRect") as mock_get_rect:
-        
+
         # デフォルトの戻り値を設定
         mock_find_window.return_value = 12345  # ダミーのウィンドウハンドル
         mock_get_rect.return_value = (100, 100, 800, 600)  # ダミーの座標
-        
+
         yield {
             "find_window": mock_find_window,
             "set_foreground": mock_set_foreground,
@@ -178,7 +179,7 @@ def mock_win32gui():
 
 
 @pytest.fixture
-def detection_result_data() -> Dict[str, Any]:
+def detection_result_data() -> dict[str, Any]:
     """検出結果のテストデータを提供するフィクスチャ"""
     return {
         "state_type": "compilation_error",

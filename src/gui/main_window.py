@@ -40,14 +40,14 @@ class MainWindow:
         """モード選択ウィジェットのセットアップ"""
         # モード選択用の変数
         self.mode_var = tk.StringVar(value=self.mode_manager.get_current_mode())
-        
+
         # ラジオボタンでモード選択
         modes = [
             ("Kiro-IDEモード", "kiro"),
             ("AmazonQモード", "amazonq"),
             ("自動モード", "auto")
         ]
-        
+
         for i, (text, mode) in enumerate(modes):
             rb = ttk.Radiobutton(
                 self.mode_frame,
@@ -57,13 +57,13 @@ class MainWindow:
                 command=self.on_mode_changed
             )
             rb.grid(row=0, column=i, padx=10, pady=5, sticky=tk.W)
-        
+
         # モード状態表示ラベル
         self.mode_status_label = ttk.Label(self.mode_frame, text="")
         self.mode_status_label.grid(row=1, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
-        
+
         self.update_mode_status()
-    
+
     def on_mode_changed(self):
         """モード変更時の処理"""
         new_mode = self.mode_var.get()
@@ -75,13 +75,13 @@ class MainWindow:
             # 切り替え失敗時は元のモードに戻す
             self.mode_var.set(self.mode_manager.get_current_mode())
             messagebox.showerror("エラー", f"モードの切り替えに失敗しました: {new_mode}")
-    
+
     def update_mode_status(self):
         """モード状態の更新"""
         status = self.mode_manager.get_mode_status()
         current_mode = status['current_mode']
         active_detectors = status['active_detectors']
-        
+
         status_text = f"現在のモード: {current_mode} | アクティブな検出器: {', '.join(active_detectors) if active_detectors else 'なし'}"
         self.mode_status_label.config(text=status_text)
 
@@ -168,7 +168,7 @@ class MainWindow:
 
             # 監視ウィジェットの状態を更新
             self.monitor_widget.update_status(status)
-            
+
             # モード状態も更新
             self.update_mode_status()
 
@@ -208,7 +208,7 @@ class MainWindow:
         try:
             # 現在のモードを取得
             current_mode = self.mode_manager.get_current_mode()
-            
+
             # モードに応じたメッセージを表示
             if current_mode == "amazonq":
                 dialog_title = "AmazonQテンプレート保存"
@@ -216,7 +216,7 @@ class MainWindow:
             else:
                 dialog_title = "Kiroエラーテンプレート保存"
                 dialog_message = "エラーテンプレート名を入力してください:"
-            
+
             # テンプレート名の入力
             template_name = simpledialog.askstring(dialog_title, dialog_message)
 
@@ -226,7 +226,7 @@ class MainWindow:
                         success_msg = f"AmazonQテンプレート '{template_name}' をamazonq_templates/に保存しました"
                     else:
                         success_msg = f"Kiroテンプレート '{template_name}' をerror_templates/に保存しました"
-                    
+
                     self.monitor_widget.add_log(success_msg)
                     logger.info(success_msg)
                 else:
@@ -238,30 +238,30 @@ class MainWindow:
             self.monitor_widget.add_log(f"テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート保存エラー: {e}")
             logger.error(f"テンプレート保存エラー: {e}")
-    
+
     def save_template_with_selection(self):
         """範囲選択でテンプレート保存（テンプレート管理と同じ処理）"""
         try:
             from src.gui.template_manager import TemplateManager
-            
+
             # テンプレート管理を開く
             template_manager = TemplateManager(self.root, self.config_manager)
-            
+
             # 現在のモードに応じてアクティブタブを設定
             current_mode = self.mode_manager.get_current_mode()
             if current_mode == "amazonq":
                 template_manager.set_active_tab("amazonq")
             else:
                 template_manager.set_active_tab("kiro")
-            
+
             template_manager.show()
-            
+
             # 範囲選択を直接呼び出し
             if current_mode == "amazonq":
                 template_manager.add_amazonq_template_with_selection()
             else:
                 template_manager.add_template_with_selection()
-                
+
         except Exception as e:
             logger.error(f"範囲選択テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"範囲選択テンプレートの保存に失敗しました: {e}")
@@ -295,7 +295,7 @@ class MainWindow:
         """テンプレート管理を開く（現在のモードに応じたタブをアクティブに）"""
         try:
             template_manager = TemplateManager(self.root, self.config_manager)
-            
+
             # 現在のモードに応じてアクティブタブを設定
             current_mode = self.mode_manager.get_current_mode()
             if current_mode == "amazonq":
@@ -306,9 +306,9 @@ class MainWindow:
                 # Kiroモードまたは自動モードの場合はKiro-IDEタブをアクティブに
                 template_manager.set_active_tab("kiro")
                 logger.info("Kiro-IDEテンプレート管理を開きました")
-            
+
             template_manager.show()
-            
+
         except Exception as e:
             logger.error(f"テンプレート管理表示エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート管理の表示に失敗しました: {e}")
@@ -332,7 +332,7 @@ class MainWindow:
         except Exception as e:
             logger.error(f"監視エリア設定表示エラー: {e}")
             messagebox.showerror("エラー", f"監視エリア設定の表示に失敗しました: {e}")
-    
+
     def open_amazonq_settings(self):
         """AmazonQ設定ダイアログを開く"""
         try:
@@ -391,7 +391,7 @@ class MainWindow:
         """ホットキー: 監視停止"""
         self.monitor_widget.add_log("ホットキー: 監視停止要求")
         self.stop_monitoring()
-    
+
 
 
     def on_closing(self):

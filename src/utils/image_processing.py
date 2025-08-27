@@ -43,19 +43,19 @@ class ImageProcessor:
                 logger.debug(f"監視エリア: {monitor_region} (x, y, width, height)")
             else:
                 logger.debug("監視エリア: 全画面")
-            
+
             for error_name, template in error_templates.items():
                 # テンプレートのサイズをログ出力
                 logger.debug(f"テンプレート '{error_name}' サイズ: {template.shape} (H x W)")
-                
+
                 # サイズ比較を詳細にログ出力
                 screenshot_h, screenshot_w = screenshot.shape[:2]
                 template_h, template_w = template.shape[:2]
-                
+
                 logger.debug(f"サイズ比較 '{error_name}': "
                            f"スクリーンショット({screenshot_h}x{screenshot_w}) vs "
                            f"テンプレート({template_h}x{template_w})")
-                
+
                 # サイズチェック: テンプレートがスクリーンショットより大きい場合はスキップ
                 if template_h > screenshot_h or template_w > screenshot_w:
                     logger.warning(f"テンプレート '{error_name}' がスクリーンショットより大きいためスキップ "
@@ -67,7 +67,7 @@ class ImageProcessor:
                 logger.debug(f"テンプレートマッチング実行: '{error_name}'")
                 result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
                 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                
+
                 logger.debug(f"マッチング結果 '{error_name}': 信頼度={max_val:.3f}, 闾値={threshold}")
 
                 if max_val >= threshold:
@@ -97,7 +97,7 @@ class ImageProcessor:
         """
         try:
             # サイズチェック
-            if (template.shape[0] > screenshot.shape[0] or 
+            if (template.shape[0] > screenshot.shape[0] or
                 template.shape[1] > screenshot.shape[1]):
                 logger.debug("テンプレートがスクリーンショットより大きいためスキップ")
                 return None

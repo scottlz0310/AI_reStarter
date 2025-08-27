@@ -4,40 +4,40 @@
 このスクリプトは様々なテストシナリオを実行するためのユーティリティを提供します。
 """
 
-import sys
-import subprocess
-from pathlib import Path
-from typing import List, Optional
 import logging
+import subprocess
+import sys
+from pathlib import Path
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 
 class TestRunner:
     """テスト実行管理クラス"""
-    
+
     def __init__(self, project_root: Optional[Path] = None):
         """
         テストランナーを初期化
-        
+
         Args:
             project_root: プロジェクトのルートディレクトリ
         """
         self.project_root = project_root or Path(__file__).parent.parent
         self.tests_dir = self.project_root / "tests"
-    
+
     def run_unit_tests(self, verbose: bool = True) -> int:
         """
         単体テストを実行
-        
+
         Args:
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info("単体テストを実行します")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir / "unit"),
@@ -45,24 +45,24 @@ class TestRunner:
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def run_integration_tests(self, verbose: bool = True) -> int:
         """
         統合テストを実行
-        
+
         Args:
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info("統合テストを実行します")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir / "integration"),
@@ -70,24 +70,24 @@ class TestRunner:
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def run_gui_tests(self, verbose: bool = True) -> int:
         """
         GUIテストを実行
-        
+
         Args:
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info("GUIテストを実行します")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir / "gui"),
@@ -95,79 +95,79 @@ class TestRunner:
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def run_all_tests(self, verbose: bool = True, coverage_html: bool = False) -> int:
         """
         全てのテストを実行
-        
+
         Args:
             verbose: 詳細出力を行うかどうか
             coverage_html: HTMLカバレッジレポートを生成するかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info("全てのテストを実行します")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir),
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if coverage_html:
             cmd.append("--cov-report=html")
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def run_specific_test(self, test_path: str, verbose: bool = True) -> int:
         """
         特定のテストファイルまたはテストメソッドを実行
-        
+
         Args:
             test_path: テストファイルパスまたはテストメソッドパス
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info(f"特定のテストを実行します: {test_path}")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             test_path,
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
-    def run_tests_with_markers(self, markers: List[str], verbose: bool = True) -> int:
+
+    def run_tests_with_markers(self, markers: list[str], verbose: bool = True) -> int:
         """
         指定されたマーカーのテストを実行
-        
+
         Args:
             markers: テストマーカーのリスト
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         marker_expr = " or ".join(markers)
         logger.info(f"マーカー指定でテストを実行します: {marker_expr}")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir),
@@ -175,24 +175,24 @@ class TestRunner:
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def run_fast_tests(self, verbose: bool = True) -> int:
         """
         高速テスト（slowマーカー以外）を実行
-        
+
         Args:
             verbose: 詳細出力を行うかどうか
-            
+
         Returns:
             int: 終了コード
         """
         logger.info("高速テストを実行します")
-        
+
         cmd = [
             sys.executable, "-m", "pytest",
             str(self.tests_dir),
@@ -200,41 +200,41 @@ class TestRunner:
             "--cov=src",
             "--cov-report=term-missing"
         ]
-        
+
         if verbose:
             cmd.append("-v")
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
-    
+
     def generate_coverage_report(self, format_type: str = "html") -> int:
         """
         カバレッジレポートを生成
-        
+
         Args:
             format_type: レポート形式 ("html", "xml", "term")
-            
+
         Returns:
             int: 終了コード
         """
         logger.info(f"カバレッジレポートを生成します: {format_type}")
-        
+
         cmd = [
             sys.executable, "-m", "coverage",
             "report"
         ]
-        
+
         if format_type == "html":
             cmd = [sys.executable, "-m", "coverage", "html"]
         elif format_type == "xml":
             cmd = [sys.executable, "-m", "coverage", "xml"]
-        
+
         return subprocess.run(cmd, cwd=self.project_root).returncode
 
 
 def main():
     """メイン関数"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="AI reStarter テスト実行ツール")
     parser.add_argument(
         "test_type",
@@ -260,17 +260,17 @@ def main():
         action="store_true",
         help="HTMLカバレッジレポートを生成"
     )
-    
+
     args = parser.parse_args()
-    
+
     # ログ設定
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-    
+
     runner = TestRunner()
-    
+
     try:
         if args.test_type == "unit":
             exit_code = runner.run_unit_tests(verbose=args.verbose)
@@ -295,14 +295,14 @@ def main():
         else:
             logger.error("無効なテストタイプです")
             sys.exit(1)
-        
+
         if exit_code == 0:
             logger.info("全てのテストが成功しました")
         else:
             logger.error(f"テストが失敗しました（終了コード: {exit_code}）")
-        
+
         sys.exit(exit_code)
-        
+
     except KeyboardInterrupt:
         logger.info("テスト実行が中断されました")
         sys.exit(1)

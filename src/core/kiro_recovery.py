@@ -12,11 +12,11 @@ from typing import Optional
 import numpy as np
 
 from src.config.config_manager import ConfigManager
+from src.core.detection_result import DetectionResult
+from src.core.mode_manager import ModeManager
+from src.plugins.amazonq_detector import AmazonQDetector
 from src.utils.image_processing import ImageProcessor
 from src.utils.screen_capture import ScreenCapture
-from src.core.mode_manager import ModeManager
-from src.core.detection_result import DetectionResult
-from src.plugins.amazonq_detector import AmazonQDetector
 
 # cv2ライブラリを条件付きでインポート
 try:
@@ -275,7 +275,7 @@ class KiroRecovery:
             # Enterキーで送信（PostMessageを使用）
             win32gui.PostMessage(target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
             win32gui.PostMessage(target_hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
-            
+
             logger.info(f"復旧コマンド送信: {command}")
             return True
 
@@ -333,7 +333,7 @@ class KiroRecovery:
                             if result:
                                 logger.info(f"監視エリア '{area_name}' で状態検出・実行: {result.state_type}")
                                 break  # 検出・実行されたら他のエリアはスキップ
-                            
+
                             # 従来のKiroエラー検出も並行実行
                             error_type = self.detect_error(screenshot)
                             if error_type:
@@ -344,7 +344,7 @@ class KiroRecovery:
                     # 従来のmonitor_regionが設定されている場合
                     logger.debug(f"従来の監視エリアを使用: {monitor_region}")
                     screenshot = self.screen_capture.capture_screen(monitor_region)
-                    
+
                     # ModeManagerで検出・実行を試行
                     result = self.mode_manager.detect_and_execute(screenshot)
                     if result:
@@ -359,7 +359,7 @@ class KiroRecovery:
                     # 監視エリアが設定されていない場合、画面全体を監視
                     logger.debug("監視エリアが設定されていません。画面全体を監視します。")
                     screenshot = self.screen_capture.capture_screen()
-                    
+
                     # ModeManagerで検出・実行を試行
                     result = self.mode_manager.detect_and_execute(screenshot)
                     if result:
@@ -381,23 +381,23 @@ class KiroRecovery:
                 time.sleep(5)  # エラー時は少し長く待機
 
         logger.info("監視終了")
-    
+
     def _detect_and_execute_with_offset(self, screenshot: np.ndarray, region_offset: tuple[int, int]) -> Optional[DetectionResult]:
         """監視エリアのオフセットを考慮した検出・実行
-        
+
         Args:
             screenshot: 画面キャプチャ
             region_offset: 監視エリアのオフセット (x, y)
-            
+
         Returns:
             DetectionResult: 実行された検出結果、何も実行されなかった場合はNone
         """
         active_detectors = self.mode_manager.get_active_detectors()
-        
+
         if not active_detectors:
             logger.debug("アクティブな検出器がありません")
             return None
-        
+
         # 各検出器で状態検出を試行
         for detector in active_detectors:
             try:
@@ -406,20 +406,20 @@ class KiroRecovery:
                     result = detector.detect_state(screenshot, region_offset)
                 else:
                     result = detector.detect_state(screenshot)
-                
+
                 if result and result.is_valid():
                     logger.info(f"状態検出成功: {detector.name} - {result.state_type}")
-                    
+
                     # 復旧アクションを実行
                     if detector.execute_recovery_action(result):
                         logger.info(f"復旧アクション実行成功: {detector.name}")
                         return result
                     else:
                         logger.warning(f"復旧アクション実行失敗: {detector.name}")
-                        
+
             except Exception as e:
                 logger.error(f"検出器エラー: {detector.name} - {e}", exc_info=True)
-        
+
         return None
 
     def _handle_error_detection(self, error_type: str) -> None:
@@ -453,7 +453,7 @@ class KiroRecovery:
         # 現在のモードに応じてテンプレートの存在をチェック
         current_mode = self.mode_manager.get_current_mode()
         active_detectors = self.mode_manager.get_active_detectors()
-        
+
         if current_mode == "amazonq":
             # AmazonQモードの場合はAmazonQ検出器のテンプレートをチェック
             amazonq_detector = self.mode_manager.get_detector("amazonq")
@@ -572,11 +572,11 @@ class KiroRecovery:
                 # AmazonQモードの場合はamazonq_templatesディレクトリから削除
                 templates_dir = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
                 template_path = os.path.join(templates_dir, f"{template_name}.png")
-                
+
                 if os.path.exists(template_path):
                     os.remove(template_path)
                     logger.info(f"AmazonQテンプレート削除: {template_path}")
-                    
+
                     # AmazonQ検出器のテンプレートを再読み込み
                     amazonq_detector = self.mode_manager.get_detector("amazonq")
                     if amazonq_detector:
@@ -589,18 +589,18 @@ class KiroRecovery:
                 # Kiroモードまたは自動モードの場合はerror_templatesディレクトリから削除
                 templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
                 template_path = os.path.join(templates_dir, f"{template_name}.png")
-                
+
                 if os.path.exists(template_path):
                     os.remove(template_path)
                     logger.info(f"Kiroテンプレート削除: {template_path}")
-                    
+
                     # テンプレートを再読み込み
                     self.reload_error_templates()
                     return True
                 else:
                     logger.warning(f"Kiroテンプレートファイルが存在しません: {template_path}")
                     return False
-                
+
         except Exception as e:
             logger.error(f"テンプレート削除エラー: {e}")
             return False
