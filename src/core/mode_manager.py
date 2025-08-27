@@ -110,7 +110,9 @@ class ModeManager:
                 if detector.is_enabled():
                     active_detectors.append(detector)
 
-        logger.debug(f"アクティブな検出器: {len(active_detectors)}個 (モード: {self.current_mode})")
+        logger.debug(
+            f"アクティブな検出器: {len(active_detectors)}個 (モード: {self.current_mode})"
+        )
         return active_detectors
 
     def detect_and_execute(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
@@ -205,7 +207,6 @@ class ModeManager:
             "active_detectors": [d.name for d in active_detectors],
             "total_detectors": len(self.detectors),
             "enabled_detectors": {
-                name: detector.is_enabled()
-                for name, detector in self.detectors.items()
-            }
+                name: detector.is_enabled() for name, detector in self.detectors.items()
+            },
         }

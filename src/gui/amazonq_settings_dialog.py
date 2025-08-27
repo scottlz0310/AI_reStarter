@@ -62,9 +62,7 @@ class AmazonQSettingsDialog:
 
         # 有効/無効チェックボックス
         ttk.Checkbutton(
-            basic_frame,
-            text="AmazonQ機能を有効にする",
-            variable=self.enabled_var
+            basic_frame, text="AmazonQ機能を有効にする", variable=self.enabled_var
         ).grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky=tk.W)
 
         # 検出設定セクション
@@ -72,7 +70,9 @@ class AmazonQSettingsDialog:
         detection_frame.pack(fill=tk.X, pady=(0, 10))
 
         # 検出閾値
-        ttk.Label(detection_frame, text="検出閾値:").grid(row=0, column=0, padx=10, pady=5, sticky=tk.W)
+        ttk.Label(detection_frame, text="検出閾値:").grid(
+            row=0, column=0, padx=10, pady=5, sticky=tk.W
+        )
         threshold_frame = ttk.Frame(detection_frame)
         threshold_frame.grid(row=0, column=1, padx=10, pady=5, sticky=tk.W)
 
@@ -82,50 +82,56 @@ class AmazonQSettingsDialog:
             to=1.0,
             variable=self.detection_threshold_var,
             orient=tk.HORIZONTAL,
-            length=200
+            length=200,
         ).pack(side=tk.LEFT)
 
         self.threshold_label = ttk.Label(threshold_frame, text="0.8")
         self.threshold_label.pack(side=tk.LEFT, padx=(10, 0))
 
         # 閾値変更時のコールバック
-        self.detection_threshold_var.trace('w', self.on_threshold_changed)
+        self.detection_threshold_var.trace("w", self.on_threshold_changed)
 
         # クリック遅延
-        ttk.Label(detection_frame, text="クリック遅延 (秒):").grid(row=1, column=0, padx=10, pady=5, sticky=tk.W)
+        ttk.Label(detection_frame, text="クリック遅延 (秒):").grid(
+            row=1, column=0, padx=10, pady=5, sticky=tk.W
+        )
         ttk.Spinbox(
             detection_frame,
             from_=0.1,
             to=5.0,
             increment=0.1,
             textvariable=self.click_delay_var,
-            width=10
+            width=10,
         ).grid(row=1, column=1, padx=10, pady=5, sticky=tk.W)
 
         # ボタンフレーム
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill=tk.X, pady=(10, 0))
 
-        ttk.Button(
-            button_frame,
-            text="OK",
-            command=self.on_ok
-        ).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(button_frame, text="OK", command=self.on_ok).pack(
+            side=tk.RIGHT, padx=(5, 0)
+        )
 
-        ttk.Button(
-            button_frame,
-            text="キャンセル",
-            command=self.on_cancel
-        ).pack(side=tk.RIGHT)
+        ttk.Button(button_frame, text="キャンセル", command=self.on_cancel).pack(
+            side=tk.RIGHT
+        )
 
     def load_settings(self):
         """設定値を読み込み"""
         try:
             # 現在の設定値を取得
             self.enabled_var.set(self.config_manager.get("amazonq.enabled", True))
-            self.detection_threshold_var.set(self.config_manager.get("amazonq.detection_threshold", 0.8))
-            self.click_delay_var.set(self.config_manager.get("amazonq.click_delay", 1.0))
-            self.templates_dir_var.set(self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates"))
+            self.detection_threshold_var.set(
+                self.config_manager.get("amazonq.detection_threshold", 0.8)
+            )
+            self.click_delay_var.set(
+                self.config_manager.get("amazonq.click_delay", 1.0)
+            )
+            self.templates_dir_var.set(
+                self.config_manager.get(
+                    "amazonq.run_button_templates_dir", "amazonq_templates"
+                )
+            )
 
             # 閾値ラベルを更新
             self.on_threshold_changed()
@@ -147,13 +153,17 @@ class AmazonQSettingsDialog:
             # 検出閾値のチェック
             threshold = self.detection_threshold_var.get()
             if not (0.1 <= threshold <= 1.0):
-                messagebox.showerror("エラー", "検出閾値は0.1から1.0の間で設定してください")
+                messagebox.showerror(
+                    "エラー", "検出閾値は0.1から1.0の間で設定してください"
+                )
                 return False
 
             # クリック遅延のチェック
             delay = self.click_delay_var.get()
             if not (0.1 <= delay <= 5.0):
-                messagebox.showerror("エラー", "クリック遅延は0.1から5.0秒の間で設定してください")
+                messagebox.showerror(
+                    "エラー", "クリック遅延は0.1から5.0秒の間で設定してください"
+                )
                 return False
 
             return True
@@ -171,7 +181,11 @@ class AmazonQSettingsDialog:
                 "enabled": self.enabled_var.get(),
                 "detection_threshold": self.detection_threshold_var.get(),
                 "click_delay": self.click_delay_var.get(),
-                "run_button_templates_dir": self.templates_dir_var.get().strip() if self.templates_dir_var.get() else "amazonq_templates"
+                "run_button_templates_dir": (
+                    self.templates_dir_var.get().strip()
+                    if self.templates_dir_var.get()
+                    else "amazonq_templates"
+                ),
             }
 
             # 既存のamazonq設定を取得して更新

@@ -41,7 +41,7 @@ class ModeSelectorWidget(ttk.Frame):
         modes = [
             ("Kiro-IDEモード", "kiro", "Kiro-IDEのエラー検出・復旧のみ"),
             ("AmazonQモード", "amazonq", "AmazonQの▶RUNボタン検出・クリックのみ"),
-            ("自動モード", "auto", "両方の機能を自動判定で実行")
+            ("自動モード", "auto", "両方の機能を自動判定で実行"),
         ]
 
         for i, (text, mode, description) in enumerate(modes):
@@ -51,26 +51,21 @@ class ModeSelectorWidget(ttk.Frame):
                 text=text,
                 variable=self.mode_var,
                 value=mode,
-                command=self.on_mode_changed
+                command=self.on_mode_changed,
             )
             rb.grid(row=i, column=0, padx=10, pady=2, sticky=tk.W)
 
             # 説明ラベル
             desc_label = ttk.Label(
-                self,
-                text=f"  {description}",
-                font=("", 8),
-                foreground="gray"
+                self, text=f"  {description}", font=("", 8), foreground="gray"
             )
             desc_label.grid(row=i, column=1, padx=10, pady=2, sticky=tk.W)
 
         # モード状態表示ラベル
-        self.mode_status_label = ttk.Label(
-            self,
-            text="",
-            font=("", 9, "bold")
+        self.mode_status_label = ttk.Label(self, text="", font=("", 9, "bold"))
+        self.mode_status_label.grid(
+            row=len(modes), column=0, columnspan=2, padx=10, pady=10, sticky=tk.W
         )
-        self.mode_status_label.grid(row=len(modes), column=0, columnspan=2, padx=10, pady=10, sticky=tk.W)
 
         self.update_mode_status()
 
@@ -90,7 +85,9 @@ class ModeSelectorWidget(ttk.Frame):
             else:
                 # 切り替え失敗時は元のモードに戻す
                 self.mode_var.set(self.mode_manager.get_current_mode())
-                messagebox.showerror("エラー", f"モードの切り替えに失敗しました: {new_mode}")
+                messagebox.showerror(
+                    "エラー", f"モードの切り替えに失敗しました: {new_mode}"
+                )
                 logger.error(f"モード切り替え失敗: {new_mode}")
 
         except Exception as e:
@@ -103,20 +100,24 @@ class ModeSelectorWidget(ttk.Frame):
         """モード状態の更新"""
         try:
             status = self.mode_manager.get_mode_status()
-            current_mode = status['current_mode']
-            active_detectors = status['active_detectors']
+            current_mode = status["current_mode"]
+            active_detectors = status["active_detectors"]
 
             # モード名の日本語変換
             mode_names = {
                 "kiro": "Kiro-IDEモード",
                 "amazonq": "AmazonQモード",
-                "auto": "自動モード"
+                "auto": "自動モード",
             }
 
             mode_display = mode_names.get(current_mode, current_mode)
-            detectors_display = ', '.join(active_detectors) if active_detectors else 'なし'
+            detectors_display = (
+                ", ".join(active_detectors) if active_detectors else "なし"
+            )
 
-            status_text = f"現在: {mode_display} | アクティブ検出器: {detectors_display}"
+            status_text = (
+                f"現在: {mode_display} | アクティブ検出器: {detectors_display}"
+            )
             self.mode_status_label.config(text=status_text)
 
         except Exception as e:

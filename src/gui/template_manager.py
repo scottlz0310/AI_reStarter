@@ -23,7 +23,9 @@ class TemplateManager:
         self.parent = parent
         self.config_manager = config_manager
         self.dialog = None
-        self.template_folder = self.config_manager.get("screenshot_folder", "error_templates")
+        self.template_folder = self.config_manager.get(
+            "screenshot_folder", "error_templates"
+        )
         self.templates: list[dict[str, Any]] = []
 
         self.active_tab_mode = "kiro"  # デフォルトはKiro-IDEタブ
@@ -60,7 +62,7 @@ class TemplateManager:
         self.create_status_bar(parent)
 
         # アクティブタブを設定
-        if hasattr(self, 'active_tab_mode'):
+        if hasattr(self, "active_tab_mode"):
             if self.active_tab_mode == "amazonq":
                 self.notebook.select(1)  # AmazonQタブを選択
             else:
@@ -68,7 +70,9 @@ class TemplateManager:
 
     def setup_kiro_tab(self):
         """従来のKiro-IDEタブのセットアップ"""
-        self.template_folder = self.config_manager.get("error_templates_dir", "error_templates")
+        self.template_folder = self.config_manager.get(
+            "error_templates_dir", "error_templates"
+        )
 
         # ツールバー
         self.create_toolbar(self.kiro_frame)
@@ -81,7 +85,9 @@ class TemplateManager:
 
     def setup_amazonq_tab(self):
         """AmazonQタブのセットアップ"""
-        self.amazonq_folder = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+        self.amazonq_folder = self.config_manager.get(
+            "amazonq.run_button_templates_dir", "amazonq_templates"
+        )
 
         # ツールバー
         self.create_amazonq_toolbar(self.amazonq_frame)
@@ -115,7 +121,9 @@ class TemplateManager:
 
         except Exception as e:
             logger.error(f"テンプレート管理GUI表示エラー: {e}")
-            messagebox.showerror("エラー", f"テンプレート管理GUIの表示に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"テンプレート管理GUIの表示に失敗しました: {e}"
+            )
 
     def setup_ui(self):
         """UIの初期化"""
@@ -136,11 +144,15 @@ class TemplateManager:
         add_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 範囲選択で追加ボタン
-        select_button = ttk.Button(toolbar, text="範囲選択で追加", command=self.add_template_with_selection)
+        select_button = ttk.Button(
+            toolbar, text="範囲選択で追加", command=self.add_template_with_selection
+        )
         select_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # インポートボタン
-        import_button = ttk.Button(toolbar, text="インポート", command=self.import_template)
+        import_button = ttk.Button(
+            toolbar, text="インポート", command=self.import_template
+        )
         import_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 削除ボタン
@@ -152,7 +164,9 @@ class TemplateManager:
         edit_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 更新ボタン
-        refresh_button = ttk.Button(toolbar, text="更新", command=self.refresh_templates)
+        refresh_button = ttk.Button(
+            toolbar, text="更新", command=self.refresh_templates
+        )
         refresh_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 検索フィールド
@@ -169,7 +183,9 @@ class TemplateManager:
 
         # ツリービュー
         columns = ("名前", "サイズ", "作成日", "説明")
-        self.template_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=10)
+        self.template_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=10
+        )
 
         # 列の設定
         for col in columns:
@@ -177,7 +193,9 @@ class TemplateManager:
             self.template_tree.column(col, width=150)
 
         # スクロールバー
-        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.template_tree.yview)
+        scrollbar = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.template_tree.yview
+        )
         self.template_tree.configure(yscrollcommand=scrollbar.set)
 
         # 配置
@@ -193,7 +211,9 @@ class TemplateManager:
         preview_frame.pack(fill=tk.X, pady=(0, 10))
 
         # プレビューラベル
-        self.preview_label = ttk.Label(preview_frame, text="テンプレートを選択してください")
+        self.preview_label = ttk.Label(
+            preview_frame, text="テンプレートを選択してください"
+        )
         self.preview_label.pack(expand=True)
 
         # 情報表示
@@ -224,12 +244,14 @@ class TemplateManager:
             self.template_tree.delete(*self.template_tree.get_children())
 
             if not os.path.exists(self.template_folder):
-                logger.warning(f"テンプレートフォルダが存在しません: {self.template_folder}")
+                logger.warning(
+                    f"テンプレートフォルダが存在しません: {self.template_folder}"
+                )
                 return
 
             # テンプレートファイルを検索
             for filename in os.listdir(self.template_folder):
-                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+                if filename.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
                     filepath = os.path.join(self.template_folder, filename)
                     file_stat = os.stat(filepath)
 
@@ -238,7 +260,7 @@ class TemplateManager:
                         "path": filepath,
                         "size": file_stat.st_size,
                         "created": file_stat.st_ctime,
-                        "modified": file_stat.st_mtime
+                        "modified": file_stat.st_mtime,
                     }
 
                     self.templates.append(template_info)
@@ -247,12 +269,11 @@ class TemplateManager:
                     size_kb = f"{file_stat.st_size / 1024:.1f} KB"
                     created_date = self.format_date(file_stat.st_ctime)
 
-                    self.template_tree.insert("", "end", values=(
-                        filename,
-                        size_kb,
-                        created_date,
-                        "テンプレート画像"
-                    ))
+                    self.template_tree.insert(
+                        "",
+                        "end",
+                        values=(filename, size_kb, created_date, "テンプレート画像"),
+                    )
 
             # ステータス更新
             self.status_label.config(text=f"テンプレート数: {len(self.templates)}")
@@ -265,6 +286,7 @@ class TemplateManager:
     def format_date(self, timestamp):
         """タイムスタンプを日付文字列に変換"""
         import datetime
+
         return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M")
 
     def on_template_select(self, event):
@@ -275,10 +297,12 @@ class TemplateManager:
 
         # 選択されたアイテムの情報を取得
         item = self.template_tree.item(selection[0])
-        template_name = item['values'][0]
+        template_name = item["values"][0]
 
         # テンプレート情報を検索
-        template_info = next((t for t in self.templates if t["name"] == template_name), None)
+        template_info = next(
+            (t for t in self.templates if t["name"] == template_name), None
+        )
         if not template_info:
             return
 
@@ -335,13 +359,14 @@ class TemplateManager:
                     ("PNGファイル", "*.png"),
                     ("JPEGファイル", "*.jpg *.jpeg"),
                     ("BMPファイル", "*.bmp"),
-                    ("全てのファイル", "*.*")
-                ]
+                    ("全てのファイル", "*.*"),
+                ],
             )
 
             if file_path:
                 # ファイルをコピー
                 import shutil
+
                 filename = os.path.basename(file_path)
                 dest_path = os.path.join(self.template_folder, filename)
 
@@ -380,21 +405,26 @@ class TemplateManager:
 
                 # テンプレートを保存
                 import cv2
+
                 dest_path = os.path.join(self.template_folder, f"{template_name}.png")
 
                 os.makedirs(self.template_folder, exist_ok=True)
                 cv2.imwrite(dest_path, selected_image)
 
-                messagebox.showinfo("完了", f"Kiroテンプレート '{template_name}' を追加しました")
+                messagebox.showinfo(
+                    "完了", f"Kiroテンプレート '{template_name}' を追加しました"
+                )
                 logger.info(f"範囲選択でKiroテンプレートを追加: {template_name}")
 
                 self.load_templates()
 
         except Exception as e:
             logger.error(f"範囲選択テンプレート追加エラー: {e}")
-            messagebox.showerror("エラー", f"範囲選択テンプレートの追加に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"範囲選択テンプレートの追加に失敗しました: {e}"
+            )
             # エラー時もダイアログを再表示
-            if hasattr(self, 'dialog') and self.dialog:
+            if hasattr(self, "dialog") and self.dialog:
                 self.dialog.deiconify()
 
     def import_template(self):
@@ -411,18 +441,24 @@ class TemplateManager:
 
         # 確認ダイアログ
         item = self.template_tree.item(selection[0])
-        template_name = item['values'][0]
+        template_name = item["values"][0]
 
-        if not messagebox.askyesno("確認", f"テンプレート '{template_name}' を削除しますか？"):
+        if not messagebox.askyesno(
+            "確認", f"テンプレート '{template_name}' を削除しますか？"
+        ):
             return
 
         try:
             # ファイルを削除
-            template_info = next((t for t in self.templates if t["name"] == template_name), None)
+            template_info = next(
+                (t for t in self.templates if t["name"] == template_name), None
+            )
             if template_info:
                 os.remove(template_info["path"])
 
-                messagebox.showinfo("完了", f"テンプレート '{template_name}' を削除しました")
+                messagebox.showinfo(
+                    "完了", f"テンプレート '{template_name}' を削除しました"
+                )
                 logger.info(f"テンプレートを削除しました: {template_name}")
 
                 # 一覧を更新
@@ -441,12 +477,14 @@ class TemplateManager:
 
         # 現在はファイル名の変更のみ対応
         item = self.template_tree.item(selection[0])
-        template_name = item['values'][0]
+        template_name = item["values"][0]
 
         # 新しいファイル名を入力
-        new_name = tk.simpledialog.askstring("ファイル名変更",
-                                           "新しいファイル名を入力してください:",
-                                           initialvalue=template_name)
+        new_name = tk.simpledialog.askstring(
+            "ファイル名変更",
+            "新しいファイル名を入力してください:",
+            initialvalue=template_name,
+        )
 
         if new_name and new_name != template_name:
             try:
@@ -456,7 +494,9 @@ class TemplateManager:
                 os.rename(old_path, new_path)
 
                 messagebox.showinfo("完了", f"ファイル名を '{new_name}' に変更しました")
-                logger.info(f"テンプレート名を変更しました: {template_name} -> {new_name}")
+                logger.info(
+                    f"テンプレート名を変更しました: {template_name} -> {new_name}"
+                )
 
                 # 一覧を更新
                 self.load_templates()
@@ -485,22 +525,36 @@ class TemplateManager:
                 size_kb = f"{file_stat.st_size / 1024:.1f} KB"
                 created_date = self.format_date(file_stat.st_ctime)
 
-                self.template_tree.insert("", "end", values=(
-                    template_info["name"],
-                    size_kb,
-                    created_date,
-                    "テンプレート画像"
-                ))
+                self.template_tree.insert(
+                    "",
+                    "end",
+                    values=(
+                        template_info["name"],
+                        size_kb,
+                        created_date,
+                        "テンプレート画像",
+                    ),
+                )
 
     def create_amazonq_toolbar(self, parent):
         """ツールバーの作成（AmazonQ用）"""
         toolbar = ttk.Frame(parent)
         toolbar.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Button(toolbar, text="新規追加", command=self.add_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(toolbar, text="範囲選択で追加", command=self.add_amazonq_template_with_selection).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(toolbar, text="削除", command=self.delete_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(toolbar, text="更新", command=self.refresh_amazonq_templates).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(toolbar, text="新規追加", command=self.add_amazonq_template).pack(
+            side=tk.LEFT, padx=(0, 5)
+        )
+        ttk.Button(
+            toolbar,
+            text="範囲選択で追加",
+            command=self.add_amazonq_template_with_selection,
+        ).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(toolbar, text="削除", command=self.delete_amazonq_template).pack(
+            side=tk.LEFT, padx=(0, 5)
+        )
+        ttk.Button(toolbar, text="更新", command=self.refresh_amazonq_templates).pack(
+            side=tk.LEFT, padx=(0, 5)
+        )
 
     def create_amazonq_template_list(self, parent):
         """テンプレート一覧の作成（AmazonQ用）"""
@@ -508,13 +562,17 @@ class TemplateManager:
         list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
         columns = ("名前", "サイズ", "作成日")
-        self.amazonq_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=10)
+        self.amazonq_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=10
+        )
 
         for col in columns:
             self.amazonq_tree.heading(col, text=col)
             self.amazonq_tree.column(col, width=150)
 
-        scrollbar_aq = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.amazonq_tree.yview)
+        scrollbar_aq = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.amazonq_tree.yview
+        )
         self.amazonq_tree.configure(yscrollcommand=scrollbar_aq.set)
 
         self.amazonq_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -527,7 +585,9 @@ class TemplateManager:
         preview_frame = ttk.LabelFrame(parent, text="プレビュー", padding="10")
         preview_frame.pack(fill=tk.X, pady=(0, 10))
 
-        self.amazonq_preview_label = ttk.Label(preview_frame, text="テンプレートを選択してください")
+        self.amazonq_preview_label = ttk.Label(
+            preview_frame, text="テンプレートを選択してください"
+        )
         self.amazonq_preview_label.pack(expand=True)
 
         info_frame = ttk.Frame(preview_frame)
@@ -544,19 +604,22 @@ class TemplateManager:
                 filetypes=[
                     ("画像ファイル", "*.png *.jpg *.jpeg *.bmp"),
                     ("PNGファイル", "*.png"),
-                    ("全てのファイル", "*.*")
-                ]
+                    ("全てのファイル", "*.*"),
+                ],
             )
 
             if file_path:
                 import shutil
+
                 filename = os.path.basename(file_path)
                 dest_path = os.path.join(self.amazonq_folder, filename)
 
                 os.makedirs(self.amazonq_folder, exist_ok=True)
                 shutil.copy2(file_path, dest_path)
 
-                messagebox.showinfo("完了", f"▶RUNボタンテンプレート '{filename}' を追加しました")
+                messagebox.showinfo(
+                    "完了", f"▶RUNボタンテンプレート '{filename}' を追加しました"
+                )
                 logger.info(f"AmazonQテンプレートを追加: {filename}")
 
                 self.refresh_amazonq_templates()
@@ -585,21 +648,26 @@ class TemplateManager:
 
                 # テンプレートを保存
                 import cv2
+
                 dest_path = os.path.join(self.amazonq_folder, f"{template_name}.png")
 
                 os.makedirs(self.amazonq_folder, exist_ok=True)
                 cv2.imwrite(dest_path, selected_image)
 
-                messagebox.showinfo("完了", f"▶RUNボタンテンプレート '{template_name}' を追加しました")
+                messagebox.showinfo(
+                    "完了", f"▶RUNボタンテンプレート '{template_name}' を追加しました"
+                )
                 logger.info(f"範囲選択でAmazonQテンプレートを追加: {template_name}")
 
                 self.refresh_amazonq_templates()
 
         except Exception as e:
             logger.error(f"範囲選択テンプレート追加エラー: {e}")
-            messagebox.showerror("エラー", f"範囲選択テンプレートの追加に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"範囲選択テンプレートの追加に失敗しました: {e}"
+            )
             # エラー時もダイアログを再表示
-            if hasattr(self, 'dialog') and self.dialog:
+            if hasattr(self, "dialog") and self.dialog:
                 self.dialog.deiconify()
 
     def delete_amazonq_template(self):
@@ -610,16 +678,20 @@ class TemplateManager:
             return
 
         item = self.amazonq_tree.item(selection[0])
-        template_name = item['values'][0]
+        template_name = item["values"][0]
 
-        if not messagebox.askyesno("確認", f"▶RUNボタンテンプレート '{template_name}' を削除しますか？"):
+        if not messagebox.askyesno(
+            "確認", f"▶RUNボタンテンプレート '{template_name}' を削除しますか？"
+        ):
             return
 
         try:
             template_path = os.path.join(self.amazonq_folder, template_name)
             if os.path.exists(template_path):
                 os.remove(template_path)
-                messagebox.showinfo("完了", f"テンプレート '{template_name}' を削除しました")
+                messagebox.showinfo(
+                    "完了", f"テンプレート '{template_name}' を削除しました"
+                )
                 logger.info(f"AmazonQテンプレートを削除: {template_name}")
                 self.refresh_amazonq_templates()
 
@@ -636,18 +708,16 @@ class TemplateManager:
                 return
 
             for filename in os.listdir(self.amazonq_folder):
-                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+                if filename.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
                     filepath = os.path.join(self.amazonq_folder, filename)
                     file_stat = os.stat(filepath)
 
                     size_kb = f"{file_stat.st_size / 1024:.1f} KB"
                     created_date = self.format_date(file_stat.st_ctime)
 
-                    self.amazonq_tree.insert("", "end", values=(
-                        filename,
-                        size_kb,
-                        created_date
-                    ))
+                    self.amazonq_tree.insert(
+                        "", "end", values=(filename, size_kb, created_date)
+                    )
 
             logger.info("AmazonQテンプレート一覧を更新しました")
 
@@ -661,7 +731,7 @@ class TemplateManager:
             return
 
         item = self.amazonq_tree.item(selection[0])
-        template_name = item['values'][0]
+        template_name = item["values"][0]
         template_path = os.path.join(self.amazonq_folder, template_name)
 
         # プレビュー表示

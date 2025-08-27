@@ -58,7 +58,7 @@ class TemplateCaptureDialog:
             self.dialog.grab_set()
 
             # ESCキーで閉じる
-            self.dialog.bind('<Escape>', lambda e: self.cancel())
+            self.dialog.bind("<Escape>", lambda e: self.cancel())
 
             self.setup_ui()
 
@@ -105,9 +105,9 @@ class TemplateCaptureDialog:
             canvas_frame,
             yscrollcommand=v_scrollbar.set,
             xscrollcommand=h_scrollbar.set,
-            bg='white',
+            bg="white",
             highlightthickness=0,
-            bd=0
+            bd=0,
         )
 
         v_scrollbar.config(command=self.canvas.yview)
@@ -137,24 +137,51 @@ class TemplateCaptureDialog:
         self.canvas.bind("<Motion>", self.on_mouse_motion)
 
         # 追加のマウスイベント
-        self.canvas.bind("<Enter>", lambda e: print("DEBUG: マウスがキャンバスに入った"))
-        self.canvas.bind("<Leave>", lambda e: print("DEBUG: マウスがキャンバスから出た"))
+        self.canvas.bind(
+            "<Enter>", lambda e: print("DEBUG: マウスがキャンバスに入った")
+        )
+        self.canvas.bind(
+            "<Leave>", lambda e: print("DEBUG: マウスがキャンバスから出た")
+        )
 
         # ボタンフレーム（最下部に固定配置）
-        button_frame = tk.Frame(self.dialog, bg='lightgray', relief='raised', bd=2)
+        button_frame = tk.Frame(self.dialog, bg="lightgray", relief="raised", bd=2)
         button_frame.pack(fill=tk.X, padx=10, pady=5, side=tk.BOTTOM, before=main_frame)
 
         # ボタンを大きくして見やすく
-        tk.Button(button_frame, text="保存", command=self.save_template,
-                 font=('Arial', 12), bg='green', fg='white', width=10).pack(side=tk.LEFT, padx=5, pady=5)
-        tk.Button(button_frame, text="キャンセル", command=self.cancel,
-                 font=('Arial', 12), bg='red', fg='white', width=10).pack(side=tk.LEFT, padx=5, pady=5)
-        tk.Button(button_frame, text="選択をクリア", command=self.clear_selection_full,
-                 font=('Arial', 12), width=12).pack(side=tk.LEFT, padx=5, pady=5)
+        tk.Button(
+            button_frame,
+            text="保存",
+            command=self.save_template,
+            font=("Arial", 12),
+            bg="green",
+            fg="white",
+            width=10,
+        ).pack(side=tk.LEFT, padx=5, pady=5)
+        tk.Button(
+            button_frame,
+            text="キャンセル",
+            command=self.cancel,
+            font=("Arial", 12),
+            bg="red",
+            fg="white",
+            width=10,
+        ).pack(side=tk.LEFT, padx=5, pady=5)
+        tk.Button(
+            button_frame,
+            text="選択をクリア",
+            command=self.clear_selection_full,
+            font=("Arial", 12),
+            width=12,
+        ).pack(side=tk.LEFT, padx=5, pady=5)
 
         # 選択情報表示
-        self.info_label = tk.Label(button_frame, text="範囲を選択してください",
-                                  font=('Arial', 11), bg='lightgray')
+        self.info_label = tk.Label(
+            button_frame,
+            text="範囲を選択してください",
+            font=("Arial", 11),
+            bg="lightgray",
+        )
         self.info_label.pack(side=tk.RIGHT, padx=5, pady=5)
 
     def display_screenshot(self):
@@ -178,7 +205,9 @@ class TemplateCaptureDialog:
             self.canvas.config(width=min(width, 1200), height=min(height, 800))
 
             # キャンバスに画像を表示
-            self.image_item = self.canvas.create_image(0, 0, anchor=tk.NW, image=self.photo_image)
+            self.image_item = self.canvas.create_image(
+                0, 0, anchor=tk.NW, image=self.photo_image
+            )
 
             # スクロール領域を設定
             self.canvas.configure(scrollregion=(0, 0, width, height))
@@ -204,18 +233,26 @@ class TemplateCaptureDialog:
         self.canvas.focus_set()
 
         logger.debug(f"選択開始: ({self.start_x}, {self.start_y})")
-        print(f"DEBUG: マウス押下 - event.x={event.x}, event.y={event.y}, start_x={self.start_x}, start_y={self.start_y}")
+        print(
+            f"DEBUG: マウス押下 - event.x={event.x}, event.y={event.y}, start_x={self.start_x}, start_y={self.start_y}"
+        )
 
         # 初期矩形を作成（サイズ0で）
         try:
             self.selection_rect = self.canvas.create_rectangle(
-                self.start_x, self.start_y, self.start_x, self.start_y,
-                outline='red', width=3
+                self.start_x,
+                self.start_y,
+                self.start_x,
+                self.start_y,
+                outline="red",
+                width=3,
             )
             print(f"DEBUG: 矩形作成成功 - rect_id={self.selection_rect}")
         except Exception as e:
             print(f"DEBUG: 矩形作成エラー - {e}")
-            print(f"DEBUG: 座標情報 - start_x={self.start_x} ({type(self.start_x)}), start_y={self.start_y} ({type(self.start_y)})")
+            print(
+                f"DEBUG: 座標情報 - start_x={self.start_x} ({type(self.start_x)}), start_y={self.start_y} ({type(self.start_y)})"
+            )
 
     def on_mouse_drag(self, event):
         """マウスドラッグ時の処理"""
@@ -231,12 +268,19 @@ class TemplateCaptureDialog:
 
         # 既存の選択矩形を更新
         if self.selection_rect:
-            self.canvas.coords(self.selection_rect, self.start_x, self.start_y, current_x, current_y)
+            self.canvas.coords(
+                self.selection_rect, self.start_x, self.start_y, current_x, current_y
+            )
         else:
             # 矩形が存在しない場合は新規作成
             self.selection_rect = self.canvas.create_rectangle(
-                self.start_x, self.start_y, current_x, current_y,
-                outline='red', width=3, fill=''
+                self.start_x,
+                self.start_y,
+                current_x,
+                current_y,
+                outline="red",
+                width=3,
+                fill="",
             )
 
         # 選択範囲の情報を更新
@@ -261,7 +305,9 @@ class TemplateCaptureDialog:
             self.info_label.config(text="選択範囲が小さすぎます（最小10x10px）")
             return
 
-        logger.debug(f"選択完了: ({self.start_x}, {self.start_y}) - ({self.end_x}, {self.end_y})")
+        logger.debug(
+            f"選択完了: ({self.start_x}, {self.start_y}) - ({self.end_x}, {self.end_y})"
+        )
         self.info_label.config(text=f"選択完了: {int(width)} x {int(height)} px")
 
     def clear_selection(self):
@@ -275,13 +321,17 @@ class TemplateCaptureDialog:
         # self.start_y = None
         self.end_x = None
         self.end_y = None
-        if hasattr(self, 'info_label'):
+        if hasattr(self, "info_label"):
             self.info_label.config(text="範囲を選択してください")
 
     def save_template(self):
         """選択範囲をテンプレートとして保存"""
-        if (self.start_x is None or self.start_y is None or
-            self.end_x is None or self.end_y is None):
+        if (
+            self.start_x is None
+            or self.start_y is None
+            or self.end_x is None
+            or self.end_y is None
+        ):
             messagebox.showwarning("警告", "範囲を選択してください")
             return
 
@@ -290,7 +340,7 @@ class TemplateCaptureDialog:
             template_name = simpledialog.askstring(
                 "テンプレート名",
                 "テンプレート名を入力してください:",
-                parent=self.dialog
+                parent=self.dialog,
             )
 
             if not template_name:
@@ -333,7 +383,11 @@ class TemplateCaptureDialog:
         x = float(event.x)
         y = float(event.y)
         # デバッグ情報を少なくする
-        if hasattr(self, '_last_motion_log') and abs(x - self._last_motion_log[0]) < 50 and abs(y - self._last_motion_log[1]) < 50:
+        if (
+            hasattr(self, "_last_motion_log")
+            and abs(x - self._last_motion_log[0]) < 50
+            and abs(y - self._last_motion_log[1]) < 50
+        ):
             return
         self._last_motion_log = (x, y)
         # print(f"DEBUG: マウス移動 - x={x}, y={y}")  # コメントアウトして出力を減らす

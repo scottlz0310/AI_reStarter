@@ -25,7 +25,7 @@ class ImageProcessor:
         screenshot: np.ndarray,
         error_templates: dict[str, np.ndarray],
         threshold: float = 0.8,
-        monitor_region: Optional[tuple[int, int, int, int]] = None
+        monitor_region: Optional[tuple[int, int, int, int]] = None,
     ) -> Optional[str]:
         """
         エラーを検出
@@ -46,21 +46,27 @@ class ImageProcessor:
 
             for error_name, template in error_templates.items():
                 # テンプレートのサイズをログ出力
-                logger.debug(f"テンプレート '{error_name}' サイズ: {template.shape} (H x W)")
+                logger.debug(
+                    f"テンプレート '{error_name}' サイズ: {template.shape} (H x W)"
+                )
 
                 # サイズ比較を詳細にログ出力
                 screenshot_h, screenshot_w = screenshot.shape[:2]
                 template_h, template_w = template.shape[:2]
 
-                logger.debug(f"サイズ比較 '{error_name}': "
-                           f"スクリーンショット({screenshot_h}x{screenshot_w}) vs "
-                           f"テンプレート({template_h}x{template_w})")
+                logger.debug(
+                    f"サイズ比較 '{error_name}': "
+                    f"スクリーンショット({screenshot_h}x{screenshot_w}) vs "
+                    f"テンプレート({template_h}x{template_w})"
+                )
 
                 # サイズチェック: テンプレートがスクリーンショットより大きい場合はスキップ
                 if template_h > screenshot_h or template_w > screenshot_w:
-                    logger.warning(f"テンプレート '{error_name}' がスクリーンショットより大きいためスキップ "
-                                 f"(テンプレート: {template_h}x{template_w}, "
-                                 f"スクリーンショット: {screenshot_h}x{screenshot_w})")
+                    logger.warning(
+                        f"テンプレート '{error_name}' がスクリーンショットより大きいためスキップ "
+                        f"(テンプレート: {template_h}x{template_w}, "
+                        f"スクリーンショット: {screenshot_h}x{screenshot_w})"
+                    )
                     continue
 
                 # テンプレートマッチング
@@ -68,7 +74,9 @@ class ImageProcessor:
                 result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
                 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-                logger.debug(f"マッチング結果 '{error_name}': 信頼度={max_val:.3f}, 闾値={threshold}")
+                logger.debug(
+                    f"マッチング結果 '{error_name}': 信頼度={max_val:.3f}, 闾値={threshold}"
+                )
 
                 if max_val >= threshold:
                     logger.info(f"エラー検出: {error_name} (信頼度: {max_val:.3f})")
@@ -81,10 +89,7 @@ class ImageProcessor:
             return None
 
     def find_template_position(
-        self,
-        screenshot: np.ndarray,
-        template: np.ndarray,
-        threshold: float = 0.7
+        self, screenshot: np.ndarray, template: np.ndarray, threshold: float = 0.7
     ) -> Optional[tuple[int, int]]:
         """
         テンプレートの位置を検出
@@ -97,8 +102,10 @@ class ImageProcessor:
         """
         try:
             # サイズチェック
-            if (template.shape[0] > screenshot.shape[0] or
-                template.shape[1] > screenshot.shape[1]):
+            if (
+                template.shape[0] > screenshot.shape[0]
+                or template.shape[1] > screenshot.shape[1]
+            ):
                 logger.debug("テンプレートがスクリーンショットより大きいためスキップ")
                 return None
 
@@ -118,11 +125,7 @@ class ImageProcessor:
             logger.error(f"テンプレート位置検出エラー: {e}")
             return None
 
-    def save_template(
-        self,
-        image: np.ndarray,
-        template_path: str
-    ) -> bool:
+    def save_template(self, image: np.ndarray, template_path: str) -> bool:
         """
         テンプレート画像を保存
         Args:

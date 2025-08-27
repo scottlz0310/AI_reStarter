@@ -50,9 +50,15 @@ class MonitorWidget(ttk.Frame):
         # 状態ラベル
         self.mode_label = ttk.Label(self.status_group, text="モード: Kiro-IDE")
         self.status_label = ttk.Label(self.status_group, text="状態: 停止中")
-        self.template_count_label = ttk.Label(self.status_group, text="テンプレート: 0個")
-        self.last_action_label = ttk.Label(self.status_group, text="最終アクション: なし")
-        self.recovery_attempts_label = ttk.Label(self.status_group, text="復旧試行: 0/3")
+        self.template_count_label = ttk.Label(
+            self.status_group, text="テンプレート: 0個"
+        )
+        self.last_action_label = ttk.Label(
+            self.status_group, text="最終アクション: なし"
+        )
+        self.recovery_attempts_label = ttk.Label(
+            self.status_group, text="復旧試行: 0/3"
+        )
 
         # ラベルをグリッドに配置
         self.mode_label.grid(row=0, column=1, sticky=tk.W, padx=5, pady=2)
@@ -62,11 +68,21 @@ class MonitorWidget(ttk.Frame):
         self.recovery_attempts_label.grid(row=4, column=1, sticky=tk.W, padx=5, pady=2)
 
         # ラベルテキスト
-        ttk.Label(self.status_group, text="モード:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=2)
-        ttk.Label(self.status_group, text="状態:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=2)
-        ttk.Label(self.status_group, text="テンプレート:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=2)
-        ttk.Label(self.status_group, text="最終アクション:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=2)
-        ttk.Label(self.status_group, text="復旧試行:").grid(row=4, column=0, sticky=tk.W, padx=5, pady=2)
+        ttk.Label(self.status_group, text="モード:").grid(
+            row=0, column=0, sticky=tk.W, padx=5, pady=2
+        )
+        ttk.Label(self.status_group, text="状態:").grid(
+            row=1, column=0, sticky=tk.W, padx=5, pady=2
+        )
+        ttk.Label(self.status_group, text="テンプレート:").grid(
+            row=2, column=0, sticky=tk.W, padx=5, pady=2
+        )
+        ttk.Label(self.status_group, text="最終アクション:").grid(
+            row=3, column=0, sticky=tk.W, padx=5, pady=2
+        )
+        ttk.Label(self.status_group, text="復旧試行:").grid(
+            row=4, column=0, sticky=tk.W, padx=5, pady=2
+        )
 
     def setup_control_group(self):
         """制御ボタングループの設定"""
@@ -81,13 +97,31 @@ class MonitorWidget(ttk.Frame):
         button_frame2.pack(fill=tk.X, padx=5, pady=2)
 
         # 制御ボタン（適切なフレームに配置）
-        self.start_button = ttk.Button(button_frame1, text="監視開始", command=self._on_start_clicked)
-        self.stop_button = ttk.Button(button_frame1, text="監視停止", command=self._on_stop_clicked)
-        self.monitor_area_button = ttk.Button(button_frame1, text="監視エリア設定", command=self._on_monitor_area_clicked)
+        self.start_button = ttk.Button(
+            button_frame1, text="監視開始", command=self._on_start_clicked
+        )
+        self.stop_button = ttk.Button(
+            button_frame1, text="監視停止", command=self._on_stop_clicked
+        )
+        self.monitor_area_button = ttk.Button(
+            button_frame1, text="監視エリア設定", command=self._on_monitor_area_clicked
+        )
 
-        self.save_template_button = ttk.Button(button_frame2, text="テンプレート保存", command=self._on_save_template_clicked)
-        self.save_template_selection_button = ttk.Button(button_frame2, text="範囲選択で保存", command=self._on_save_template_with_selection_clicked)
-        self.send_recovery_button = ttk.Button(button_frame2, text="復旧コマンド送信", command=self._on_send_recovery_clicked)
+        self.save_template_button = ttk.Button(
+            button_frame2,
+            text="テンプレート保存",
+            command=self._on_save_template_clicked,
+        )
+        self.save_template_selection_button = ttk.Button(
+            button_frame2,
+            text="範囲選択で保存",
+            command=self._on_save_template_with_selection_clicked,
+        )
+        self.send_recovery_button = ttk.Button(
+            button_frame2,
+            text="復旧コマンド送信",
+            command=self._on_send_recovery_clicked,
+        )
 
         # ボタンの初期状態設定
         self.stop_button.config(state="disabled")
@@ -111,12 +145,16 @@ class MonitorWidget(ttk.Frame):
         self.log_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # スクロールバー
-        scrollbar = ttk.Scrollbar(self.log_group, orient=tk.VERTICAL, command=self.log_text.yview)
+        scrollbar = ttk.Scrollbar(
+            self.log_group, orient=tk.VERTICAL, command=self.log_text.yview
+        )
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.log_text.config(yscrollcommand=scrollbar.set)
 
         # ログクリアボタン
-        self.clear_log_button = ttk.Button(self.log_group, text="ログクリア", command=self.clear_log)
+        self.clear_log_button = ttk.Button(
+            self.log_group, text="ログクリア", command=self.clear_log
+        )
         self.clear_log_button.pack(pady=5)
 
     def setup_progress_group(self):
@@ -125,24 +163,33 @@ class MonitorWidget(ttk.Frame):
         self.progress_group.pack(fill=tk.X, padx=5, pady=5)
 
         # 復旧試行進捗バー
-        self.recovery_progress = ttk.Progressbar(self.progress_group, length=300, mode='determinate')
+        self.recovery_progress = ttk.Progressbar(
+            self.progress_group, length=300, mode="determinate"
+        )
         self.recovery_progress.pack(padx=5, pady=5)
 
         # 進捗ラベル
         self.progress_label = ttk.Label(self.progress_group, text="復旧試行: 0/3")
         self.progress_label.pack(pady=2)
 
-    def set_callbacks(self, start_callback: Callable, stop_callback: Callable,
-                     save_template_callback: Callable, send_recovery_callback: Callable,
-                     monitor_area_callback: Optional[Callable] = None,
-                     save_template_with_selection_callback: Optional[Callable] = None):
+    def set_callbacks(
+        self,
+        start_callback: Callable,
+        stop_callback: Callable,
+        save_template_callback: Callable,
+        send_recovery_callback: Callable,
+        monitor_area_callback: Optional[Callable] = None,
+        save_template_with_selection_callback: Optional[Callable] = None,
+    ):
         """コールバック関数を設定"""
         self.start_callback = start_callback
         self.stop_callback = stop_callback
         self.save_template_callback = save_template_callback
         self.send_recovery_callback = send_recovery_callback
         self.monitor_area_callback = monitor_area_callback
-        self.save_template_with_selection_callback = save_template_with_selection_callback
+        self.save_template_with_selection_callback = (
+            save_template_with_selection_callback
+        )
 
     def _on_start_clicked(self):
         """開始ボタンクリック時の処理"""
@@ -179,7 +226,9 @@ class MonitorWidget(ttk.Frame):
         try:
             # 監視状態の更新
             monitoring = status_data.get("monitoring", False)
-            self.status_label.config(text=f"状態: {'監視中' if monitoring else '停止中'}")
+            self.status_label.config(
+                text=f"状態: {'監視中' if monitoring else '停止中'}"
+            )
 
             # ボタンの有効/無効切り替え
             self.start_button.config(state="disabled" if monitoring else "normal")
@@ -192,11 +241,15 @@ class MonitorWidget(ttk.Frame):
             # 復旧試行回数の更新
             recovery_attempts = status_data.get("recovery_attempts", 0)
             max_attempts = status_data.get("max_recovery_attempts", 3)
-            self.recovery_attempts_label.config(text=f"復旧試行: {recovery_attempts}/{max_attempts}")
+            self.recovery_attempts_label.config(
+                text=f"復旧試行: {recovery_attempts}/{max_attempts}"
+            )
 
             # 進捗バーの更新
             self.recovery_progress.config(maximum=max_attempts, value=recovery_attempts)
-            self.progress_label.config(text=f"復旧試行: {recovery_attempts}/{max_attempts}")
+            self.progress_label.config(
+                text=f"復旧試行: {recovery_attempts}/{max_attempts}"
+            )
 
             logger.debug(f"状態を更新しました: {status_data}")
 
@@ -207,6 +260,7 @@ class MonitorWidget(ttk.Frame):
         """ログを追加"""
         try:
             import datetime
+
             timestamp = datetime.datetime.now().strftime("%H:%M:%S")
             log_entry = f"[{timestamp}] {message}\n"
             self.log_text.insert(tk.END, log_entry)

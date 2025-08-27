@@ -27,23 +27,23 @@ def main():
     """メインエントリーポイント"""
     try:
         logger.info("AI reStarter を起動しています...")
-        
+
         # ルートウィンドウの作成
         root = tk.Tk()
         root.title("AI reStarter - AI-IDE自動復旧システム")
         root.geometry("800x600")
-        
+
         # メインウィンドウの作成
         main_window = MainWindow(root)
-        
+
         # クローズイベントの設定
         root.protocol("WM_DELETE_WINDOW", main_window.on_closing)
-        
+
         logger.info("メインウィンドウを表示しました")
-        
+
         # メインループの開始
         root.mainloop()
-        
+
     except Exception as e:
         logger.critical(f"アプリケーション起動エラー: {e}", exc_info=True)
         sys.exit(1)

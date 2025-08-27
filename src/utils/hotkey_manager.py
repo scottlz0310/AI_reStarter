@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 # keyboardライブラリを条件付きでインポート
 try:
     import keyboard
+
     KEYBOARD_AVAILABLE = True
 except ImportError:
     KEYBOARD_AVAILABLE = False
@@ -24,7 +25,9 @@ class HotkeyManager:
     def __init__(self):
         """初期化"""
         if not KEYBOARD_AVAILABLE:
-            logger.warning("keyboardライブラリが利用できません。ホットキー機能は無効です。")
+            logger.warning(
+                "keyboardライブラリが利用できません。ホットキー機能は無効です。"
+            )
         else:
             logger.info("ホットキー管理機能を初期化しました")
 
@@ -37,7 +40,9 @@ class HotkeyManager:
             設定成功フラグ
         """
         if not KEYBOARD_AVAILABLE:
-            logger.warning("keyboardライブラリが利用できません。ホットキー機能は無効です。")
+            logger.warning(
+                "keyboardライブラリが利用できません。ホットキー機能は無効です。"
+            )
             return False
 
         try:

@@ -80,7 +80,9 @@ class LogViewer:
         refresh_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # クリアボタン
-        clear_button = ttk.Button(toolbar, text="クリア", command=self.clear_log_display)
+        clear_button = ttk.Button(
+            toolbar, text="クリア", command=self.clear_log_display
+        )
         clear_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 保存ボタン
@@ -93,9 +95,12 @@ class LogViewer:
 
         # 自動更新チェックボックス
         self.auto_refresh_var = tk.BooleanVar(value=False)
-        auto_refresh_check = ttk.Checkbutton(toolbar, text="自動更新",
-                                           variable=self.auto_refresh_var,
-                                           command=self.toggle_auto_refresh)
+        auto_refresh_check = ttk.Checkbutton(
+            toolbar,
+            text="自動更新",
+            variable=self.auto_refresh_var,
+            command=self.toggle_auto_refresh,
+        )
         auto_refresh_check.pack(side=tk.RIGHT, padx=(10, 0))
 
     def create_log_file_selector(self, parent):
@@ -106,13 +111,16 @@ class LogViewer:
         # ログファイル選択コンボボックス
         ttk.Label(selector_frame, text="ログファイル:").pack(side=tk.LEFT, padx=(0, 10))
         self.log_file_var = tk.StringVar()
-        self.log_file_combo = ttk.Combobox(selector_frame, textvariable=self.log_file_var,
-                                          state="readonly", width=40)
+        self.log_file_combo = ttk.Combobox(
+            selector_frame, textvariable=self.log_file_var, state="readonly", width=40
+        )
         self.log_file_combo.pack(side=tk.LEFT, padx=(0, 10))
         self.log_file_combo.bind("<<ComboboxSelected>>", self.on_log_file_selected)
 
         # 手動ファイル選択ボタン
-        browse_button = ttk.Button(selector_frame, text="参照", command=self.browse_log_file)
+        browse_button = ttk.Button(
+            selector_frame, text="参照", command=self.browse_log_file
+        )
         browse_button.pack(side=tk.LEFT)
 
     def create_log_display(self, parent):
@@ -124,9 +132,15 @@ class LogViewer:
         self.log_text = tk.Text(display_frame, font=("Consolas", 9), wrap=tk.NONE)
 
         # スクロールバー
-        v_scrollbar = ttk.Scrollbar(display_frame, orient=tk.VERTICAL, command=self.log_text.yview)
-        h_scrollbar = ttk.Scrollbar(display_frame, orient=tk.HORIZONTAL, command=self.log_text.xview)
-        self.log_text.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        v_scrollbar = ttk.Scrollbar(
+            display_frame, orient=tk.VERTICAL, command=self.log_text.yview
+        )
+        h_scrollbar = ttk.Scrollbar(
+            display_frame, orient=tk.HORIZONTAL, command=self.log_text.xview
+        )
+        self.log_text.configure(
+            yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set
+        )
 
         # 配置
         self.log_text.grid(row=0, column=0, sticky="nsew")
@@ -142,38 +156,58 @@ class LogViewer:
         filter_frame.pack(fill=tk.X, pady=(0, 10))
 
         # ログレベルフィルター
-        ttk.Label(filter_frame, text="ログレベル:").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        ttk.Label(filter_frame, text="ログレベル:").grid(
+            row=0, column=0, sticky=tk.W, padx=(0, 10)
+        )
         self.log_level_var = tk.StringVar(value="ALL")
-        log_level_combo = ttk.Combobox(filter_frame, textvariable=self.log_level_var,
-                                      values=["ALL", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                                      state="readonly", width=15)
+        log_level_combo = ttk.Combobox(
+            filter_frame,
+            textvariable=self.log_level_var,
+            values=["ALL", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+            state="readonly",
+            width=15,
+        )
         log_level_combo.grid(row=0, column=1, sticky=tk.W, padx=(0, 20))
         log_level_combo.bind("<<ComboboxSelected>>", self.apply_filters)
 
         # 日時フィルター
-        ttk.Label(filter_frame, text="開始日時:").grid(row=0, column=2, sticky=tk.W, padx=(0, 10))
+        ttk.Label(filter_frame, text="開始日時:").grid(
+            row=0, column=2, sticky=tk.W, padx=(0, 10)
+        )
         self.start_date_var = tk.StringVar()
-        start_date_entry = ttk.Entry(filter_frame, textvariable=self.start_date_var, width=20)
+        start_date_entry = ttk.Entry(
+            filter_frame, textvariable=self.start_date_var, width=20
+        )
         start_date_entry.grid(row=0, column=3, sticky=tk.W, padx=(0, 10))
 
-        ttk.Label(filter_frame, text="終了日時:").grid(row=0, column=4, sticky=tk.W, padx=(0, 10))
+        ttk.Label(filter_frame, text="終了日時:").grid(
+            row=0, column=4, sticky=tk.W, padx=(0, 10)
+        )
         self.end_date_var = tk.StringVar()
-        end_date_entry = ttk.Entry(filter_frame, textvariable=self.end_date_var, width=20)
+        end_date_entry = ttk.Entry(
+            filter_frame, textvariable=self.end_date_var, width=20
+        )
         end_date_entry.grid(row=0, column=5, sticky=tk.W)
 
         # キーワードフィルター
-        ttk.Label(filter_frame, text="キーワード:").grid(row=1, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        ttk.Label(filter_frame, text="キーワード:").grid(
+            row=1, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0)
+        )
         self.keyword_var = tk.StringVar()
         keyword_entry = ttk.Entry(filter_frame, textvariable=self.keyword_var, width=30)
         keyword_entry.grid(row=1, column=1, columnspan=2, sticky=tk.W, pady=(10, 0))
         keyword_entry.bind("<KeyRelease>", self.apply_filters)
 
         # フィルター適用ボタン
-        apply_filter_button = ttk.Button(filter_frame, text="フィルター適用", command=self.apply_filters)
+        apply_filter_button = ttk.Button(
+            filter_frame, text="フィルター適用", command=self.apply_filters
+        )
         apply_filter_button.grid(row=1, column=3, padx=(20, 0), pady=(10, 0))
 
         # フィルタークリアボタン
-        clear_filter_button = ttk.Button(filter_frame, text="フィルタークリア", command=self.clear_filters)
+        clear_filter_button = ttk.Button(
+            filter_frame, text="フィルタークリア", command=self.clear_filters
+        )
         clear_filter_button.grid(row=1, column=4, padx=(10, 0), pady=(10, 0))
 
     def create_status_bar(self, parent):
@@ -197,7 +231,7 @@ class LogViewer:
             # 現在のディレクトリからログファイルを検索
             current_dir = os.getcwd()
             for filename in os.listdir(current_dir):
-                if filename.endswith('.log'):
+                if filename.endswith(".log"):
                     self.log_files.append(filename)
 
             # デフォルトのログファイルを追加
@@ -207,7 +241,7 @@ class LogViewer:
                     self.log_files.append(log_file)
 
             # コンボボックスを更新
-            self.log_file_combo['values'] = self.log_files
+            self.log_file_combo["values"] = self.log_files
 
             if self.log_files:
                 # 最初のログファイルを選択
@@ -237,15 +271,15 @@ class LogViewer:
             filetypes=[
                 ("ログファイル", "*.log"),
                 ("テキストファイル", "*.txt"),
-                ("全てのファイル", "*.*")
-            ]
+                ("全てのファイル", "*.*"),
+            ],
         )
 
         if file_path:
             filename = os.path.basename(file_path)
             if filename not in self.log_files:
                 self.log_files.append(filename)
-                self.log_file_combo['values'] = self.log_files
+                self.log_file_combo["values"] = self.log_files
 
             self.log_file_combo.set(filename)
             self.on_log_file_selected(None)
@@ -259,14 +293,16 @@ class LogViewer:
             self.log_content.clear()
             self.log_text.delete(1.0, tk.END)
 
-            with open(self.current_log_file, encoding='utf-8', errors='ignore') as f:
+            with open(self.current_log_file, encoding="utf-8", errors="ignore") as f:
                 for line_num, line in enumerate(f, 1):
-                    self.log_content.append({
-                        'line_num': line_num,
-                        'content': line.rstrip(),
-                        'timestamp': self.extract_timestamp(line),
-                        'level': self.extract_log_level(line)
-                    })
+                    self.log_content.append(
+                        {
+                            "line_num": line_num,
+                            "content": line.rstrip(),
+                            "timestamp": self.extract_timestamp(line),
+                            "level": self.extract_log_level(line),
+                        }
+                    )
 
             # ログ内容を表示
             self.display_log_content()
@@ -274,7 +310,9 @@ class LogViewer:
             # ステータス更新
             self.status_label.config(text=f"ログ行数: {len(self.log_content)}")
 
-            logger.debug(f"ログファイル '{self.current_log_file}' から {len(self.log_content)} 行を読み込みました")
+            logger.debug(
+                f"ログファイル '{self.current_log_file}' から {len(self.log_content)} 行を読み込みました"
+            )
 
         except Exception as e:
             logger.error(f"ログ内容読み込みエラー: {e}")
@@ -286,10 +324,11 @@ class LogViewer:
         try:
             # 一般的なログ形式のタイムスタンプを検出
             import re
+
             timestamp_patterns = [
-                r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})',
-                r'(\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2})',
-                r'(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})'
+                r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})",
+                r"(\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2})",
+                r"(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})",
             ]
 
             for pattern in timestamp_patterns:
@@ -305,7 +344,8 @@ class LogViewer:
         """ログ行からログレベルを抽出"""
         try:
             import re
-            level_pattern = r'(\b(?:DEBUG|INFO|WARNING|ERROR|CRITICAL)\b)'
+
+            level_pattern = r"(\b(?:DEBUG|INFO|WARNING|ERROR|CRITICAL)\b)"
             match = re.search(level_pattern, line.upper())
             return match.group(1) if match else None
         except Exception:
@@ -334,27 +374,34 @@ class LogViewer:
     def should_display_log(self, log_entry):
         """ログエントリを表示すべきか判定"""
         # ログレベルフィルター
-        if (self.log_level_var.get() != "ALL" and
-            (not log_entry['level'] or log_entry['level'] != self.log_level_var.get())):
+        if self.log_level_var.get() != "ALL" and (
+            not log_entry["level"] or log_entry["level"] != self.log_level_var.get()
+        ):
             return False
 
         # キーワードフィルター
         keyword = self.keyword_var.get().strip()
-        if keyword and keyword.lower() not in log_entry['content'].lower():
+        if keyword and keyword.lower() not in log_entry["content"].lower():
             return False
 
         # 日時フィルター
-        if log_entry['timestamp']:
+        if log_entry["timestamp"]:
             try:
-                log_time = datetime.datetime.strptime(log_entry['timestamp'], "%Y-%m-%d %H:%M:%S")
+                log_time = datetime.datetime.strptime(
+                    log_entry["timestamp"], "%Y-%m-%d %H:%M:%S"
+                )
 
                 if self.start_date_var.get().strip():
-                    start_time = datetime.datetime.strptime(self.start_date_var.get(), "%Y-%m-%d %H:%M:%S")
+                    start_time = datetime.datetime.strptime(
+                        self.start_date_var.get(), "%Y-%m-%d %H:%M:%S"
+                    )
                     if log_time < start_time:
                         return False
 
                 if self.end_date_var.get().strip():
-                    end_time = datetime.datetime.strptime(self.end_date_var.get(), "%Y-%m-%d %H:%M:%S")
+                    end_time = datetime.datetime.strptime(
+                        self.end_date_var.get(), "%Y-%m-%d %H:%M:%S"
+                    )
                     if log_time > end_time:
                         return False
 
@@ -392,7 +439,9 @@ class LogViewer:
         """ログを保存"""
         try:
             if not self.current_log_file:
-                messagebox.showwarning("警告", "保存するログファイルが選択されていません")
+                messagebox.showwarning(
+                    "警告", "保存するログファイルが選択されていません"
+                )
                 return
 
             # 保存先を選択
@@ -402,12 +451,12 @@ class LogViewer:
                 filetypes=[
                     ("ログファイル", "*.log"),
                     ("テキストファイル", "*.txt"),
-                    ("全てのファイル", "*.*")
-                ]
+                    ("全てのファイル", "*.*"),
+                ],
             )
 
             if save_path:
-                with open(save_path, 'w', encoding='utf-8') as f:
+                with open(save_path, "w", encoding="utf-8") as f:
                     f.write(self.log_text.get(1.0, tk.END))
 
                 messagebox.showinfo("完了", f"ログを保存しました: {save_path}")
@@ -421,7 +470,9 @@ class LogViewer:
         """ログを検索"""
         try:
             # 検索ダイアログ
-            search_term = tk.simpledialog.askstring("ログ検索", "検索する文字列を入力してください:")
+            search_term = tk.simpledialog.askstring(
+                "ログ検索", "検索する文字列を入力してください:"
+            )
 
             if search_term:
                 # 検索実行
@@ -464,7 +515,7 @@ class LogViewer:
 
     def stop_auto_refresh(self):
         """自動更新を停止"""
-        if hasattr(self, 'auto_refresh_timer'):
+        if hasattr(self, "auto_refresh_timer"):
             self.dialog.after_cancel(self.auto_refresh_timer)
             logger.debug("ログの自動更新を停止しました")
 
@@ -472,7 +523,9 @@ class LogViewer:
         """自動更新コールバック"""
         if self.auto_refresh_var.get():
             self.refresh_logs()
-            self.auto_refresh_timer = self.dialog.after(5000, self.auto_refresh_callback)
+            self.auto_refresh_timer = self.dialog.after(
+                5000, self.auto_refresh_callback
+            )
 
     def close(self):
         """ダイアログを閉じる"""

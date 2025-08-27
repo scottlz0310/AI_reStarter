@@ -36,7 +36,7 @@ class MockDetector(BaseDetector):
                 confidence=0.9,
                 position=(100, 200),
                 template_name="test_template.png",
-                recovery_action="統合テスト用復旧アクション"
+                recovery_action="統合テスト用復旧アクション",
             )
         return None
 
@@ -62,7 +62,9 @@ class TestDetectionWorkflow:
         """設定マネージャーのフィクスチャ"""
         return ConfigManager(str(config_file))
 
-    def test_full_detection_workflow(self, mock_detector, mock_screen_capture, mock_pyautogui):
+    def test_full_detection_workflow(
+        self, mock_detector, mock_screen_capture, mock_pyautogui
+    ):
         """完全な検出ワークフローのテスト"""
         # 画面キャプチャのモック設定
         test_screenshot = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
@@ -85,7 +87,9 @@ class TestDetectionWorkflow:
         assert recovery_success is True
         assert mock_detector.recovery_count == 1
 
-    def test_detection_with_config_integration(self, config_manager, mock_screen_capture):
+    def test_detection_with_config_integration(
+        self, config_manager, mock_screen_capture
+    ):
         """設定管理との統合検出テスト"""
         # 設定から閾値を取得
         threshold = config_manager.get_value("template_threshold", 0.8)
@@ -94,7 +98,7 @@ class TestDetectionWorkflow:
         detector_config = {
             "threshold": threshold,
             "should_detect": True,
-            "recovery_success": True
+            "recovery_success": True,
         }
         detector = MockDetector(detector_config)
 
@@ -107,8 +111,10 @@ class TestDetectionWorkflow:
         assert result is not None
         assert detector.config["threshold"] == threshold
 
-    @patch('src.utils.image_processing.ImageProcessor.find_template_position')
-    def test_template_matching_integration(self, mock_find_template, mock_detector, mock_screen_capture):
+    @patch("src.utils.image_processing.ImageProcessor.find_template_position")
+    def test_template_matching_integration(
+        self, mock_find_template, mock_detector, mock_screen_capture
+    ):
         """テンプレートマッチングとの統合テスト"""
         # テンプレートマッチングのモック設定
         mock_find_template.return_value = (100, 200)
@@ -181,7 +187,9 @@ class TestDetectionWorkflow:
         assert recovery_success is False
         assert detector.recovery_count == 1
 
-    def test_config_update_during_workflow(self, config_manager, mock_detector, mock_screen_capture):
+    def test_config_update_during_workflow(
+        self, config_manager, mock_detector, mock_screen_capture
+    ):
         """ワークフロー実行中の設定更新テスト"""
         # 初期検出
         screenshot = mock_screen_capture()
@@ -199,7 +207,7 @@ class TestDetectionWorkflow:
         assert result2 is not None
         assert mock_detector.config["threshold"] == 0.95
 
-    @patch('src.utils.screen_capture.ScreenCapture.capture_screen')
+    @patch("src.utils.screen_capture.ScreenCapture.capture_screen")
     def test_screen_capture_error_handling(self, mock_capture, mock_detector):
         """画面キャプチャエラー時の処理テスト"""
         # 画面キャプチャでエラーを発生させる
@@ -211,7 +219,9 @@ class TestDetectionWorkflow:
             screenshot = screen_capture.capture_screen()
             mock_detector.detect_state(screenshot)
 
-    def test_detection_result_serialization_workflow(self, mock_detector, mock_screen_capture):
+    def test_detection_result_serialization_workflow(
+        self, mock_detector, mock_screen_capture
+    ):
         """検出結果のシリアライゼーションワークフローテスト"""
         # 検出実行
         screenshot = mock_screen_capture()

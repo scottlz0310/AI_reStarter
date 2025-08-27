@@ -37,19 +37,19 @@ def sample_config() -> dict[str, Any]:
         "recovery_commands": [
             "続行してください",
             "エラーを修正して続行",
-            "タスクを再開してください"
+            "タスクを再開してください",
         ],
         "custom_commands": {
             "compilation_error": "コンパイルエラーを修正して続行してください",
-            "runtime_error": "ランタイムエラーを解決して再実行してください"
+            "runtime_error": "ランタイムエラーを解決して再実行してください",
         },
         "chat_input_position": [1457, 932],
         "monitor_region": [1431, 777, 480, 217],
         "amazonq_config": {
             "enabled": True,
             "detection_interval": 1.5,
-            "template_threshold": 0.85
-        }
+            "template_threshold": 0.85,
+        },
     }
 
 
@@ -85,6 +85,7 @@ def sample_template_image(temp_dir: Path) -> Path:
 @pytest.fixture
 def mock_screen_capture():
     """画面キャプチャ機能をモックするフィクスチャ"""
+
     # デフォルトで100x100の画像を返すモック関数
     def mock_capture_func(*args, **kwargs):
         return np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
@@ -95,25 +96,22 @@ def mock_screen_capture():
 @pytest.fixture
 def mock_pyautogui():
     """pyautoguiをモックするフィクスチャ"""
-    with patch("pyautogui.click") as mock_click, \
-         patch("pyautogui.write") as mock_write, \
-         patch("pyautogui.press") as mock_press:
-        yield {
-            "click": mock_click,
-            "write": mock_write,
-            "press": mock_press
-        }
+    with (
+        patch("pyautogui.click") as mock_click,
+        patch("pyautogui.write") as mock_write,
+        patch("pyautogui.press") as mock_press,
+    ):
+        yield {"click": mock_click, "write": mock_write, "press": mock_press}
 
 
 @pytest.fixture
 def mock_keyboard():
     """keyboardライブラリをモックするフィクスチャ"""
-    with patch("keyboard.add_hotkey") as mock_add_hotkey, \
-         patch("keyboard.remove_hotkey") as mock_remove_hotkey:
-        yield {
-            "add_hotkey": mock_add_hotkey,
-            "remove_hotkey": mock_remove_hotkey
-        }
+    with (
+        patch("keyboard.add_hotkey") as mock_add_hotkey,
+        patch("keyboard.remove_hotkey") as mock_remove_hotkey,
+    ):
+        yield {"add_hotkey": mock_add_hotkey, "remove_hotkey": mock_remove_hotkey}
 
 
 @pytest.fixture
@@ -146,7 +144,7 @@ def setup_test_logging():
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
 
@@ -163,9 +161,11 @@ def setup_test_logging():
 @pytest.fixture
 def mock_win32gui():
     """win32guiライブラリをモックするフィクスチャ（Windows専用機能）"""
-    with patch("win32gui.FindWindow") as mock_find_window, \
-         patch("win32gui.SetForegroundWindow") as mock_set_foreground, \
-         patch("win32gui.GetWindowRect") as mock_get_rect:
+    with (
+        patch("win32gui.FindWindow") as mock_find_window,
+        patch("win32gui.SetForegroundWindow") as mock_set_foreground,
+        patch("win32gui.GetWindowRect") as mock_get_rect,
+    ):
 
         # デフォルトの戻り値を設定
         mock_find_window.return_value = 12345  # ダミーのウィンドウハンドル
@@ -174,7 +174,7 @@ def mock_win32gui():
         yield {
             "find_window": mock_find_window,
             "set_foreground": mock_set_foreground,
-            "get_rect": mock_get_rect
+            "get_rect": mock_get_rect,
         }
 
 
@@ -187,24 +187,17 @@ def detection_result_data() -> dict[str, Any]:
         "position": (100, 200),
         "template_name": "error_template.png",
         "timestamp": "2024-01-01T12:00:00",
-        "recovery_action": "コンパイルエラーを修正して続行してください"
+        "recovery_action": "コンパイルエラーを修正して続行してください",
     }
 
 
 # テスト用のマーカーを定義
 pytest_plugins = []
 
+
 def pytest_configure(config):
     """pytestの設定を行う関数"""
-    config.addinivalue_line(
-        "markers", "unit: 単体テスト用のマーカー"
-    )
-    config.addinivalue_line(
-        "markers", "integration: 統合テスト用のマーカー"
-    )
-    config.addinivalue_line(
-        "markers", "gui: GUIテスト用のマーカー"
-    )
-    config.addinivalue_line(
-        "markers", "slow: 実行時間が長いテスト用のマーカー"
-    )
+    config.addinivalue_line("markers", "unit: 単体テスト用のマーカー")
+    config.addinivalue_line("markers", "integration: 統合テスト用のマーカー")
+    config.addinivalue_line("markers", "gui: GUIテスト用のマーカー")
+    config.addinivalue_line("markers", "slow: 実行時間が長いテスト用のマーカー")

@@ -21,6 +21,7 @@ from src.utils.screen_capture import ScreenCapture
 # cv2ライブラリを条件付きでインポート
 try:
     import cv2
+
     CV2_AVAILABLE = True
 except ImportError:
     CV2_AVAILABLE = False
@@ -33,6 +34,7 @@ logger = logging.getLogger(__name__)
 try:
     import win32con
     import win32gui
+
     WIN32GUI_AVAILABLE = True
 except ImportError:
     WIN32GUI_AVAILABLE = False
@@ -52,6 +54,7 @@ except Exception:
 # pyautoguiライブラリを条件付きでインポート（画面操作用）
 try:
     import pyautogui
+
     PYAUTOGUI_AVAILABLE = True
 except ImportError:
     PYAUTOGUI_AVAILABLE = False
@@ -93,26 +96,26 @@ class KiroRecovery:
         # if not PYPERCLIP_AVAILABLE:
         #     logger.warning("pyperclipが利用できません。クリップボード入力機能は無効です。")
         if not WIN32GUI_AVAILABLE:
-            logger.warning(
-                "win32guiが利用できません。強制フォーカス機能は無効です。"
-            )
+            logger.warning("win32guiが利用できません。強制フォーカス機能は無効です。")
         if not PYAUTOGUI_AVAILABLE:
-            logger.warning(
-                "pyautoguiが利用できません。画面操作機能は無効です。"
-            )
+            logger.warning("pyautoguiが利用できません。画面操作機能は無効です。")
         if not self.screen_capture.is_available():
             logger.warning("画面キャプチャ機能が利用できません。")
 
     def load_error_templates(self) -> None:
         """エラー検出用のテンプレート画像を読み込み"""
-        templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+        templates_dir = self.config_manager.get(
+            "error_templates_dir", "error_templates"
+        )
         self.error_templates = self.image_processor.load_templates(templates_dir)
 
     def reload_error_templates(self) -> None:
         """エラーテンプレートを再読み込み"""
         logger.info("エラーテンプレートを再読み込み中...")
         self.load_error_templates()
-        logger.info(f"エラーテンプレート再読み込み完了: {len(self.error_templates)}個のテンプレート")
+        logger.info(
+            f"エラーテンプレート再読み込み完了: {len(self.error_templates)}個のテンプレート"
+        )
 
     def detect_error(self, screenshot: np.ndarray) -> Optional[str]:
         """
@@ -124,7 +127,9 @@ class KiroRecovery:
         """
         threshold = self.config_manager.get("template_threshold", 0.8)
         monitor_region = self.config_manager.get("monitor_region")
-        return self.image_processor.detect_error(screenshot, self.error_templates, threshold, monitor_region)
+        return self.image_processor.detect_error(
+            screenshot, self.error_templates, threshold, monitor_region
+        )
 
     def force_focus_kiro_window(self) -> bool:
         """
@@ -181,17 +186,23 @@ class KiroRecovery:
                     # フォーカスが成功したかチェック
                     foreground_hwnd = win32gui.GetForegroundWindow()
                     if foreground_hwnd == hwnd:
-                        logger.info(f"KiroIDEウィンドウに強制フォーカス成功: {target_window.title}")
+                        logger.info(
+                            f"KiroIDEウィンドウに強制フォーカス成功: {target_window.title}"
+                        )
                         return True
                     else:
-                        logger.warning(f"フォーカス設定に失敗: 期待={hwnd}, 実際={foreground_hwnd}")
+                        logger.warning(
+                            f"フォーカス設定に失敗: 期待={hwnd}, 実際={foreground_hwnd}"
+                        )
                         return False
 
                 except Exception as e:
                     logger.error(f"フォーカス処理中にエラー: {e}")
                     return False
             else:
-                logger.warning(f"ウィンドウハンドルが見つかりません: {target_window.title}")
+                logger.warning(
+                    f"ウィンドウハンドルが見つかりません: {target_window.title}"
+                )
                 return False
 
         except Exception as e:
@@ -224,7 +235,9 @@ class KiroRecovery:
 
             x, y = chat_position[0], chat_position[1]
             if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
-                logger.error(f"チャット入力欄座標の値が不正: x={x} ({type(x)}), y={y} ({type(y)})")
+                logger.error(
+                    f"チャット入力欄座標の値が不正: x={x} ({type(x)}), y={y} ({type(y)})"
+                )
                 return False
 
             if x < 0 or y < 0:
@@ -246,7 +259,9 @@ class KiroRecovery:
             # 旧実装と同じシンプルな検索: 最初のKiroウィンドウを使用
             if kiro_windows:
                 target_hwnd = win32gui.FindWindow(None, kiro_windows[0].title)
-                logger.info(f"KiroIDEウィンドウを選択: {kiro_windows[0].title} -> hwnd: {target_hwnd}")
+                logger.info(
+                    f"KiroIDEウィンドウを選択: {kiro_windows[0].title} -> hwnd: {target_hwnd}"
+                )
 
             if not target_hwnd:
                 logger.error("KiroIDEウィンドウが見つかりません")
@@ -261,7 +276,9 @@ class KiroRecovery:
             command = recovery_commands[0] if recovery_commands else "続行してください"
 
             # エラータイプに応じてコマンドを選択
-            if error_type and error_type in self.config_manager.get("custom_commands", {}):
+            if error_type and error_type in self.config_manager.get(
+                "custom_commands", {}
+            ):
                 command = self.config_manager.get("custom_commands", {})[error_type]
 
             # PostMessageを使用してテキストを送信
@@ -273,7 +290,9 @@ class KiroRecovery:
             time.sleep(0.5)
 
             # Enterキーで送信（PostMessageを使用）
-            win32gui.PostMessage(target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
+            win32gui.PostMessage(
+                target_hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0
+            )
             win32gui.PostMessage(target_hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
 
             logger.info(f"復旧コマンド送信: {command}")
@@ -320,7 +339,12 @@ class KiroRecovery:
                     for area in monitor_areas:
                         if area.get("enabled", True):
                             area_name = area.get("name", "未命名")
-                            x, y, width, height = area["x"], area["y"], area["width"], area["height"]
+                            x, y, width, height = (
+                                area["x"],
+                                area["y"],
+                                area["width"],
+                                area["height"],
+                            )
                             region = (x, y, width, height)
 
                             logger.debug(f"監視エリア '{area_name}' を監視中: {region}")
@@ -329,15 +353,21 @@ class KiroRecovery:
                             screenshot = self.screen_capture.capture_screen(region)
 
                             # ModeManagerで検出・実行を試行（監視エリアのオフセットを考慮）
-                            result = self._detect_and_execute_with_offset(screenshot, (x, y))
+                            result = self._detect_and_execute_with_offset(
+                                screenshot, (x, y)
+                            )
                             if result:
-                                logger.info(f"監視エリア '{area_name}' で状態検出・実行: {result.state_type}")
+                                logger.info(
+                                    f"監視エリア '{area_name}' で状態検出・実行: {result.state_type}"
+                                )
                                 break  # 検出・実行されたら他のエリアはスキップ
 
                             # 従来のKiroエラー検出も並行実行
                             error_type = self.detect_error(screenshot)
                             if error_type:
-                                logger.info(f"監視エリア '{area_name}' でエラー検出: {error_type}")
+                                logger.info(
+                                    f"監視エリア '{area_name}' でエラー検出: {error_type}"
+                                )
                                 self._handle_error_detection(error_type)
                                 break
                 elif monitor_region:
@@ -348,7 +378,9 @@ class KiroRecovery:
                     # ModeManagerで検出・実行を試行
                     result = self.mode_manager.detect_and_execute(screenshot)
                     if result:
-                        logger.info(f"従来の監視エリアで状態検出・実行: {result.state_type}")
+                        logger.info(
+                            f"従来の監視エリアで状態検出・実行: {result.state_type}"
+                        )
                     else:
                         # 従来のKiroエラー検出も実行
                         error_type = self.detect_error(screenshot)
@@ -357,7 +389,9 @@ class KiroRecovery:
                             self._handle_error_detection(error_type)
                 else:
                     # 監視エリアが設定されていない場合、画面全体を監視
-                    logger.debug("監視エリアが設定されていません。画面全体を監視します。")
+                    logger.debug(
+                        "監視エリアが設定されていません。画面全体を監視します。"
+                    )
                     screenshot = self.screen_capture.capture_screen()
 
                     # ModeManagerで検出・実行を試行
@@ -382,7 +416,9 @@ class KiroRecovery:
 
         logger.info("監視終了")
 
-    def _detect_and_execute_with_offset(self, screenshot: np.ndarray, region_offset: tuple[int, int]) -> Optional[DetectionResult]:
+    def _detect_and_execute_with_offset(
+        self, screenshot: np.ndarray, region_offset: tuple[int, int]
+    ) -> Optional[DetectionResult]:
         """監視エリアのオフセットを考慮した検出・実行
 
         Args:
@@ -440,9 +476,7 @@ class KiroRecovery:
             else:
                 logger.error("復旧コマンドの送信に失敗")
         else:
-            logger.info(
-                "復旧をスキップ（クールダウン中または最大試行回数到達）"
-            )
+            logger.info("復旧をスキップ（クールダウン中または最大試行回数到達）")
 
     def start_monitoring(self) -> Optional[threading.Thread]:
         """監視開始（モードに応じたテンプレートチェック）"""
@@ -476,7 +510,9 @@ class KiroRecovery:
             self.recovery_attempts = 0
 
             # 別スレッドで監視開始
-            monitor_thread = threading.Thread(target=self.monitor_loop, name="KiroRecovery-Monitor")
+            monitor_thread = threading.Thread(
+                target=self.monitor_loop, name="KiroRecovery-Monitor"
+            )
             monitor_thread.daemon = True
             monitor_thread.start()
 
@@ -498,9 +534,7 @@ class KiroRecovery:
         logger.info("監視を停止しました")
 
     def save_error_template(
-        self,
-        template_name: str,
-        region: Optional[tuple[int, int, int, int]] = None
+        self, template_name: str, region: Optional[tuple[int, int, int, int]] = None
     ) -> bool:
         """
         現在の画面からテンプレートを保存（モードに応じたディレクトリを使用）
@@ -529,7 +563,9 @@ class KiroRecovery:
             current_mode = self.mode_manager.get_current_mode()
             if current_mode == "amazonq":
                 # AmazonQモードの場合はamazonq_templatesディレクトリを使用
-                templates_dir = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+                templates_dir = self.config_manager.get(
+                    "amazonq.run_button_templates_dir", "amazonq_templates"
+                )
                 # AmazonQ検出器にテンプレートを追加
                 amazonq_detector = self.mode_manager.get_detector("amazonq")
                 if amazonq_detector:
@@ -542,7 +578,9 @@ class KiroRecovery:
                     return False
             else:
                 # Kiroモードまたは自動モードの場合はerror_templatesディレクトリを使用
-                templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+                templates_dir = self.config_manager.get(
+                    "error_templates_dir", "error_templates"
+                )
                 template_path = os.path.join(templates_dir, f"{template_name}.png")
 
                 if self.image_processor.save_template(screenshot, template_path):
@@ -570,7 +608,9 @@ class KiroRecovery:
             current_mode = self.mode_manager.get_current_mode()
             if current_mode == "amazonq":
                 # AmazonQモードの場合はamazonq_templatesディレクトリから削除
-                templates_dir = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+                templates_dir = self.config_manager.get(
+                    "amazonq.run_button_templates_dir", "amazonq_templates"
+                )
                 template_path = os.path.join(templates_dir, f"{template_name}.png")
 
                 if os.path.exists(template_path):
@@ -583,11 +623,15 @@ class KiroRecovery:
                         amazonq_detector._load_run_button_templates()
                     return True
                 else:
-                    logger.warning(f"AmazonQテンプレートファイルが存在しません: {template_path}")
+                    logger.warning(
+                        f"AmazonQテンプレートファイルが存在しません: {template_path}"
+                    )
                     return False
             else:
                 # Kiroモードまたは自動モードの場合はerror_templatesディレクトリから削除
-                templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+                templates_dir = self.config_manager.get(
+                    "error_templates_dir", "error_templates"
+                )
                 template_path = os.path.join(templates_dir, f"{template_name}.png")
 
                 if os.path.exists(template_path):
@@ -598,7 +642,9 @@ class KiroRecovery:
                     self.reload_error_templates()
                     return True
                 else:
-                    logger.warning(f"Kiroテンプレートファイルが存在しません: {template_path}")
+                    logger.warning(
+                        f"Kiroテンプレートファイルが存在しません: {template_path}"
+                    )
                     return False
 
         except Exception as e:

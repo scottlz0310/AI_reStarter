@@ -179,7 +179,9 @@ class TestConfigManager:
 
         # 無効な値
         assert manager._validate_setting("chat_input_position", [100]) is False
-        assert manager._validate_setting("chat_input_position", [100, 200, 300]) is False
+        assert (
+            manager._validate_setting("chat_input_position", [100, 200, 300]) is False
+        )
         assert manager._validate_setting("chat_input_position", [-10, 200]) is False
 
     def test_save_config_success(self, temp_dir):
@@ -241,7 +243,7 @@ class TestConfigManager:
         assert "recovery_commands" in sample_config
         assert sample_config["chat_input_position"] == [800, 600]
 
-    @patch('src.config.config_manager.logger')
+    @patch("src.config.config_manager.logger")
     def test_logging_on_init(self, mock_logger, config_file):
         """初期化時のログ出力テスト"""
         ConfigManager(str(config_file))
@@ -249,7 +251,7 @@ class TestConfigManager:
         # 情報ログが出力されることを確認
         mock_logger.info.assert_called()
 
-    @patch('src.config.config_manager.logger')
+    @patch("src.config.config_manager.logger")
     def test_logging_on_save_success(self, mock_logger, temp_dir):
         """設定保存成功時のログ出力テスト"""
         config_path = temp_dir / "test.json"

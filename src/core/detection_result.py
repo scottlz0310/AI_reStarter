@@ -40,8 +40,8 @@ class DetectionResult:
         cls,
         confidence: float,
         position: tuple[int, int],
-        template_name: str = "unknown"
-    ) -> 'DetectionResult':
+        template_name: str = "unknown",
+    ) -> "DetectionResult":
         """▶RUNボタン検出結果を作成
 
         Args:
@@ -57,7 +57,7 @@ class DetectionResult:
             confidence=confidence,
             position=position,
             timestamp=time.time(),
-            metadata={"template_name": template_name}
+            metadata={"template_name": template_name},
         )
 
     @classmethod
@@ -65,8 +65,8 @@ class DetectionResult:
         cls,
         confidence: float,
         error_type: str,
-        position: Optional[tuple[int, int]] = None
-    ) -> 'DetectionResult':
+        position: Optional[tuple[int, int]] = None,
+    ) -> "DetectionResult":
         """エラー検出結果を作成
 
         Args:
@@ -82,7 +82,7 @@ class DetectionResult:
             confidence=confidence,
             position=position,
             timestamp=time.time(),
-            metadata={"error_type": error_type}
+            metadata={"error_type": error_type},
         )
 
     def is_valid(self) -> bool:
@@ -92,9 +92,9 @@ class DetectionResult:
             bool: 有効な場合True
         """
         return (
-            self.confidence > 0.0 and
-            self.state_type is not None and
-            len(self.state_type) > 0
+            self.confidence > 0.0
+            and self.state_type is not None
+            and len(self.state_type) > 0
         )
 
     def get_age_seconds(self) -> float:

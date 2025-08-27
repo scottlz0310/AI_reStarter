@@ -29,7 +29,7 @@ class BaseDetector(ABC):
         logger.debug(f"{self.name}検出器を初期化しました")
 
     @abstractmethod
-    def detect_state(self, screenshot: np.ndarray) -> Optional['DetectionResult']:
+    def detect_state(self, screenshot: np.ndarray) -> Optional["DetectionResult"]:
         """状態を検出する抽象メソッド
 
         Args:
@@ -41,7 +41,7 @@ class BaseDetector(ABC):
         pass
 
     @abstractmethod
-    def execute_recovery_action(self, result: 'DetectionResult') -> bool:
+    def execute_recovery_action(self, result: "DetectionResult") -> bool:
         """復旧アクションを実行する抽象メソッド
 
         Args:

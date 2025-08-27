@@ -24,7 +24,7 @@ class TestTemplateCaptureDialog(unittest.TestCase):
         if self.root:
             self.root.destroy()
 
-    @patch('src.gui.template_capture_dialog.ScreenCapture')
+    @patch("src.gui.template_capture_dialog.ScreenCapture")
     def test_dialog_initialization(self, mock_screen_capture):
         """ダイアログの初期化テスト"""
         dialog = TemplateCaptureDialog(self.root)
@@ -33,7 +33,7 @@ class TestTemplateCaptureDialog(unittest.TestCase):
         self.assertIsNotNone(dialog.screen_capture)
         self.assertIsNone(dialog.selected_region)
 
-    @patch('src.gui.template_capture_dialog.ScreenCapture')
+    @patch("src.gui.template_capture_dialog.ScreenCapture")
     def test_coordinate_calculation(self, mock_screen_capture):
         """座標計算のテスト"""
         # モックスクリーンショットを作成
@@ -58,5 +58,5 @@ class TestTemplateCaptureDialog(unittest.TestCase):
         self.assertEqual(dialog.start_y, 20.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

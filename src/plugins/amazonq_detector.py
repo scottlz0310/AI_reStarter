@@ -35,9 +35,13 @@ class AmazonQDetector(BaseDetector):
         super().__init__()
         self.config_manager = config_manager
         self.run_button_templates: dict[str, np.ndarray] = {}
-        self.detection_threshold = config_manager.get("amazonq.detection_threshold", 0.8)
+        self.detection_threshold = config_manager.get(
+            "amazonq.detection_threshold", 0.8
+        )
         self.click_delay = config_manager.get("amazonq.click_delay", 1.0)
-        self.templates_dir = config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+        self.templates_dir = config_manager.get(
+            "amazonq.run_button_templates_dir", "amazonq_templates"
+        )
 
         logger.info(f"AmazonQ検出器を初期化: 閾値={self.detection_threshold}")
         self._load_run_button_templates()
@@ -45,11 +49,17 @@ class AmazonQDetector(BaseDetector):
     def _load_run_button_templates(self) -> None:
         """▶RUNボタンのテンプレート画像を読み込み"""
         if not os.path.exists(self.templates_dir):
-            logger.warning(f"テンプレートディレクトリが存在しません: {self.templates_dir}")
+            logger.warning(
+                f"テンプレートディレクトリが存在しません: {self.templates_dir}"
+            )
             os.makedirs(self.templates_dir, exist_ok=True)
             return
 
-        template_files = [f for f in os.listdir(self.templates_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
+        template_files = [
+            f
+            for f in os.listdir(self.templates_dir)
+            if f.endswith((".png", ".jpg", ".jpeg"))
+        ]
 
         for template_file in template_files:
             template_path = os.path.join(self.templates_dir, template_file)
@@ -64,9 +74,13 @@ class AmazonQDetector(BaseDetector):
             except Exception as e:
                 logger.error(f"テンプレート読み込みエラー: {template_path} - {e}")
 
-        logger.info(f"▶RUNボタンテンプレート読み込み完了: {len(self.run_button_templates)}個")
+        logger.info(
+            f"▶RUNボタンテンプレート読み込み完了: {len(self.run_button_templates)}個"
+        )
 
-    def detect_state(self, screenshot: np.ndarray, region_offset: tuple[int, int] = (0, 0)) -> Optional[DetectionResult]:
+    def detect_state(
+        self, screenshot: np.ndarray, region_offset: tuple[int, int] = (0, 0)
+    ) -> Optional[DetectionResult]:
         """▶RUNボタンを検出
 
         Args:
@@ -92,7 +106,9 @@ class AmazonQDetector(BaseDetector):
         # 各テンプレートでマッチング実行
         for template_name, template in self.run_button_templates.items():
             try:
-                result = cv2.matchTemplate(gray_screenshot, template, cv2.TM_CCOEFF_NORMED)
+                result = cv2.matchTemplate(
+                    gray_screenshot, template, cv2.TM_CCOEFF_NORMED
+                )
                 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
                 if max_val > best_confidence:
@@ -109,7 +125,9 @@ class AmazonQDetector(BaseDetector):
                     absolute_y = relative_center_y + region_offset[1]
                     best_position = (absolute_x, absolute_y)
 
-                logger.debug(f"テンプレートマッチング: {template_name} - 信頼度: {max_val:.3f}")
+                logger.debug(
+                    f"テンプレートマッチング: {template_name} - 信頼度: {max_val:.3f}"
+                )
 
             except Exception as e:
                 logger.error(f"テンプレートマッチングエラー: {template_name} - {e}")
@@ -123,10 +141,12 @@ class AmazonQDetector(BaseDetector):
             return DetectionResult.create_run_button_result(
                 confidence=best_confidence,
                 position=best_position,
-                template_name=best_template_name
+                template_name=best_template_name,
             )
 
-        logger.debug(f"▶RUNボタン検出失敗: 最高信頼度 {best_confidence:.3f} < 閾値 {self.detection_threshold}")
+        logger.debug(
+            f"▶RUNボタン検出失敗: 最高信頼度 {best_confidence:.3f} < 閾値 {self.detection_threshold}"
+        )
         return None
 
     def execute_recovery_action(self, result: DetectionResult) -> bool:
@@ -146,7 +166,9 @@ class AmazonQDetector(BaseDetector):
             x, y = result.position
             template_name = result.metadata.get("template_name", "unknown")
 
-            logger.info(f"▶RUNボタンをクリック: 座標({x}, {y}), テンプレート: {template_name}")
+            logger.info(
+                f"▶RUNボタンをクリック: 座標({x}, {y}), テンプレート: {template_name}"
+            )
 
             # クリック実行
             pyautogui.click(x, y)

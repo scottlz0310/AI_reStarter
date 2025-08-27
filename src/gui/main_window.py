@@ -45,7 +45,7 @@ class MainWindow:
         modes = [
             ("Kiro-IDEモード", "kiro"),
             ("AmazonQモード", "amazonq"),
-            ("自動モード", "auto")
+            ("自動モード", "auto"),
         ]
 
         for i, (text, mode) in enumerate(modes):
@@ -54,13 +54,15 @@ class MainWindow:
                 text=text,
                 variable=self.mode_var,
                 value=mode,
-                command=self.on_mode_changed
+                command=self.on_mode_changed,
             )
             rb.grid(row=0, column=i, padx=10, pady=5, sticky=tk.W)
 
         # モード状態表示ラベル
         self.mode_status_label = ttk.Label(self.mode_frame, text="")
-        self.mode_status_label.grid(row=1, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
+        self.mode_status_label.grid(
+            row=1, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W
+        )
 
         self.update_mode_status()
 
@@ -74,13 +76,15 @@ class MainWindow:
         else:
             # 切り替え失敗時は元のモードに戻す
             self.mode_var.set(self.mode_manager.get_current_mode())
-            messagebox.showerror("エラー", f"モードの切り替えに失敗しました: {new_mode}")
+            messagebox.showerror(
+                "エラー", f"モードの切り替えに失敗しました: {new_mode}"
+            )
 
     def update_mode_status(self):
         """モード状態の更新"""
         status = self.mode_manager.get_mode_status()
-        current_mode = status['current_mode']
-        active_detectors = status['active_detectors']
+        current_mode = status["current_mode"]
+        active_detectors = status["active_detectors"]
 
         status_text = f"現在のモード: {current_mode} | アクティブな検出器: {', '.join(active_detectors) if active_detectors else 'なし'}"
         self.mode_status_label.config(text=status_text)
@@ -107,7 +111,7 @@ class MainWindow:
             self.save_template,
             self.send_recovery_command,
             self.open_monitor_area_settings,
-            self.save_template_with_selection  # 範囲選択コールバックを追加
+            self.save_template_with_selection,  # 範囲選択コールバックを追加
         )
 
     def setup_menu(self):
@@ -120,18 +124,26 @@ class MainWindow:
         menubar.add_cascade(label="ファイル", menu=file_menu)
 
         # 設定アクション
-        file_menu.add_command(label="設定", command=self.open_settings, accelerator="Ctrl+,")
+        file_menu.add_command(
+            label="設定", command=self.open_settings, accelerator="Ctrl+,"
+        )
         file_menu.add_separator()
-        file_menu.add_command(label="終了", command=self.root.quit, accelerator="Ctrl+Q")
+        file_menu.add_command(
+            label="終了", command=self.root.quit, accelerator="Ctrl+Q"
+        )
 
         # ツールメニュー
         tools_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="ツール", menu=tools_menu)
 
-        tools_menu.add_command(label="テンプレート管理", command=self.open_template_manager)
+        tools_menu.add_command(
+            label="テンプレート管理", command=self.open_template_manager
+        )
         tools_menu.add_command(label="ログ表示", command=self.show_logs)
         tools_menu.add_separator()
-        tools_menu.add_command(label="監視エリア設定", command=self.open_monitor_area_settings)
+        tools_menu.add_command(
+            label="監視エリア設定", command=self.open_monitor_area_settings
+        )
         tools_menu.add_command(label="AmazonQ設定", command=self.open_amazonq_settings)
 
         # ヘルプメニュー
@@ -264,7 +276,9 @@ class MainWindow:
 
         except Exception as e:
             logger.error(f"範囲選択テンプレート保存エラー: {e}")
-            messagebox.showerror("エラー", f"範囲選択テンプレートの保存に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"範囲選択テンプレートの保存に失敗しました: {e}"
+            )
 
     def send_recovery_command(self):
         """復旧コマンド送信"""
@@ -337,12 +351,15 @@ class MainWindow:
         """AmazonQ設定ダイアログを開く"""
         try:
             from src.gui.amazonq_settings_dialog import AmazonQSettingsDialog
+
             amazonq_dialog = AmazonQSettingsDialog(self.root, self.config_manager)
             amazonq_dialog.show()
             logger.info("AmazonQ設定ダイアログを開きました")
         except Exception as e:
             logger.error(f"AmazonQ設定ダイアログ表示エラー: {e}")
-            messagebox.showerror("エラー", f"AmazonQ設定ダイアログの表示に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"AmazonQ設定ダイアログの表示に失敗しました: {e}"
+            )
 
     def show_hotkey_list(self):
         """ホットキー一覧表示"""
@@ -391,8 +408,6 @@ class MainWindow:
         """ホットキー: 監視停止"""
         self.monitor_widget.add_log("ホットキー: 監視停止要求")
         self.stop_monitoring()
-
-
 
     def on_closing(self):
         """ウィンドウクローズ時の処理"""

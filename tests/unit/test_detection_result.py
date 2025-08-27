@@ -25,7 +25,7 @@ class TestDetectionResult:
             confidence=0.95,
             position=(100, 200),
             timestamp=timestamp,
-            metadata=metadata
+            metadata=metadata,
         )
 
         assert result.state_type == "compilation_error"
@@ -41,7 +41,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(50, 100),
             timestamp=0,
-            metadata={}
+            metadata={},
         )
 
         assert result.state_type == "runtime_error"
@@ -57,7 +57,7 @@ class TestDetectionResult:
             confidence=0.9,
             position=(0, 0),
             timestamp=0,  # 0を指定すると自動生成される
-            metadata={}
+            metadata={},
         )
 
         # タイムスタンプが自動生成されることを確認
@@ -67,9 +67,7 @@ class TestDetectionResult:
     def test_create_run_button_result(self):
         """▶RUNボタン検出結果の作成テスト"""
         result = DetectionResult.create_run_button_result(
-            confidence=0.95,
-            position=(100, 200),
-            template_name="run_button.png"
+            confidence=0.95, position=(100, 200), template_name="run_button.png"
         )
 
         assert result.state_type == "run_button"
@@ -81,8 +79,7 @@ class TestDetectionResult:
     def test_create_run_button_result_default_template(self):
         """デフォルトテンプレート名でのRUNボタン結果作成テスト"""
         result = DetectionResult.create_run_button_result(
-            confidence=0.8,
-            position=(50, 100)
+            confidence=0.8, position=(50, 100)
         )
 
         assert result.state_type == "run_button"
@@ -93,9 +90,7 @@ class TestDetectionResult:
     def test_create_error_result_with_position(self):
         """位置情報付きエラー検出結果の作成テスト"""
         result = DetectionResult.create_error_result(
-            confidence=0.9,
-            error_type="compilation_error",
-            position=(150, 250)
+            confidence=0.9, error_type="compilation_error", position=(150, 250)
         )
 
         assert result.state_type == "error"
@@ -106,8 +101,7 @@ class TestDetectionResult:
     def test_create_error_result_without_position(self):
         """位置情報なしエラー検出結果の作成テスト"""
         result = DetectionResult.create_error_result(
-            confidence=0.85,
-            error_type="runtime_error"
+            confidence=0.85, error_type="runtime_error"
         )
 
         assert result.state_type == "error"
@@ -122,7 +116,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         assert result.is_valid() is True
@@ -134,7 +128,7 @@ class TestDetectionResult:
             confidence=0.0,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         assert result.is_valid() is False
@@ -146,7 +140,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         assert result.is_valid() is False
@@ -158,7 +152,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         assert result.is_valid() is False
@@ -171,7 +165,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=past_timestamp,
-            metadata={}
+            metadata={},
         )
 
         age = result.get_age_seconds()
@@ -186,7 +180,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         age = result.get_age_seconds()
@@ -204,7 +198,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(100, 200),
             timestamp=timestamp,
-            metadata=metadata
+            metadata=metadata,
         )
 
         result2 = DetectionResult(
@@ -212,7 +206,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(100, 200),
             timestamp=timestamp,
-            metadata=metadata
+            metadata=metadata,
         )
 
         assert result1 == result2
@@ -226,7 +220,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(100, 200),
             timestamp=timestamp,
-            metadata={}
+            metadata={},
         )
 
         result2 = DetectionResult(
@@ -234,7 +228,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(100, 200),
             timestamp=timestamp,
-            metadata={}
+            metadata={},
         )
 
         assert result1 != result2
@@ -246,7 +240,7 @@ class TestDetectionResult:
             confidence=0.95,
             position=(100, 200),
             timestamp=time.time(),
-            metadata={"template_name": "error_template.png"}
+            metadata={"template_name": "error_template.png"},
         )
 
         str_repr = str(result)
@@ -262,7 +256,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(50, 100),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         repr_str = repr(result)
@@ -272,7 +266,7 @@ class TestDetectionResult:
         assert "0.8" in repr_str
         assert "(50, 100)" in repr_str
 
-    @patch('src.core.detection_result.logger')
+    @patch("src.core.detection_result.logger")
     def test_logging_on_creation(self, mock_logger):
         """検出結果作成時のログ出力テスト"""
         DetectionResult(
@@ -280,7 +274,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         # デバッグログが出力されることを確認
@@ -296,7 +290,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={"initial": "value"}
+            metadata={"initial": "value"},
         )
 
         # メタデータを変更
@@ -313,7 +307,7 @@ class TestDetectionResult:
             confidence=0.8,
             position=None,
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
 
         assert result.position is None
@@ -327,7 +321,7 @@ class TestDetectionResult:
             confidence=0.001,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
         assert result1.is_valid() is True
 
@@ -337,6 +331,6 @@ class TestDetectionResult:
             confidence=1.0,
             position=(0, 0),
             timestamp=time.time(),
-            metadata={}
+            metadata={},
         )
         assert result2.is_valid() is True

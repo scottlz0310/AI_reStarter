@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 # pyautoguiは条件付きでインポート（WSL環境での問題回避）
 try:
     import pyautogui
+
     PYAUTOGUI_AVAILABLE = True
 except ImportError:
     PYAUTOGUI_AVAILABLE = False
@@ -69,6 +70,7 @@ class ScreenCapture:
             # RGBからグレースケールに変換
             if len(image.shape) == 3:
                 import cv2
+
                 return cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             else:
                 return image

@@ -49,8 +49,10 @@ class MonitorAreaDialog:
 
             # Windows環境での最大化ボタンを明示的に有効化
             try:
-                self.dialog.state('zoomed')  # 最大化状態に設定
-                self.dialog.state('normal')  # 通常状態に戻す（これで最大化ボタンが有効になる）
+                self.dialog.state("zoomed")  # 最大化状態に設定
+                self.dialog.state(
+                    "normal"
+                )  # 通常状態に戻す（これで最大化ボタンが有効になる）
             except tk.TclError:
                 # 最大化がサポートされていない環境の場合
                 pass
@@ -85,18 +87,20 @@ class MonitorAreaDialog:
 
         except Exception as e:
             logger.error(f"監視エリア設定ダイアログ表示エラー: {e}")
-            messagebox.showerror("エラー", f"監視エリア設定ダイアログの表示に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"監視エリア設定ダイアログの表示に失敗しました: {e}"
+            )
 
     def toggle_maximize(self, event=None):
         """最大化/復元の切り替え"""
         try:
             current_state = self.dialog.state()
-            if current_state == 'zoomed':
-                self.dialog.state('normal')
+            if current_state == "zoomed":
+                self.dialog.state("normal")
                 self.maximize_button.config(text="最大化")
                 logger.debug("ダイアログを通常サイズに復元しました")
             else:
-                self.dialog.state('zoomed')
+                self.dialog.state("zoomed")
                 self.maximize_button.config(text="復元")
                 logger.debug("ダイアログを最大化しました")
         except tk.TclError as e:
@@ -113,7 +117,7 @@ class MonitorAreaDialog:
     def on_window_configure(self, event):
         """ウィンドウの設定変更時の処理"""
         # ウィンドウサイズや位置の変更を監視
-        if hasattr(event, 'width') and hasattr(event, 'height'):
+        if hasattr(event, "width") and hasattr(event, "height"):
             logger.debug(f"ウィンドウサイズ変更: {event.width} x {event.height}")
 
     def on_title_bar_double_click(self, event):
@@ -187,7 +191,9 @@ class MonitorAreaDialog:
         add_button = ttk.Button(toolbar, text="新規追加", command=self.add_new_area)
         add_button.pack(side=tk.LEFT, padx=(0, 5))
 
-        delete_button = ttk.Button(toolbar, text="削除", command=self.delete_selected_area)
+        delete_button = ttk.Button(
+            toolbar, text="削除", command=self.delete_selected_area
+        )
         delete_button.pack(side=tk.LEFT, padx=(0, 5))
 
         # 監視エリアリスト
@@ -196,7 +202,9 @@ class MonitorAreaDialog:
         self.area_listbox.bind("<<ListboxSelect>>", self.on_area_selected)
 
         # スクロールバー
-        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.area_listbox.yview)
+        scrollbar = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.area_listbox.yview
+        )
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.area_listbox.configure(yscrollcommand=scrollbar.set)
 
@@ -217,7 +225,9 @@ class MonitorAreaDialog:
         preview_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
         # プレビューキャンバス
-        self.preview_canvas = tk.Canvas(preview_frame, bg="white", width=600, height=400)
+        self.preview_canvas = tk.Canvas(
+            preview_frame, bg="white", width=600, height=400
+        )
         self.preview_canvas.pack(fill=tk.BOTH, expand=True)
 
         # マウスイベントの設定
@@ -226,9 +236,15 @@ class MonitorAreaDialog:
         self.preview_canvas.bind("<ButtonRelease-1>", self.on_mouse_up)
 
         # スクロールバー
-        v_scrollbar = ttk.Scrollbar(preview_frame, orient=tk.VERTICAL, command=self.preview_canvas.yview)
-        h_scrollbar = ttk.Scrollbar(preview_frame, orient=tk.HORIZONTAL, command=self.preview_canvas.xview)
-        self.preview_canvas.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        v_scrollbar = ttk.Scrollbar(
+            preview_frame, orient=tk.VERTICAL, command=self.preview_canvas.yview
+        )
+        h_scrollbar = ttk.Scrollbar(
+            preview_frame, orient=tk.HORIZONTAL, command=self.preview_canvas.xview
+        )
+        self.preview_canvas.configure(
+            yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set
+        )
 
         v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
@@ -283,8 +299,9 @@ class MonitorAreaDialog:
         enable_frame.pack(fill=tk.X, pady=(0, 10))
 
         self.enabled_var = tk.BooleanVar(value=True)
-        enabled_check = ttk.Checkbutton(enable_frame, text="この監視エリアを有効にする",
-                                      variable=self.enabled_var)
+        enabled_check = ttk.Checkbutton(
+            enable_frame, text="この監視エリアを有効にする", variable=self.enabled_var
+        )
         enabled_check.pack(side=tk.LEFT)
 
         # 説明設定
@@ -306,23 +323,35 @@ class MonitorAreaDialog:
         left_button_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         # スクリーンショット更新ボタン
-        refresh_screenshot_button = ttk.Button(left_button_frame, text="画面更新", command=self.refresh_screenshot)
+        refresh_screenshot_button = ttk.Button(
+            left_button_frame, text="画面更新", command=self.refresh_screenshot
+        )
         refresh_screenshot_button.pack(fill=tk.X, pady=(0, 5))
 
         # 座標変換テストボタン
-        coord_test_button = ttk.Button(left_button_frame, text="座標テスト", command=self.test_coordinate_conversion)
+        coord_test_button = ttk.Button(
+            left_button_frame,
+            text="座標テスト",
+            command=self.test_coordinate_conversion,
+        )
         coord_test_button.pack(fill=tk.X, pady=(0, 5))
 
         # 最大化切り替えボタン
-        self.maximize_button = ttk.Button(left_button_frame, text="最大化", command=self.toggle_maximize)
+        self.maximize_button = ttk.Button(
+            left_button_frame, text="最大化", command=self.toggle_maximize
+        )
         self.maximize_button.pack(fill=tk.X, pady=(0, 5))
 
         # テストボタン
-        test_button = ttk.Button(left_button_frame, text="テスト", command=self.test_selected_area)
+        test_button = ttk.Button(
+            left_button_frame, text="テスト", command=self.test_selected_area
+        )
         test_button.pack(fill=tk.X, pady=(0, 5))
 
         # チャット欄設定ボタン
-        chat_setup_button = ttk.Button(left_button_frame, text="チャット欄設定", command=self.setup_chat_input)
+        chat_setup_button = ttk.Button(
+            left_button_frame, text="チャット欄設定", command=self.setup_chat_input
+        )
         chat_setup_button.pack(fill=tk.X)
 
         # 右側: 保存・キャンセルボタン（縦一列）
@@ -330,11 +359,15 @@ class MonitorAreaDialog:
         right_button_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
         # 保存ボタン
-        save_button = ttk.Button(right_button_frame, text="保存", command=self.save_monitor_areas)
+        save_button = ttk.Button(
+            right_button_frame, text="保存", command=self.save_monitor_areas
+        )
         save_button.pack(fill=tk.X, pady=(0, 5))
 
         # キャンセルボタン
-        cancel_button = ttk.Button(right_button_frame, text="キャンセル", command=self.cancel)
+        cancel_button = ttk.Button(
+            right_button_frame, text="キャンセル", command=self.cancel
+        )
         cancel_button.pack(fill=tk.X)
 
     def draw_screen_preview(self):
@@ -346,6 +379,7 @@ class MonitorAreaDialog:
             # 実際の画面サイズを取得
             try:
                 import pyautogui
+
                 screen_width, screen_height = pyautogui.size()
             except ImportError:
                 # pyautoguiが利用できない場合は仮の値
@@ -362,15 +396,17 @@ class MonitorAreaDialog:
                 scale = min(scale_x, scale_y)
 
                 # 実際のスクリーンショットを表示
-                self.display_screenshot(screen_width, screen_height, scale, canvas_width, canvas_height)
+                self.display_screenshot(
+                    screen_width, screen_height, scale, canvas_width, canvas_height
+                )
 
                 # 既存の監視エリアを描画
                 self.draw_existing_areas(0, 0, scale)
 
                 # キャンバスのスクロール領域を設定
-                self.preview_canvas.configure(scrollregion=(
-                    0, 0, canvas_width, canvas_height
-                ))
+                self.preview_canvas.configure(
+                    scrollregion=(0, 0, canvas_width, canvas_height)
+                )
             else:
                 # キャンバスサイズが取得できない場合は基本的な表示
                 self.draw_basic_screen_frame(screen_width, screen_height)
@@ -380,11 +416,19 @@ class MonitorAreaDialog:
             # エラー時は基本的な画面枠のみ表示
             self.draw_basic_screen_frame(screen_width, screen_height)
 
-    def display_screenshot(self, screen_width: int, screen_height: int, scale: float, canvas_width: int, canvas_height: int):
+    def display_screenshot(
+        self,
+        screen_width: int,
+        screen_height: int,
+        scale: float,
+        canvas_width: int,
+        canvas_height: int,
+    ):
         """実際のスクリーンショットを表示"""
         try:
             # スクリーンショットを取得
             import pyautogui
+
             screenshot = pyautogui.screenshot()
 
             # PIL画像をPhotoImageに変換
@@ -395,7 +439,9 @@ class MonitorAreaDialog:
             scaled_height = int(screen_height * scale)
 
             # 画像をリサイズ
-            resized_screenshot = screenshot.resize((scaled_width, scaled_height), Image.Resampling.LANCZOS)
+            resized_screenshot = screenshot.resize(
+                (scaled_width, scaled_height), Image.Resampling.LANCZOS
+            )
 
             # PhotoImageに変換
             photo = ImageTk.PhotoImage(resized_screenshot)
@@ -405,23 +451,31 @@ class MonitorAreaDialog:
             y_offset = (canvas_height - scaled_height) // 2
 
             # 画像を表示
-            self.preview_canvas.create_image(x_offset, y_offset, anchor=tk.NW, image=photo)
+            self.preview_canvas.create_image(
+                x_offset, y_offset, anchor=tk.NW, image=photo
+            )
 
             # 画像の参照を保持
             self.screenshot_photo = photo
 
             # 画面の枠を描画
             self.preview_canvas.create_rectangle(
-                x_offset, y_offset,
-                x_offset + scaled_width, y_offset + scaled_height,
-                outline="black", width=2
+                x_offset,
+                y_offset,
+                x_offset + scaled_width,
+                y_offset + scaled_height,
+                outline="black",
+                width=2,
             )
 
             # 画面ラベル
             self.preview_canvas.create_text(
-                x_offset + scaled_width // 2, y_offset - 20,
+                x_offset + scaled_width // 2,
+                y_offset - 20,
                 text=f"画面 ({screen_width}x{screen_height})",
-                anchor=tk.CENTER, fill="black", font=("TkDefaultFont", 10, "bold")
+                anchor=tk.CENTER,
+                fill="black",
+                font=("TkDefaultFont", 10, "bold"),
             )
 
             logger.debug("スクリーンショットを表示しました")
@@ -429,9 +483,18 @@ class MonitorAreaDialog:
         except Exception as e:
             logger.error(f"スクリーンショット表示エラー: {e}")
             # エラー時は基本的な画面枠のみ表示
-            self.draw_basic_screen_frame(screen_width, screen_height, scale, canvas_width, canvas_height)
+            self.draw_basic_screen_frame(
+                screen_width, screen_height, scale, canvas_width, canvas_height
+            )
 
-    def draw_basic_screen_frame(self, screen_width: int, screen_height: int, scale: float = 1.0, canvas_width: int = 600, canvas_height: int = 400):
+    def draw_basic_screen_frame(
+        self,
+        screen_width: int,
+        screen_height: int,
+        scale: float = 1.0,
+        canvas_width: int = 600,
+        canvas_height: int = 400,
+    ):
         """基本的な画面枠を描画（スクリーンショットが利用できない場合）"""
         try:
             # スケールを計算
@@ -450,30 +513,44 @@ class MonitorAreaDialog:
 
             # 白い背景の矩形
             self.preview_canvas.create_rectangle(
-                x_offset, y_offset,
-                x_offset + scaled_width, y_offset + scaled_height,
-                outline="black", width=2, fill="white"
+                x_offset,
+                y_offset,
+                x_offset + scaled_width,
+                y_offset + scaled_height,
+                outline="black",
+                width=2,
+                fill="white",
             )
 
             # 画面ラベル
             self.preview_canvas.create_text(
-                x_offset + scaled_width // 2, y_offset - 20,
+                x_offset + scaled_width // 2,
+                y_offset - 20,
                 text=f"画面 ({screen_width}x{screen_height}) - スクリーンショットなし",
-                anchor=tk.CENTER, fill="gray"
+                anchor=tk.CENTER,
+                fill="gray",
             )
 
             # グリッド線を描画（監視エリアの位置を把握しやすくする）
             grid_spacing = 100  # 100ピクセル間隔
             for x in range(0, scaled_width, int(grid_spacing * scale)):
                 self.preview_canvas.create_line(
-                    x_offset + x, y_offset, x_offset + x, y_offset + scaled_height,
-                    fill="lightgray", width=1
+                    x_offset + x,
+                    y_offset,
+                    x_offset + x,
+                    y_offset + scaled_height,
+                    fill="lightgray",
+                    width=1,
                 )
 
             for y in range(0, scaled_height, int(grid_spacing * scale)):
                 self.preview_canvas.create_line(
-                    x_offset, y_offset + y, x_offset + scaled_width, y_offset + y,
-                    fill="lightgray", width=1
+                    x_offset,
+                    y_offset + y,
+                    x_offset + scaled_width,
+                    y_offset + y,
+                    fill="lightgray",
+                    width=1,
                 )
 
             logger.debug("基本的な画面枠を描画しました")
@@ -492,25 +569,35 @@ class MonitorAreaDialog:
 
                 # 監視エリアを描画
                 self.preview_canvas.create_rectangle(
-                    x, y, x + width, y + height,
-                    outline="red", width=2, fill="red", stipple="gray50",
-                    tags="area_rect"
+                    x,
+                    y,
+                    x + width,
+                    y + height,
+                    outline="red",
+                    width=2,
+                    fill="red",
+                    stipple="gray50",
+                    tags="area_rect",
                 )
 
                 # ラベル
                 self.preview_canvas.create_text(
-                    x + width // 2, y - 10,
+                    x + width // 2,
+                    y - 10,
                     text=area.get("name", f"エリア{i+1}"),
-                    anchor=tk.CENTER, fill="red",
-                    tags="area_label"
+                    anchor=tk.CENTER,
+                    fill="red",
+                    tags="area_label",
                 )
 
                 # 座標情報
                 self.preview_canvas.create_text(
-                    x + width // 2, y + height + 15,
+                    x + width // 2,
+                    y + height + 15,
                     text=f"({area['x']},{area['y']}) {area['width']}x{area['height']}",
-                    anchor=tk.CENTER, font=("TkDefaultFont", 8),
-                    tags="area_coord"
+                    anchor=tk.CENTER,
+                    font=("TkDefaultFont", 8),
+                    tags="area_coord",
                 )
 
     def on_mouse_down(self, event):
@@ -539,17 +626,26 @@ class MonitorAreaDialog:
         height = abs(y2 - y1)
 
         self.preview_canvas.create_rectangle(
-            x, y, x + width, y + height,
-            outline="blue", width=2, dash=(5, 5), tags="drag_rect"
+            x,
+            y,
+            x + width,
+            y + height,
+            outline="blue",
+            width=2,
+            dash=(5, 5),
+            tags="drag_rect",
         )
 
         # ドラッグ情報を表示
         info_text = f"ドラッグ中: {width} x {height}"
         self.preview_canvas.create_text(
-            x + width // 2, y - 25,
+            x + width // 2,
+            y - 25,
             text=info_text,
-            anchor=tk.CENTER, fill="blue", font=("TkDefaultFont", 9, "bold"),
-            tags="drag_info"
+            anchor=tk.CENTER,
+            fill="blue",
+            font=("TkDefaultFont", 9, "bold"),
+            tags="drag_info",
         )
 
     def on_mouse_up(self, event):
@@ -581,12 +677,15 @@ class MonitorAreaDialog:
 
             # 最小サイズチェック（キャンバス座標）
             if width < 20 or height < 20:
-                messagebox.showwarning("警告", "監視エリアが小さすぎます。最小20x20ピクセル必要です。")
+                messagebox.showwarning(
+                    "警告", "監視エリアが小さすぎます。最小20x20ピクセル必要です。"
+                )
                 return
 
             # 実際の画面サイズを取得
             try:
                 import pyautogui
+
                 screen_width, screen_height = pyautogui.size()
             except ImportError:
                 # pyautoguiが利用できない場合は仮の値
@@ -614,8 +713,12 @@ class MonitorAreaDialog:
 
                 # 座標変換のデバッグ情報
                 logger.debug(f"ドラッグ座標: キャンバス({x},{y},{width},{height})")
-                logger.debug(f"オフセット: ({x_offset},{y_offset}), スケール: {scale:.3f}")
-                logger.debug(f"変換結果: 画面({screen_x},{screen_y},{screen_w},{screen_h})")
+                logger.debug(
+                    f"オフセット: ({x_offset},{y_offset}), スケール: {scale:.3f}"
+                )
+                logger.debug(
+                    f"変換結果: 画面({screen_x},{screen_y},{screen_w},{screen_h})"
+                )
 
                 # 画面範囲内に制限
                 screen_x = max(0, min(screen_x, screen_width - screen_w))
@@ -626,13 +729,18 @@ class MonitorAreaDialog:
                 # 座標の整合性チェック
                 if screen_w <= 0 or screen_h <= 0:
                     logger.warning("監視エリアのサイズが無効です")
-                    messagebox.showwarning("警告", "監視エリアが画面外にはみ出しています")
+                    messagebox.showwarning(
+                        "警告", "監視エリアが画面外にはみ出しています"
+                    )
                     return
 
                 # 重複チェック：既存の監視エリアと重複していないか確認
                 if self._is_area_overlapping(screen_x, screen_y, screen_w, screen_h):
                     logger.warning("既存の監視エリアと重複しています")
-                    messagebox.showwarning("警告", "既存の監視エリアと重複しています。別の場所に監視エリアを作成してください。")
+                    messagebox.showwarning(
+                        "警告",
+                        "既存の監視エリアと重複しています。別の場所に監視エリアを作成してください。",
+                    )
                     return
 
                 # 新しい監視エリアを作成
@@ -643,7 +751,7 @@ class MonitorAreaDialog:
                     "width": screen_w,
                     "height": screen_h,
                     "enabled": True,
-                    "description": "ドラッグで作成された監視エリア"
+                    "description": "ドラッグで作成された監視エリア",
                 }
 
                 self.monitor_areas.append(new_area)
@@ -662,8 +770,12 @@ class MonitorAreaDialog:
                 self.area_listbox.see(len(self.monitor_areas) - 1)
 
                 logger.info(f"新しい監視エリアを作成しました: {new_area['name']}")
-                logger.debug(f"座標変換: キャンバス({x},{y},{width},{height}) -> 画面({screen_x},{screen_y},{screen_w},{screen_h})")
-                logger.debug(f"スケール: {scale:.3f}, オフセット: ({x_offset},{y_offset})")
+                logger.debug(
+                    f"座標変換: キャンバス({x},{y},{width},{height}) -> 画面({screen_x},{screen_y},{screen_w},{screen_h})"
+                )
+                logger.debug(
+                    f"スケール: {scale:.3f}, オフセット: ({x_offset},{y_offset})"
+                )
 
         except Exception as e:
             logger.error(f"ドラッグからの監視エリア作成エラー: {e}")
@@ -678,6 +790,7 @@ class MonitorAreaDialog:
 
             try:
                 import pyautogui
+
                 screen_width, screen_height = pyautogui.size()
             except ImportError:
                 screen_width, screen_height = 1920, 1080
@@ -727,6 +840,7 @@ class MonitorAreaDialog:
 
             try:
                 import pyautogui
+
                 screen_width, screen_height = pyautogui.size()
             except ImportError:
                 screen_width, screen_height = 1920, 1080
@@ -754,7 +868,10 @@ class MonitorAreaDialog:
 
             # 新規作成ボタンクリック時は、実際の監視エリアは作成しない
             # 代わりに、ドラッグ作業の準備を行う
-            messagebox.showinfo("新規作成", "画面をドラッグして監視エリアを作成してください。\n\n新規作成ボタンは、ドラッグ作業の開始を示すものです。")
+            messagebox.showinfo(
+                "新規作成",
+                "画面をドラッグして監視エリアを作成してください。\n\n新規作成ボタンは、ドラッグ作業の開始を示すものです。",
+            )
 
             # プレビューキャンバスにフォーカスを設定（メッセージ自動入力の阻害を防ぐため一時的にコメントアウト）
             # self.preview_canvas.focus_set()
@@ -763,7 +880,9 @@ class MonitorAreaDialog:
 
         except Exception as e:
             logger.error(f"新規監視エリア作成準備エラー: {e}")
-            messagebox.showerror("エラー", f"新規監視エリア作成の準備に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"新規監視エリア作成の準備に失敗しました: {e}"
+            )
 
     def delete_selected_area(self):
         """選択された監視エリアを削除"""
@@ -775,7 +894,9 @@ class MonitorAreaDialog:
         index = selection[0]
         area = self.monitor_areas[index]
 
-        if not messagebox.askyesno("確認", f"監視エリア '{area['name']}' を削除しますか？"):
+        if not messagebox.askyesno(
+            "確認", f"監視エリア '{area['name']}' を削除しますか？"
+        ):
             return
 
         try:
@@ -854,7 +975,9 @@ class MonitorAreaDialog:
 
             self.config_manager.save_config()
 
-            messagebox.showinfo("完了", "監視エリア設定とチャット入力欄位置を保存しました")
+            messagebox.showinfo(
+                "完了", "監視エリア設定とチャット入力欄位置を保存しました"
+            )
             logger.info("監視エリア設定とチャット入力欄位置を保存しました")
 
             # ダイアログを閉じる
@@ -884,7 +1007,10 @@ class MonitorAreaDialog:
 
         except ValueError as e:
             logger.error(f"設定値の検証エラー: {e}")
-            messagebox.showerror("エラー", "無効な設定値が入力されています。数値フィールドには数値を入力してください。")
+            messagebox.showerror(
+                "エラー",
+                "無効な設定値が入力されています。数値フィールドには数値を入力してください。",
+            )
             raise
 
     def test_selected_area(self):
@@ -895,11 +1021,13 @@ class MonitorAreaDialog:
 
         try:
             area = self.current_area
-            messagebox.showinfo("テスト",
-                              f"監視エリア '{area['name']}' のテストを実行します。\n"
-                              f"座標: ({area['x']}, {area['y']})\n"
-                              f"サイズ: {area['width']} x {area['height']}\n"
-                              f"有効: {'はい' if area.get('enabled', True) else 'いいえ'}")
+            messagebox.showinfo(
+                "テスト",
+                f"監視エリア '{area['name']}' のテストを実行します。\n"
+                f"座標: ({area['x']}, {area['y']})\n"
+                f"サイズ: {area['width']} x {area['height']}\n"
+                f"有効: {'はい' if area.get('enabled', True) else 'いいえ'}",
+            )
 
             logger.info(f"監視エリア '{area['name']}' のテストを実行しました")
 
@@ -919,10 +1047,12 @@ class MonitorAreaDialog:
 
             # 3秒待機
             import time
+
             time.sleep(3)
 
             # チャット入力欄の位置を取得
             import pyautogui
+
             chat_pos = pyautogui.position()
 
             # 設定を保存
@@ -934,7 +1064,7 @@ class MonitorAreaDialog:
             # 完了メッセージ
             messagebox.showinfo(
                 "設定完了",
-                f"チャット入力欄の位置を設定しました:\n座標: ({chat_pos.x}, {chat_pos.y})"
+                f"チャット入力欄の位置を設定しました:\n座標: ({chat_pos.x}, {chat_pos.y})",
             )
 
             logger.info(f"チャット入力欄の位置を設定: ({chat_pos.x}, {chat_pos.y})")
@@ -967,8 +1097,11 @@ class MonitorAreaDialog:
             main_frame.pack(fill=tk.BOTH, expand=True)
 
             # タイトル
-            title_label = ttk.Label(main_frame, text="チャット欄設定の手順",
-                                  font=("TkDefaultFont", 14, "bold"))
+            title_label = ttk.Label(
+                main_frame,
+                text="チャット欄設定の手順",
+                font=("TkDefaultFont", 14, "bold"),
+            )
             title_label.pack(pady=(0, 20))
 
             # 説明テキスト
@@ -988,8 +1121,9 @@ class MonitorAreaDialog:
 • クリック後は、その位置に復旧コマンドが送信されます
 • 設定をキャンセルする場合は「キャンセル」ボタンをクリックしてください"""
 
-            instruction_label = ttk.Label(main_frame, text=instruction_text,
-                                        justify=tk.LEFT, wraplength=450)
+            instruction_label = ttk.Label(
+                main_frame, text=instruction_text, justify=tk.LEFT, wraplength=450
+            )
             instruction_label.pack(pady=(0, 20))
 
             # ボタンフレーム
@@ -997,20 +1131,24 @@ class MonitorAreaDialog:
             button_frame.pack(fill=tk.X, pady=(20, 0))
 
             # 設定開始ボタン
-            start_button = ttk.Button(button_frame, text="設定開始",
-                                    command=lambda: self.start_chat_setup(instruction_dialog))
+            start_button = ttk.Button(
+                button_frame,
+                text="設定開始",
+                command=lambda: self.start_chat_setup(instruction_dialog),
+            )
             start_button.pack(side=tk.RIGHT, padx=(10, 0))
 
             # キャンセルボタン
-            cancel_button = ttk.Button(button_frame, text="キャンセル",
-                                     command=instruction_dialog.destroy)
+            cancel_button = ttk.Button(
+                button_frame, text="キャンセル", command=instruction_dialog.destroy
+            )
             cancel_button.pack(side=tk.RIGHT)
 
             # ダイアログが閉じられるまで待機
             instruction_dialog.wait_window()
 
             # 設定開始ボタンがクリックされたかチェック
-            return hasattr(self, '_chat_setup_started') and self._chat_setup_started
+            return hasattr(self, "_chat_setup_started") and self._chat_setup_started
 
         except Exception as e:
             logger.error(f"説明ダイアログ表示エラー: {e}")
@@ -1079,7 +1217,9 @@ class MonitorAreaDialog:
 
         except Exception as e:
             logger.error(f"スクリーンショット更新エラー: {e}")
-            messagebox.showerror("エラー", f"スクリーンショットの更新に失敗しました: {e}")
+            messagebox.showerror(
+                "エラー", f"スクリーンショットの更新に失敗しました: {e}"
+            )
 
     def cancel(self):
         """キャンセル処理"""
@@ -1106,9 +1246,15 @@ class MonitorAreaDialog:
                 existing_bottom = existing_area["y"] + existing_area["height"]
 
                 # 重複チェック（境界が重なっている場合）
-                if not (new_right <= existing_left or new_left >= existing_right or
-                       new_bottom <= existing_top or new_top >= existing_bottom):
-                    logger.debug(f"重複検出: 新エリア({x},{y},{width},{height}) と 既存エリア({existing_area['x']},{existing_area['y']},{existing_area['width']},{existing_area['height']})")
+                if not (
+                    new_right <= existing_left
+                    or new_left >= existing_right
+                    or new_bottom <= existing_top
+                    or new_top >= existing_bottom
+                ):
+                    logger.debug(
+                        f"重複検出: 新エリア({x},{y},{width},{height}) と 既存エリア({existing_area['x']},{existing_area['y']},{existing_area['width']},{existing_area['height']})"
+                    )
                     return True
 
             return False

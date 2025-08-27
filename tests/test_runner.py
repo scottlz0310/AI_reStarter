@@ -39,11 +39,14 @@ class TestRunner:
         logger.info("単体テストを実行します")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir / "unit"),
-            "-m", "unit or not integration and not gui",
+            "-m",
+            "unit or not integration and not gui",
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -64,11 +67,14 @@ class TestRunner:
         logger.info("統合テストを実行します")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir / "integration"),
-            "-m", "integration",
+            "-m",
+            "integration",
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -89,11 +95,14 @@ class TestRunner:
         logger.info("GUIテストを実行します")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir / "gui"),
-            "-m", "gui",
+            "-m",
+            "gui",
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -115,10 +124,12 @@ class TestRunner:
         logger.info("全てのテストを実行します")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir),
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if coverage_html:
@@ -143,10 +154,12 @@ class TestRunner:
         logger.info(f"特定のテストを実行します: {test_path}")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             test_path,
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -169,11 +182,14 @@ class TestRunner:
         logger.info(f"マーカー指定でテストを実行します: {marker_expr}")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir),
-            "-m", marker_expr,
+            "-m",
+            marker_expr,
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -194,11 +210,14 @@ class TestRunner:
         logger.info("高速テストを実行します")
 
         cmd = [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             str(self.tests_dir),
-            "-m", "not slow",
+            "-m",
+            "not slow",
             "--cov=src",
-            "--cov-report=term-missing"
+            "--cov-report=term-missing",
         ]
 
         if verbose:
@@ -218,10 +237,7 @@ class TestRunner:
         """
         logger.info(f"カバレッジレポートを生成します: {format_type}")
 
-        cmd = [
-            sys.executable, "-m", "coverage",
-            "report"
-        ]
+        cmd = [sys.executable, "-m", "coverage", "report"]
 
         if format_type == "html":
             cmd = [sys.executable, "-m", "coverage", "html"]
@@ -239,26 +255,13 @@ def main():
     parser.add_argument(
         "test_type",
         choices=["unit", "integration", "gui", "all", "fast", "specific"],
-        help="実行するテストの種類"
+        help="実行するテストの種類",
     )
+    parser.add_argument("--path", help="特定のテストパス（test_type=specificの場合）")
+    parser.add_argument("--markers", nargs="+", help="テストマーカー（複数指定可能）")
+    parser.add_argument("--verbose", "-v", action="store_true", help="詳細出力")
     parser.add_argument(
-        "--path",
-        help="特定のテストパス（test_type=specificの場合）"
-    )
-    parser.add_argument(
-        "--markers",
-        nargs="+",
-        help="テストマーカー（複数指定可能）"
-    )
-    parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="詳細出力"
-    )
-    parser.add_argument(
-        "--coverage-html",
-        action="store_true",
-        help="HTMLカバレッジレポートを生成"
+        "--coverage-html", action="store_true", help="HTMLカバレッジレポートを生成"
     )
 
     args = parser.parse_args()
@@ -266,7 +269,7 @@ def main():
     # ログ設定
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     runner = TestRunner()
@@ -280,8 +283,7 @@ def main():
             exit_code = runner.run_gui_tests(verbose=args.verbose)
         elif args.test_type == "all":
             exit_code = runner.run_all_tests(
-                verbose=args.verbose,
-                coverage_html=args.coverage_html
+                verbose=args.verbose, coverage_html=args.coverage_html
             )
         elif args.test_type == "fast":
             exit_code = runner.run_fast_tests(verbose=args.verbose)
@@ -291,7 +293,9 @@ def main():
                 sys.exit(1)
             exit_code = runner.run_specific_test(args.path, verbose=args.verbose)
         elif args.markers:
-            exit_code = runner.run_tests_with_markers(args.markers, verbose=args.verbose)
+            exit_code = runner.run_tests_with_markers(
+                args.markers, verbose=args.verbose
+            )
         else:
             logger.error("無効なテストタイプです")
             sys.exit(1)

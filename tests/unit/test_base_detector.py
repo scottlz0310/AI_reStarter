@@ -32,7 +32,7 @@ class ConcreteDetector(BaseDetector):
                 confidence=0.9,
                 position=(100, 200),
                 timestamp=0,
-                metadata={"template_name": "test_template.png"}
+                metadata={"template_name": "test_template.png"},
             )
         return None
 
@@ -74,7 +74,7 @@ class TestBaseDetector:
             confidence=0.9,
             position=(100, 200),
             timestamp=0,
-            metadata={}
+            metadata={},
         )
 
         # メソッドが呼び出し可能であることを確認
@@ -121,7 +121,7 @@ class TestBaseDetector:
             confidence=0.9,
             position=(100, 200),
             timestamp=0,
-            metadata={}
+            metadata={},
         )
 
         success = detector.execute_recovery_action(result)
@@ -140,7 +140,7 @@ class TestBaseDetector:
             confidence=0.9,
             position=(100, 200),
             timestamp=0,
-            metadata={}
+            metadata={},
         )
 
         success = detector.execute_recovery_action(result)
@@ -160,13 +160,15 @@ class TestBaseDetector:
 
         assert detector.name == "ConcreteDetector"
 
-    @patch('src.core.base_detector.logger')
+    @patch("src.core.base_detector.logger")
     def test_logging_on_initialization(self, mock_logger, sample_config):
         """初期化時のログ出力テスト"""
         ConcreteDetector(sample_config)
 
         # デバッグログが出力されることを確認
-        mock_logger.debug.assert_called_once_with("ConcreteDetector検出器を初期化しました")
+        mock_logger.debug.assert_called_once_with(
+            "ConcreteDetector検出器を初期化しました"
+        )
 
     def test_multiple_detections(self, sample_config):
         """複数回の検出実行テスト"""
@@ -195,7 +197,7 @@ class TestBaseDetector:
             confidence=0.9,
             position=(100, 200),
             timestamp=0,
-            metadata={}
+            metadata={},
         )
 
         # 複数回復旧アクションを実行

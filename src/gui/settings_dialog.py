@@ -68,17 +68,24 @@ class SettingsDialog:
         frame.pack(fill=tk.X, pady=(0, 10))
 
         # ログレベル設定
-        ttk.Label(frame, text="ログレベル:").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        ttk.Label(frame, text="ログレベル:").grid(
+            row=0, column=0, sticky=tk.W, padx=(0, 10)
+        )
         self.log_level_var = tk.StringVar(value="INFO")
-        log_level_combo = ttk.Combobox(frame, textvariable=self.log_level_var,
-                                     values=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                                     state="readonly", width=15)
+        log_level_combo = ttk.Combobox(
+            frame,
+            textvariable=self.log_level_var,
+            values=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+            state="readonly",
+            width=15,
+        )
         log_level_combo.grid(row=0, column=1, sticky=tk.W)
 
         # 自動起動設定
         self.auto_start_var = tk.BooleanVar(value=False)
-        auto_start_check = ttk.Checkbutton(frame, text="起動時に自動で監視を開始",
-                                         variable=self.auto_start_var)
+        auto_start_check = ttk.Checkbutton(
+            frame, text="起動時に自動で監視を開始", variable=self.auto_start_var
+        )
         auto_start_check.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(10, 0))
 
     def create_monitoring_settings(self, parent):
@@ -87,21 +94,34 @@ class SettingsDialog:
         frame.pack(fill=tk.X, pady=(0, 10))
 
         # 監視間隔設定
-        ttk.Label(frame, text="監視間隔 (秒):").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        ttk.Label(frame, text="監視間隔 (秒):").grid(
+            row=0, column=0, sticky=tk.W, padx=(0, 10)
+        )
         self.monitor_interval_var = tk.StringVar(value="2.0")
-        monitor_interval_entry = ttk.Entry(frame, textvariable=self.monitor_interval_var, width=10)
+        monitor_interval_entry = ttk.Entry(
+            frame, textvariable=self.monitor_interval_var, width=10
+        )
         monitor_interval_entry.grid(row=0, column=1, sticky=tk.W)
 
         # スクリーンショット保存設定
         self.save_screenshots_var = tk.BooleanVar(value=True)
-        save_screenshots_check = ttk.Checkbutton(frame, text="エラー時にスクリーンショットを保存",
-                                               variable=self.save_screenshots_var)
-        save_screenshots_check.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(10, 0))
+        save_screenshots_check = ttk.Checkbutton(
+            frame,
+            text="エラー時にスクリーンショットを保存",
+            variable=self.save_screenshots_var,
+        )
+        save_screenshots_check.grid(
+            row=1, column=0, columnspan=2, sticky=tk.W, pady=(10, 0)
+        )
 
         # スクリーンショット保存先
-        ttk.Label(frame, text="保存先フォルダ:").grid(row=2, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        ttk.Label(frame, text="保存先フォルダ:").grid(
+            row=2, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0)
+        )
         self.screenshot_folder_var = tk.StringVar(value="error_templates")
-        screenshot_folder_entry = ttk.Entry(frame, textvariable=self.screenshot_folder_var, width=30)
+        screenshot_folder_entry = ttk.Entry(
+            frame, textvariable=self.screenshot_folder_var, width=30
+        )
         screenshot_folder_entry.grid(row=2, column=1, sticky=tk.W, pady=(10, 0))
 
     def create_recovery_settings(self, parent):
@@ -110,22 +130,35 @@ class SettingsDialog:
         frame.pack(fill=tk.X, pady=(0, 10))
 
         # 最大復旧試行回数
-        ttk.Label(frame, text="最大復旧試行回数:").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        ttk.Label(frame, text="最大復旧試行回数:").grid(
+            row=0, column=0, sticky=tk.W, padx=(0, 10)
+        )
         self.max_recovery_attempts_var = tk.StringVar(value="3")
-        max_recovery_attempts_entry = ttk.Entry(frame, textvariable=self.max_recovery_attempts_var, width=10)
+        max_recovery_attempts_entry = ttk.Entry(
+            frame, textvariable=self.max_recovery_attempts_var, width=10
+        )
         max_recovery_attempts_entry.grid(row=0, column=1, sticky=tk.W)
 
         # 復旧間隔設定
-        ttk.Label(frame, text="復旧間隔 (秒):").grid(row=1, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        ttk.Label(frame, text="復旧間隔 (秒):").grid(
+            row=1, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0)
+        )
         self.recovery_interval_var = tk.StringVar(value="5.0")
-        recovery_interval_entry = ttk.Entry(frame, textvariable=self.recovery_interval_var, width=10)
+        recovery_interval_entry = ttk.Entry(
+            frame, textvariable=self.recovery_interval_var, width=10
+        )
         recovery_interval_entry.grid(row=1, column=1, sticky=tk.W, pady=(10, 0))
 
         # 自動復旧設定
         self.auto_recovery_var = tk.BooleanVar(value=True)
-        auto_recovery_check = ttk.Checkbutton(frame, text="エラー検出時に自動で復旧を実行",
-                                            variable=self.auto_recovery_var)
-        auto_recovery_check.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=(10, 0))
+        auto_recovery_check = ttk.Checkbutton(
+            frame,
+            text="エラー検出時に自動で復旧を実行",
+            variable=self.auto_recovery_var,
+        )
+        auto_recovery_check.grid(
+            row=2, column=0, columnspan=2, sticky=tk.W, pady=(10, 0)
+        )
 
     def create_hotkey_settings(self, parent):
         """ホットキー設定セクション"""
@@ -134,8 +167,9 @@ class SettingsDialog:
 
         # ホットキーの有効/無効設定
         self.hotkey_enabled_var = tk.BooleanVar(value=True)
-        hotkey_enabled_check = ttk.Checkbutton(frame, text="ホットキーを有効にする",
-                                             variable=self.hotkey_enabled_var)
+        hotkey_enabled_check = ttk.Checkbutton(
+            frame, text="ホットキーを有効にする", variable=self.hotkey_enabled_var
+        )
         hotkey_enabled_check.grid(row=0, column=0, columnspan=2, sticky=tk.W)
 
         # ホットキー一覧表示
@@ -163,7 +197,9 @@ class SettingsDialog:
         cancel_button.pack(side=tk.RIGHT)
 
         # デフォルト復元ボタン
-        restore_button = ttk.Button(button_frame, text="デフォルト復元", command=self.restore_defaults)
+        restore_button = ttk.Button(
+            button_frame, text="デフォルト復元", command=self.restore_defaults
+        )
         restore_button.pack(side=tk.LEFT)
 
     def load_current_settings(self):
@@ -172,11 +208,21 @@ class SettingsDialog:
             # 設定値を読み込み
             self.log_level_var.set(self.config_manager.get("log_level", "INFO"))
             self.auto_start_var.set(self.config_manager.get("auto_start", False))
-            self.monitor_interval_var.set(str(self.config_manager.get("monitor_interval", 2.0)))
-            self.save_screenshots_var.set(self.config_manager.get("save_screenshots", True))
-            self.screenshot_folder_var.set(self.config_manager.get("screenshot_folder", "error_templates"))
-            self.max_recovery_attempts_var.set(str(self.config_manager.get("max_recovery_attempts", 3)))
-            self.recovery_interval_var.set(str(self.config_manager.get("recovery_interval", 5.0)))
+            self.monitor_interval_var.set(
+                str(self.config_manager.get("monitor_interval", 2.0))
+            )
+            self.save_screenshots_var.set(
+                self.config_manager.get("save_screenshots", True)
+            )
+            self.screenshot_folder_var.set(
+                self.config_manager.get("screenshot_folder", "error_templates")
+            )
+            self.max_recovery_attempts_var.set(
+                str(self.config_manager.get("max_recovery_attempts", 3))
+            )
+            self.recovery_interval_var.set(
+                str(self.config_manager.get("recovery_interval", 5.0))
+            )
             self.auto_recovery_var.set(self.config_manager.get("auto_recovery", True))
             self.hotkey_enabled_var.set(self.config_manager.get("hotkey_enabled", True))
 
@@ -217,7 +263,10 @@ class SettingsDialog:
 
         except ValueError as e:
             logger.error(f"設定値の検証エラー: {e}")
-            messagebox.showerror("エラー", "無効な設定値が入力されています。数値フィールドには数値を入力してください。")
+            messagebox.showerror(
+                "エラー",
+                "無効な設定値が入力されています。数値フィールドには数値を入力してください。",
+            )
         except Exception as e:
             logger.error(f"設定保存エラー: {e}")
             messagebox.showerror("エラー", f"設定の保存に失敗しました: {e}")

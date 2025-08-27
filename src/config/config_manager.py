@@ -54,7 +54,9 @@ class ConfigManager:
                     default_config.update(user_config)
                     logger.info(f"ユーザー設定を読み込みました: {config_file}")
             else:
-                logger.info(f"設定ファイルが存在しません。デフォルト設定を使用し、設定ファイルを作成します: {config_file}")
+                logger.info(
+                    f"設定ファイルが存在しません。デフォルト設定を使用し、設定ファイルを作成します: {config_file}"
+                )
                 # デフォルト設定で設定ファイルを作成
                 try:
                     with open(config_file, "w", encoding="utf-8") as f:
@@ -73,9 +75,9 @@ class ConfigManager:
 
     def get(self, key: str, default: Any = None) -> Any:
         """指定されたキーの設定値を取得（ドット記法もサポート）"""
-        if '.' in key:
+        if "." in key:
             # ドット記法での階層アクセス（例: "amazonq.enabled"）
-            keys = key.split('.')
+            keys = key.split(".")
             value = self.config
             for k in keys:
                 if isinstance(value, dict) and k in value:
@@ -114,9 +116,10 @@ class ConfigManager:
                 if isinstance(value, (list, tuple)) and len(value) == 2:
                     x, y = value[0], value[1]
                     return (
-                        isinstance(x, (int, float)) and
-                        isinstance(y, (int, float)) and
-                        x >= 0 and y >= 0
+                        isinstance(x, (int, float))
+                        and isinstance(y, (int, float))
+                        and x >= 0
+                        and y >= 0
                     )
                 return False
             elif key == "monitor_region":
@@ -125,8 +128,9 @@ class ConfigManager:
                 if isinstance(value, (list, tuple)) and len(value) == 4:
                     x, y, w, h = value[0], value[1], value[2], value[3]
                     return (
-                        all(isinstance(v, (int, float)) for v in [x, y, w, h]) and
-                        w > 0 and h > 0
+                        all(isinstance(v, (int, float)) for v in [x, y, w, h])
+                        and w > 0
+                        and h > 0
                     )
                 return False
             elif key == "monitor_areas":
