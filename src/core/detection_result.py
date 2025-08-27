@@ -104,3 +104,35 @@ class DetectionResult:
             float: 検出からの経過時間（秒）
         """
         return time.time() - self.timestamp
+
+    def to_dict(self) -> dict[str, Any]:
+        """検出結果を辞書形式に変換
+
+        Returns:
+            dict: 検出結果の辞書表現
+        """
+        return {
+            "state_type": self.state_type,
+            "confidence": self.confidence,
+            "position": self.position,
+            "timestamp": self.timestamp,
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> 'DetectionResult':
+        """辞書から検出結果を復元
+
+        Args:
+            data: 検出結果の辞書データ
+
+        Returns:
+            DetectionResult: 復元された検出結果
+        """
+        return cls(
+            state_type=data["state_type"],
+            confidence=data["confidence"],
+            position=data.get("position"),
+            timestamp=data["timestamp"],
+            metadata=data.get("metadata", {}),
+        )
