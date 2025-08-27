@@ -107,24 +107,34 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=kiro_auto_recovery",
+    "--cov=src",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
+    "-v"
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
 ]
+markers = [
+    "unit: 単体テスト用のマーカー",
+    "integration: 統合テスト用のマーカー",
+    "gui: GUIテスト用のマーカー",
+    "slow: 実行時間が長いテスト用のマーカー"
+]
 
 [tool.coverage.run]
-source = ["kiro_auto_recovery"]
+source = ["src"]
 omit = [
     "*/tests/*",
     "*/test_*",
     "*/__pycache__/*",
     "*/venv/*",
-    "*/venv/*",
+    "*/archive/*",
+    "*/htmlcov/*",
+    "*/.mypy_cache/*",
+    "*/.ruff_cache/*"
 ]
 
 [tool.setuptools]
