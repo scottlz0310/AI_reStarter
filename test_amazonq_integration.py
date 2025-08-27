@@ -5,17 +5,18 @@ AmazonQ統合テストスクリプト
 新しく実装したAmazonQ検出機能の基本動作をテストします。
 """
 
-import sys
-import os
 import logging
+import os
+import sys
+
 import numpy as np
 
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 from src.config.config_manager import ConfigManager
-from src.core.mode_manager import ModeManager
 from src.core.detection_result import DetectionResult
+from src.core.mode_manager import ModeManager
 from src.plugins.amazonq_detector import AmazonQDetector
 
 # ログ設定

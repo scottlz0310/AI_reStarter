@@ -5,10 +5,11 @@
 AmazonQ用の▶RUNボタンテンプレートのサンプル画像を作成します。
 """
 
-import os
-import numpy as np
-import cv2
 import logging
+import os
+
+import cv2
+import numpy as np
 
 # ログ設定
 logging.basicConfig(

@@ -5,18 +5,18 @@ GUI機能テストスクリプト
 新しく実装したGUI機能の基本動作をテストします。
 """
 
-import sys
-import os
-import tkinter as tk
 import logging
+import os
+import sys
+import tkinter as tk
 
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 from src.config.config_manager import ConfigManager
 from src.core.mode_manager import ModeManager
-from src.gui.mode_selector_widget import ModeSelectorWidget
 from src.gui.amazonq_settings_dialog import AmazonQSettingsDialog
+from src.gui.mode_selector_widget import ModeSelectorWidget
 
 # ログ設定
 logging.basicConfig(
