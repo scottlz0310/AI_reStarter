@@ -28,6 +28,50 @@ class TemplateManager:
 
         logger.debug("テンプレート管理GUIを初期化しました")
 
+    def create_tab_control(self, parent):
+        """タブコントロールを作成"""
+        self.notebook = ttk.Notebook(parent)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
+        
+        # Kiro-IDEタブ
+        self.kiro_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.kiro_frame, text="Kiro-IDEテンプレート")
+        self.setup_kiro_tab()
+        
+        # AmazonQタブ
+        self.amazonq_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.amazonq_frame, text="AmazonQテンプレート")
+        self.setup_amazonq_tab()
+        
+        # ステータスバー
+        self.create_status_bar(parent)
+    
+    def setup_kiro_tab(self):
+        """従来のKiro-IDEタブのセットアップ"""
+        self.template_folder = self.config_manager.get("error_templates_dir", "error_templates")
+        
+        # ツールバー
+        self.create_toolbar(self.kiro_frame)
+        
+        # テンプレート一覧
+        self.create_template_list(self.kiro_frame)
+        
+        # プレビューエリア
+        self.create_preview_area(self.kiro_frame)
+    
+    def setup_amazonq_tab(self):
+        """AmazonQタブのセットアップ"""
+        self.amazonq_folder = self.config_manager.get("amazonq.run_button_templates_dir", "amazonq_templates")
+        
+        # ツールバー
+        self.create_amazonq_toolbar(self.amazonq_frame)
+        
+        # テンプレート一覧
+        self.create_amazonq_template_list(self.amazonq_frame)
+        
+        # プレビューエリア
+        self.create_amazonq_preview_area(self.amazonq_frame)
+
     def show(self):
         """テンプレート管理GUIを表示"""
         try:
@@ -45,6 +89,7 @@ class TemplateManager:
 
             self.setup_ui()
             self.load_templates()
+            self.refresh_amazonq_templates()
 
             logger.info("テンプレート管理GUIを表示しました")
 
@@ -58,17 +103,8 @@ class TemplateManager:
         main_frame = ttk.Frame(self.dialog, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # ツールバー
-        self.create_toolbar(main_frame)
-
-        # テンプレート一覧
-        self.create_template_list(main_frame)
-
-        # プレビューエリア
-        self.create_preview_area(main_frame)
-
-        # ステータスバー
-        self.create_status_bar(main_frame)
+        # タブコントロールを作成
+        self.create_tab_control(main_frame)
 
     def create_toolbar(self, parent):
         """ツールバーの作成"""
@@ -394,6 +430,168 @@ class TemplateManager:
                     created_date,
                     "テンプレート画像"
                 ))
+
+    def create_amazonq_toolbar(self, parent):
+        """ツールバーの作成（AmazonQ用）"""
+        toolbar = ttk.Frame(parent)
+        toolbar.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Button(toolbar, text="新規追加", command=self.add_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(toolbar, text="削除", command=self.delete_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(toolbar, text="更新", command=self.refresh_amazonq_templates).pack(side=tk.LEFT, padx=(0, 5))
+    
+    def create_amazonq_template_list(self, parent):
+        """テンプレート一覧の作成（AmazonQ用）"""
+        list_frame = ttk.LabelFrame(parent, text="▶RUNボタンテンプレート", padding="10")
+        list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        columns = ("名前", "サイズ", "作成日")
+        self.amazonq_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=10)
+        
+        for col in columns:
+            self.amazonq_tree.heading(col, text=col)
+            self.amazonq_tree.column(col, width=150)
+        
+        scrollbar_aq = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.amazonq_tree.yview)
+        self.amazonq_tree.configure(yscrollcommand=scrollbar_aq.set)
+        
+        self.amazonq_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar_aq.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.amazonq_tree.bind("<<TreeviewSelect>>", self.on_amazonq_template_select)
+    
+    def create_amazonq_preview_area(self, parent):
+        """プレビューエリアの作成（AmazonQ用）"""
+        preview_frame = ttk.LabelFrame(parent, text="プレビュー", padding="10")
+        preview_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        self.amazonq_preview_label = ttk.Label(preview_frame, text="テンプレートを選択してください")
+        self.amazonq_preview_label.pack(expand=True)
+        
+        info_frame = ttk.Frame(preview_frame)
+        info_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        self.amazonq_info_text = tk.Text(info_frame, height=4, width=50)
+        self.amazonq_info_text.pack(fill=tk.X)
+    
+    def add_amazonq_template(self):
+        """新規AmazonQテンプレートを追加"""
+        try:
+            file_path = filedialog.askopenfilename(
+                title="▶RUNボタンテンプレートを選択",
+                filetypes=[
+                    ("画像ファイル", "*.png *.jpg *.jpeg *.bmp"),
+                    ("PNGファイル", "*.png"),
+                    ("全てのファイル", "*.*")
+                ]
+            )
+            
+            if file_path:
+                import shutil
+                filename = os.path.basename(file_path)
+                dest_path = os.path.join(self.amazonq_folder, filename)
+                
+                os.makedirs(self.amazonq_folder, exist_ok=True)
+                shutil.copy2(file_path, dest_path)
+                
+                messagebox.showinfo("完了", f"▶RUNボタンテンプレート '{filename}' を追加しました")
+                logger.info(f"AmazonQテンプレートを追加: {filename}")
+                
+                self.refresh_amazonq_templates()
+                
+        except Exception as e:
+            logger.error(f"AmazonQテンプレート追加エラー: {e}")
+            messagebox.showerror("エラー", f"テンプレートの追加に失敗しました: {e}")
+    
+    def delete_amazonq_template(self):
+        """選択されたAmazonQテンプレートを削除"""
+        selection = self.amazonq_tree.selection()
+        if not selection:
+            messagebox.showwarning("警告", "削除するテンプレートを選択してください")
+            return
+        
+        item = self.amazonq_tree.item(selection[0])
+        template_name = item['values'][0]
+        
+        if not messagebox.askyesno("確認", f"▶RUNボタンテンプレート '{template_name}' を削除しますか？"):
+            return
+        
+        try:
+            template_path = os.path.join(self.amazonq_folder, template_name)
+            if os.path.exists(template_path):
+                os.remove(template_path)
+                messagebox.showinfo("完了", f"テンプレート '{template_name}' を削除しました")
+                logger.info(f"AmazonQテンプレートを削除: {template_name}")
+                self.refresh_amazonq_templates()
+                
+        except Exception as e:
+            logger.error(f"AmazonQテンプレート削除エラー: {e}")
+            messagebox.showerror("エラー", f"テンプレートの削除に失敗しました: {e}")
+    
+    def refresh_amazonq_templates(self):
+        """AmazonQテンプレート一覧を更新"""
+        try:
+            self.amazonq_tree.delete(*self.amazonq_tree.get_children())
+            
+            if not os.path.exists(self.amazonq_folder):
+                return
+            
+            for filename in os.listdir(self.amazonq_folder):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+                    filepath = os.path.join(self.amazonq_folder, filename)
+                    file_stat = os.stat(filepath)
+                    
+                    size_kb = f"{file_stat.st_size / 1024:.1f} KB"
+                    created_date = self.format_date(file_stat.st_ctime)
+                    
+                    self.amazonq_tree.insert("", "end", values=(
+                        filename,
+                        size_kb,
+                        created_date
+                    ))
+            
+            logger.info("AmazonQテンプレート一覧を更新しました")
+            
+        except Exception as e:
+            logger.error(f"AmazonQテンプレート更新エラー: {e}")
+    
+    def on_amazonq_template_select(self, event):
+        """AmazonQテンプレート選択時の処理"""
+        selection = self.amazonq_tree.selection()
+        if not selection:
+            return
+        
+        item = self.amazonq_tree.item(selection[0])
+        template_name = item['values'][0]
+        template_path = os.path.join(self.amazonq_folder, template_name)
+        
+        # プレビュー表示
+        try:
+            image = Image.open(template_path)
+            max_size = (200, 200)
+            image.thumbnail(max_size, Image.Resampling.LANCZOS)
+            photo = ImageTk.PhotoImage(image)
+            
+            self.amazonq_preview_label.config(image=photo, text="")
+            self.amazonq_preview_label.image = photo
+            
+        except Exception as e:
+            logger.error(f"AmazonQプレビュー表示エラー: {e}")
+            self.amazonq_preview_label.config(image="", text="プレビュー表示エラー")
+        
+        # 情報表示
+        try:
+            file_stat = os.stat(template_path)
+            info_text = f"""ファイル名: {template_name}
+パス: {template_path}
+サイズ: {file_stat.st_size} バイト
+作成日: {self.format_date(file_stat.st_ctime)}"""
+            
+            self.amazonq_info_text.delete(1.0, tk.END)
+            self.amazonq_info_text.insert(1.0, info_text)
+            
+        except Exception as e:
+            logger.error(f"AmazonQテンプレート情報表示エラー: {e}")
 
     def close(self):
         """ダイアログを閉じる"""
