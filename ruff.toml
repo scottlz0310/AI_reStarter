@@ -1,7 +1,7 @@
 # Ruff設定ファイル - 自動リフォーマット用
 
 # 基本設定
-target-version = "py38"
+target-version = "py311"
 line-length = 88
 include = ["src/**/*.py", "tests/**/*.py", "main.py"]
 exclude = [

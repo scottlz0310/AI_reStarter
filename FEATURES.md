@@ -49,7 +49,7 @@ AI reStarterは、様々なAI統合IDEでエラーや停止が発生した際に
 
 ## 対応プラットフォーム
 - **OS**: Windows 10/11
-- **Python**: 3.8以上
+- **Python**: 3.11以上
 - **AI-IDE**: AmazonQ Developer、その他AI統合IDE
 
 ## アーキテクチャ特徴
@@ -72,7 +72,7 @@ AI reStarterは、様々なAI統合IDEでエラーや停止が発生した際に
 ## 技術スタック
 
 ### コア技術
-- **Python 3.8+**: メイン開発言語
+- **Python 3.11+**: メイン開発言語
 - **OpenCV**: 画像処理・テンプレートマッチング
 - **tkinter**: GUI フレームワーク
 - **PyAutoGUI**: 画面キャプチャ・マウス操作

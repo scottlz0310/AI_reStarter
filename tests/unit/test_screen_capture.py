@@ -25,28 +25,32 @@ class TestScreenCapture:
         """画面キャプチャ成功のテスト"""
         mock_array = np.random.randint(0, 255, (600, 800, 3), dtype=np.uint8)
 
-        with patch("src.utils.screen_capture.np.array", return_value=mock_array):
-            with patch.object(capture, "_convert_to_grayscale") as mock_convert:
-                mock_convert.return_value = mock_array
+        with (
+            patch("src.utils.screen_capture.np.array", return_value=mock_array),
+            patch.object(capture, "_convert_to_grayscale") as mock_convert,
+        ):
+            mock_convert.return_value = mock_array
 
-                result = capture.capture_screen()
+            result = capture.capture_screen()
 
-                assert result is not None
-                assert isinstance(result, np.ndarray)
+            assert result is not None
+            assert isinstance(result, np.ndarray)
 
     def test_capture_region_success(self, capture):
         """領域キャプチャ成功のテスト"""
         mock_array = np.random.randint(0, 255, (200, 300, 3), dtype=np.uint8)
         region = (100, 100, 300, 200)
 
-        with patch("src.utils.screen_capture.np.array", return_value=mock_array):
-            with patch.object(capture, "_convert_to_grayscale") as mock_convert:
-                mock_convert.return_value = mock_array
+        with (
+            patch("src.utils.screen_capture.np.array", return_value=mock_array),
+            patch.object(capture, "_convert_to_grayscale") as mock_convert,
+        ):
+            mock_convert.return_value = mock_array
 
-                result = capture.capture_region(region)
+            result = capture.capture_region(region)
 
-                assert result is not None
-                assert isinstance(result, np.ndarray)
+            assert result is not None
+            assert isinstance(result, np.ndarray)
 
     def test_capture_screen_failure(self, capture):
         """画面キャプチャ失敗のテスト"""
@@ -55,4 +59,16 @@ class TestScreenCapture:
             side_effect=Exception("Capture failed"),
         ):
             result = capture.capture_screen()
+            assert result is None
+
+    def test_capture_region_invalid_coordinates(self, capture):
+        """無効な座標での領域キャプチャテスト"""
+        invalid_region = (-10, -10, 100, 100)  # 負の座標
+
+        with (
+            patch("src.utils.screen_capture.np.array", return_value=None),
+            patch.object(capture, "_convert_to_grayscale", return_value=None),
+        ):
+            result = capture.capture_region(invalid_region)
+
             assert result is None
