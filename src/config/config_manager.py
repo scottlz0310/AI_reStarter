@@ -101,23 +101,23 @@ class ConfigManager:
         """設定値の妥当性をチェック"""
         try:
             if key == "monitor_interval":
-                return isinstance(value, (int, float)) and 0.1 <= value <= 60.0
+                return isinstance(value, int | float) and 0.1 <= value <= 60.0
             elif key == "action_delay":
-                return isinstance(value, (int, float)) and 0.1 <= value <= 10.0
+                return isinstance(value, int | float) and 0.1 <= value <= 10.0
             elif key == "max_recovery_attempts":
                 return isinstance(value, int) and 1 <= value <= 10
             elif key == "recovery_cooldown":
-                return isinstance(value, (int, float)) and 5 <= value <= 300
+                return isinstance(value, int | float) and 5 <= value <= 300
             elif key == "template_threshold":
-                return isinstance(value, (int, float)) and 0.1 <= value <= 1.0
+                return isinstance(value, int | float) and 0.1 <= value <= 1.0
             elif key == "chat_input_position":
                 if value is None:
                     return True
-                if isinstance(value, (list, tuple)) and len(value) == 2:
+                if isinstance(value, list | tuple) and len(value) == 2:
                     x, y = value[0], value[1]
                     return (
-                        isinstance(x, (int, float))
-                        and isinstance(y, (int, float))
+                        isinstance(x, int | float)
+                        and isinstance(y, int | float)
                         and x >= 0
                         and y >= 0
                     )
@@ -125,10 +125,10 @@ class ConfigManager:
             elif key == "monitor_region":
                 if value is None:
                     return True
-                if isinstance(value, (list, tuple)) and len(value) == 4:
+                if isinstance(value, list | tuple) and len(value) == 4:
                     x, y, w, h = value[0], value[1], value[2], value[3]
                     return (
-                        all(isinstance(v, (int, float)) for v in [x, y, w, h])
+                        all(isinstance(v, int | float) for v in [x, y, w, h])
                         and w > 0
                         and h > 0
                     )
@@ -143,7 +143,7 @@ class ConfigManager:
                     if not all(key in area for key in required_keys):
                         return False
                     if not all(
-                        isinstance(area[key], (int, float))
+                        isinstance(area[key], int | float)
                         for key in ["x", "y", "width", "height"]
                     ):
                         return False

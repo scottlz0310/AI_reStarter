@@ -25,8 +25,8 @@ class ImageProcessor:
         screenshot: np.ndarray,
         error_templates: dict[str, np.ndarray],
         threshold: float = 0.8,
-        monitor_region: Optional[tuple[int, int, int, int]] = None,
-    ) -> Optional[str]:
+        monitor_region: tuple[int, int, int, int] | None = None,
+    ) -> str | None:
         """
         エラーを検出
         Args:
@@ -90,7 +90,7 @@ class ImageProcessor:
 
     def find_template_position(
         self, screenshot: np.ndarray, template: np.ndarray, threshold: float = 0.7
-    ) -> Optional[tuple[int, int]]:
+    ) -> tuple[int, int] | None:
         """
         テンプレートの位置を検出
         Args:

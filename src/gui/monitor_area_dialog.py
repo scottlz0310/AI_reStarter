@@ -23,12 +23,12 @@ class MonitorAreaDialog:
         self.config_manager = config_manager
         self.dialog = None
         self.monitor_areas: list[dict] = []
-        self.current_area: Optional[dict] = None
-        self.drag_start: Optional[tuple[int, int]] = None
-        self.drag_end: Optional[tuple[int, int]] = None
+        self.current_area: dict | None = None
+        self.drag_start: tuple[int, int] | None = None
+        self.drag_end: tuple[int, int] | None = None
         self.is_dragging = False
         self.screenshot_photo = None  # スクリーンショット画像の参照を保持
-        self.chat_input_position: Optional[list[int]] = None  # チャット入力欄の位置
+        self.chat_input_position: list[int] | None = None  # チャット入力欄の位置
 
         logger.debug("監視エリア設定ダイアログを初期化しました")
 

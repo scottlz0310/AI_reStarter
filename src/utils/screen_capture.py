@@ -33,7 +33,7 @@ class ScreenCapture:
             logger.info("画面キャプチャ機能を初期化しました")
 
     def capture_screen(
-        self, region: Optional[tuple[int, int, int, int]] = None
+        self, region: tuple[int, int, int, int] | None = None
     ) -> np.ndarray:
         """
         画面をキャプチャ
@@ -86,7 +86,7 @@ class ScreenCapture:
         """画面キャプチャ機能が利用可能かチェック"""
         return PYAUTOGUI_AVAILABLE
 
-    def get_screen_size(self) -> Optional[tuple[int, int]]:
+    def get_screen_size(self) -> tuple[int, int] | None:
         """画面サイズを取得"""
         if not PYAUTOGUI_AVAILABLE:
             return None

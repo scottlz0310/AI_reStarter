@@ -5,9 +5,9 @@
 
 import logging
 import tkinter as tk
+from collections.abc import Callable
 from tkinter import ttk
 from typing import Any
-from typing import Callable
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -20,12 +20,12 @@ class MonitorWidget(ttk.Frame):
         super().__init__(parent)
 
         # コールバック関数
-        self.start_callback: Optional[Callable] = None
-        self.stop_callback: Optional[Callable] = None
-        self.save_template_callback: Optional[Callable] = None
-        self.send_recovery_callback: Optional[Callable] = None
-        self.monitor_area_callback: Optional[Callable] = None
-        self.save_template_with_selection_callback: Optional[Callable] = None
+        self.start_callback: Callable | None = None
+        self.stop_callback: Callable | None = None
+        self.save_template_callback: Callable | None = None
+        self.send_recovery_callback: Callable | None = None
+        self.monitor_area_callback: Callable | None = None
+        self.save_template_with_selection_callback: Callable | None = None
 
         self.setup_ui()
         logger.debug("監視状態ウィジェットを初期化しました")
@@ -180,8 +180,8 @@ class MonitorWidget(ttk.Frame):
         stop_callback: Callable,
         save_template_callback: Callable,
         send_recovery_callback: Callable,
-        monitor_area_callback: Optional[Callable] = None,
-        save_template_with_selection_callback: Optional[Callable] = None,
+        monitor_area_callback: Callable | None = None,
+        save_template_with_selection_callback: Callable | None = None,
     ):
         """コールバック関数を設定"""
         self.start_callback = start_callback

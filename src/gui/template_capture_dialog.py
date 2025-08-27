@@ -38,7 +38,7 @@ class TemplateCaptureDialog:
 
         logger.debug("テンプレート範囲選択ダイアログを初期化")
 
-    def show(self) -> Optional[tuple[np.ndarray, str]]:
+    def show(self) -> tuple[np.ndarray, str] | None:
         """
         ダイアログを表示してテンプレート範囲を選択
 

@@ -23,7 +23,7 @@ class ConcreteDetector(BaseDetector):
         self.detect_calls = 0
         self.recovery_calls = 0
 
-    def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
+    def detect_state(self, screenshot: np.ndarray) -> DetectionResult | None:
         """テスト用の検出実装"""
         self.detect_calls += 1
         if self.config.get("should_detect", False):

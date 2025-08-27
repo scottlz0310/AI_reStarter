@@ -80,7 +80,7 @@ class AmazonQDetector(BaseDetector):
 
     def detect_state(
         self, screenshot: np.ndarray, region_offset: tuple[int, int] = (0, 0)
-    ) -> Optional[DetectionResult]:
+    ) -> DetectionResult | None:
         """▶RUNボタンを検出
 
         Args:

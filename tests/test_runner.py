@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class TestRunner:
     """テスト実行管理クラス"""
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """
         テストランナーを初期化
 

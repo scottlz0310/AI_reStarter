@@ -22,7 +22,7 @@ class DetectionResult:
 
     state_type: str  # 検出された状態のタイプ（例: "run_button", "error", "completion"）
     confidence: float  # 検出の信頼度（0.0-1.0）
-    position: Optional[tuple[int, int]]  # 検出された位置の座標（x, y）
+    position: tuple[int, int] | None  # 検出された位置の座標（x, y）
     timestamp: float  # 検出時刻のタイムスタンプ
     metadata: dict[str, Any]  # 追加のメタデータ
 
@@ -66,7 +66,7 @@ class DetectionResult:
         cls,
         confidence: float,
         error_type: str,
-        position: Optional[tuple[int, int]] = None,
+        position: tuple[int, int] | None = None,
     ) -> "DetectionResult":
         """エラー検出結果を作成
 

@@ -115,7 +115,7 @@ class ModeManager:
         )
         return active_detectors
 
-    def detect_and_execute(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
+    def detect_and_execute(self, screenshot: np.ndarray) -> DetectionResult | None:
         """検出と実行を一括で行う
 
         Args:
@@ -177,7 +177,7 @@ class ModeManager:
         logger.debug("自動判定: デフォルトでKiroモードを推奨")
         return "kiro"
 
-    def get_detector(self, detector_name: str) -> Optional[BaseDetector]:
+    def get_detector(self, detector_name: str) -> BaseDetector | None:
         """指定された検出器を取得
 
         Args:

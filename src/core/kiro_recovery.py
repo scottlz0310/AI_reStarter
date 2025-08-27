@@ -117,7 +117,7 @@ class KiroRecovery:
             f"エラーテンプレート再読み込み完了: {len(self.error_templates)}個のテンプレート"
         )
 
-    def detect_error(self, screenshot: np.ndarray) -> Optional[str]:
+    def detect_error(self, screenshot: np.ndarray) -> str | None:
         """
         エラーを検出
         Args:
@@ -209,7 +209,7 @@ class KiroRecovery:
             logger.error(f"強制フォーカスエラー: {e}")
             return False
 
-    def send_recovery_command(self, error_type: Optional[str] = None) -> bool:
+    def send_recovery_command(self, error_type: str | None = None) -> bool:
         """
         復旧コマンドを送信（旧実装の動作を完全再現）
         Args:
@@ -229,12 +229,12 @@ class KiroRecovery:
 
             # 座標の妥当性をチェック
             logger.info(f"取得されたチャット入力欄座標: {chat_position}")
-            if not isinstance(chat_position, (list, tuple)) or len(chat_position) != 2:
+            if not isinstance(chat_position, list | tuple) or len(chat_position) != 2:
                 logger.error(f"チャット入力欄座標の形式が不正: {chat_position}")
                 return False
 
             x, y = chat_position[0], chat_position[1]
-            if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+            if not isinstance(x, int | float) or not isinstance(y, int | float):
                 logger.error(
                     f"チャット入力欄座標の値が不正: x={x} ({type(x)}), y={y} ({type(y)})"
                 )
@@ -302,7 +302,7 @@ class KiroRecovery:
             logger.error(f"復旧コマンド送信エラー: {e}")
             return False
 
-    def find_chat_input(self) -> Optional[tuple[int, int]]:
+    def find_chat_input(self) -> tuple[int, int] | None:
         """チャット入力欄を自動検出（プレースホルダー実装）"""
         logger.warning("チャット入力欄の自動検出は未実装です")
         return None
@@ -418,7 +418,7 @@ class KiroRecovery:
 
     def _detect_and_execute_with_offset(
         self, screenshot: np.ndarray, region_offset: tuple[int, int]
-    ) -> Optional[DetectionResult]:
+    ) -> DetectionResult | None:
         """監視エリアのオフセットを考慮した検出・実行
 
         Args:
@@ -478,7 +478,7 @@ class KiroRecovery:
         else:
             logger.info("復旧をスキップ（クールダウン中または最大試行回数到達）")
 
-    def start_monitoring(self) -> Optional[threading.Thread]:
+    def start_monitoring(self) -> threading.Thread | None:
         """監視開始（モードに応じたテンプレートチェック）"""
         if self.monitoring:
             logger.warning("既に監視中です")
@@ -534,7 +534,7 @@ class KiroRecovery:
         logger.info("監視を停止しました")
 
     def save_error_template(
-        self, template_name: str, region: Optional[tuple[int, int, int, int]] = None
+        self, template_name: str, region: tuple[int, int, int, int] | None = None
     ) -> bool:
         """
         現在の画面からテンプレートを保存（モードに応じたディレクトリを使用）
