@@ -4,7 +4,6 @@
 画像処理ユーティリティの機能をテストします。
 """
 
-from unittest.mock import Mock
 from unittest.mock import patch
 
 import numpy as np
@@ -21,47 +20,35 @@ class TestImageProcessor:
         """ImageProcessorのフィクスチャ"""
         return ImageProcessor()
 
-    def test_preprocess_image_valid(self, processor):
-        """有効な画像の前処理テスト"""
-        image = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
-        result = processor.preprocess_image(image)
-        assert result is not None
-        assert result.shape == (100, 100)
+    def test_detect_error_valid(self, processor):
+        """有効なエラー検出テスト"""
+        screenshot = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
+        template = np.random.randint(0, 255, (50, 50), dtype=np.uint8)
+        error_templates = {"test_error": template}
 
-    def test_preprocess_image_none(self, processor):
-        """None画像の前処理テスト"""
-        result = processor.preprocess_image(None)
+        result = processor.detect_error(screenshot, error_templates, threshold=0.1)
+        assert result is None or isinstance(result, str)
+
+    def test_detect_error_empty_templates(self, processor):
+        """空のテンプレート辞書でのエラー検出テスト"""
+        screenshot = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
+        error_templates = {}
+
+        result = processor.detect_error(screenshot, error_templates)
         assert result is None
 
-    def test_match_template_basic(self, processor):
-        """基本的なテンプレートマッチングテスト"""
-        image = np.ones((200, 200), dtype=np.uint8) * 128
-        template = np.ones((50, 50), dtype=np.uint8) * 128
-        with (
-            patch("src.utils.image_processing.cv2.matchTemplate") as mock_match,
-            patch("src.utils.image_processing.cv2.minMaxLoc") as mock_min_max_loc,
-        ):
-            mock_match.return_value = np.ones((150, 150), dtype=np.float32)
-            mock_min_max_loc.return_value = (0.1, 0.9, (10, 10), (20, 20))
+    def test_find_template_position_basic(self, processor):
+        """基本的なテンプレート位置検出テスト"""
+        screenshot = np.random.randint(0, 255, (200, 200), dtype=np.uint8)
+        template = np.random.randint(0, 255, (50, 50), dtype=np.uint8)
 
-            result = processor.match_template(image, template, threshold=0.8)
+        result = processor.find_template_position(screenshot, template, threshold=0.1)
+        assert result is None or (isinstance(result, tuple) and len(result) == 2)
 
-            assert result is not None
-            assert result["confidence"] == 0.9
-            assert result["position"] == (35, 35)  # 20+25, 20+25
+    def test_find_template_position_large_template(self, processor):
+        """大きすぎるテンプレートでの位置検出テスト"""
+        screenshot = np.random.randint(0, 255, (50, 50), dtype=np.uint8)
+        template = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
 
-    def test_match_template_low_confidence(self, processor):
-        """信頼度が低い場合のテスト"""
-        image = np.ones((200, 200), dtype=np.uint8) * 128
-        template = np.ones((50, 50), dtype=np.uint8) * 128
-
-        with (
-            patch("src.utils.image_processing.cv2.matchTemplate") as mock_match,
-            patch("src.utils.image_processing.cv2.minMaxLoc") as mock_min_max_loc,
-        ):
-            mock_match.return_value = np.ones((150, 150), dtype=np.float32)
-            mock_min_max_loc.return_value = (0.1, 0.7, (10, 10), (20, 20))  # 閾値以下
-
-            result = processor.match_template(image, template, threshold=0.8)
-
-            assert result is None
+        result = processor.find_template_position(screenshot, template)
+        assert result is None

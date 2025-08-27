@@ -21,54 +21,59 @@ class TestScreenCapture:
         """ScreenCaptureのフィクスチャ"""
         return ScreenCapture()
 
-    def test_capture_screen_success(self, capture):
+    @patch("src.utils.screen_capture.PYAUTOGUI_AVAILABLE", True)
+    @patch("src.utils.screen_capture.pyautogui.screenshot")
+    def test_capture_screen_success(self, mock_screenshot, capture):
         """画面キャプチャ成功のテスト"""
+        mock_image = Mock()
+        mock_screenshot.return_value = mock_image
         mock_array = np.random.randint(0, 255, (600, 800, 3), dtype=np.uint8)
 
         with (
             patch("src.utils.screen_capture.np.array", return_value=mock_array),
-            patch.object(capture, "_convert_to_grayscale") as mock_convert,
+            patch.object(
+                capture, "_convert_to_grayscale", return_value=mock_array[:, :, 0]
+            ),
         ):
-            mock_convert.return_value = mock_array
-
             result = capture.capture_screen()
-
             assert result is not None
             assert isinstance(result, np.ndarray)
 
-    def test_capture_region_success(self, capture):
-        """領域キャプチャ成功のテスト"""
+    @patch("src.utils.screen_capture.PYAUTOGUI_AVAILABLE", True)
+    @patch("src.utils.screen_capture.pyautogui.screenshot")
+    def test_capture_screen_with_region(self, mock_screenshot, capture):
+        """領域指定での画面キャプチャテスト"""
+        mock_image = Mock()
+        mock_screenshot.return_value = mock_image
         mock_array = np.random.randint(0, 255, (200, 300, 3), dtype=np.uint8)
         region = (100, 100, 300, 200)
 
         with (
             patch("src.utils.screen_capture.np.array", return_value=mock_array),
-            patch.object(capture, "_convert_to_grayscale") as mock_convert,
+            patch.object(
+                capture, "_convert_to_grayscale", return_value=mock_array[:, :, 0]
+            ),
         ):
-            mock_convert.return_value = mock_array
-
-            result = capture.capture_region(region)
-
+            result = capture.capture_screen(region)
             assert result is not None
             assert isinstance(result, np.ndarray)
 
-    def test_capture_screen_failure(self, capture):
+    @patch("src.utils.screen_capture.PYAUTOGUI_AVAILABLE", True)
+    @patch("src.utils.screen_capture.pyautogui.screenshot")
+    def test_capture_screen_failure(self, mock_screenshot, capture):
         """画面キャプチャ失敗のテスト"""
-        with patch(
-            "src.utils.screen_capture.pyautogui.screenshot",
-            side_effect=Exception("Capture failed"),
-        ):
-            result = capture.capture_screen()
-            assert result is None
+        mock_screenshot.side_effect = Exception("Capture failed")
 
-    def test_capture_region_invalid_coordinates(self, capture):
-        """無効な座標での領域キャプチャテスト"""
-        invalid_region = (-10, -10, 100, 100)  # 負の座標
+        with pytest.raises(RuntimeError):
+            capture.capture_screen()
 
-        with (
-            patch("src.utils.screen_capture.np.array", return_value=None),
-            patch.object(capture, "_convert_to_grayscale", return_value=None),
-        ):
-            result = capture.capture_region(invalid_region)
+    @patch("src.utils.screen_capture.PYAUTOGUI_AVAILABLE", False)
+    def test_capture_screen_unavailable(self, capture):
+        """ライブラリが利用不可の場合のテスト"""
+        with pytest.raises(RuntimeError):
+            capture.capture_screen()
 
-            assert result is None
+    def test_is_available(self, capture):
+        """利用可能性チェックテスト"""
+        result = capture.is_available()
+        assert isinstance(result, bool)
