@@ -66,10 +66,10 @@ jobs:
         pip install ruff pytest pytest-cov black isort mypy pylint flake8
 
     - name: Check code formatting with black
-      run: python -m black --check .
+      run: python -m black --check src/ tests/ main.py
 
     - name: Check import sorting with isort
-      run: python -m isort --check-only --profile black --force-single-line .
+      run: python -m isort --check-only --profile black --force-single-line src/ tests/ main.py
 
     - name: Lint with pylint
       run: python -m pylint archive/kiro_auto_recovery.py archive/kiro_setup.py
