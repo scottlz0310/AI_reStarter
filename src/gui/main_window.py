@@ -131,6 +131,7 @@ class MainWindow:
         tools_menu.add_command(label="ログ表示", command=self.show_logs)
         tools_menu.add_separator()
         tools_menu.add_command(label="監視エリア設定", command=self.open_monitor_area_settings)
+        tools_menu.add_command(label="AmazonQ設定", command=self.open_amazonq_settings)
 
         # ヘルプメニュー
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -274,6 +275,17 @@ class MainWindow:
         except Exception as e:
             logger.error(f"監視エリア設定表示エラー: {e}")
             messagebox.showerror("エラー", f"監視エリア設定の表示に失敗しました: {e}")
+    
+    def open_amazonq_settings(self):
+        """AmazonQ設定ダイアログを開く"""
+        try:
+            from src.gui.amazonq_settings_dialog import AmazonQSettingsDialog
+            amazonq_dialog = AmazonQSettingsDialog(self.root, self.config_manager)
+            amazonq_dialog.show()
+            logger.info("AmazonQ設定ダイアログを開きました")
+        except Exception as e:
+            logger.error(f"AmazonQ設定ダイアログ表示エラー: {e}")
+            messagebox.showerror("エラー", f"AmazonQ設定ダイアログの表示に失敗しました: {e}")
 
     def show_hotkey_list(self):
         """ホットキー一覧表示"""
