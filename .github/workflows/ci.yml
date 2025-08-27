@@ -69,7 +69,7 @@ jobs:
       run: python -m black --check .
 
     - name: Check import sorting with isort
-      run: python -m isort --check-only .
+      run: python -m isort --check-only --profile black --force-single-line .
 
     - name: Lint with pylint
       run: python -m pylint archive/kiro_auto_recovery.py archive/kiro_setup.py
