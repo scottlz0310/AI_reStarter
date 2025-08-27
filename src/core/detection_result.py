@@ -120,7 +120,7 @@ class DetectionResult:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> 'DetectionResult':
+    def from_dict(cls, data: dict[str, Any]) -> "DetectionResult":
         """辞書から検出結果を復元
 
         Args:
