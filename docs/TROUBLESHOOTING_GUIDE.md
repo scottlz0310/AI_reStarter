@@ -24,7 +24,7 @@
 ```bash
 # Python バージョン確認
 python --version
-# 3.8以上であることを確認
+# 3.11以上であることを確認
 
 # 仮想環境の確認
 where python

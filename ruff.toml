@@ -47,5 +47,5 @@ known-first-party = ["src"]
 
 [lint.per-file-ignores]
 # ファイル別の例外設定
-"tests/**/*.py" = ["B011", "E999"]  # テストでの例外を緩和、Python3.8構文エラーを無視
+"tests/**/*.py" = ["B011"]  # テストでの例外を緩和
 "main.py" = ["E402"]                # メインファイルでのインポート順序を緩和

@@ -44,7 +44,7 @@ AI reStarterの初回リリースです。AI統合IDEでの自動復旧機能を
 
 #### 対応環境
 - **OS**: Windows 10/11
-- **Python**: 3.8以上
+- **Python**: 3.11以上
 - **依存関係**: OpenCV, tkinter, PyAutoGUI, numpy
 
 #### パフォーマンス
