@@ -10,6 +10,7 @@ import pytest
 
 try:
     import tkinter as tk
+
     TKINTER_AVAILABLE = True
 except ImportError:
     TKINTER_AVAILABLE = False
