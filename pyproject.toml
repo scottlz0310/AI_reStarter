@@ -47,11 +47,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
     "types-Pillow>=10.0.0",
-    "sphinx>=7.2.0",
-    "sphinx-rtd-theme>=2.0.0",
-    "ipython>=8.21.0",
     "memory-profiler>=0.61.0",
-
 ]
 test = [
     "pytest>=8.0.0",
@@ -61,6 +57,7 @@ test = [
 docs = [
     "sphinx>=7.2.0",
     "sphinx-rtd-theme>=2.0.0",
+    "ipython>=8.21.0",
 ]
 
 [tool.black]
@@ -146,3 +143,4 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
+
