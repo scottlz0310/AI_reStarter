@@ -15,6 +15,8 @@ from src.config.config_manager import ConfigManager
 from src.utils.image_processing import ImageProcessor
 from src.utils.screen_capture import ScreenCapture
 from src.core.mode_manager import ModeManager
+from src.core.detection_result import DetectionResult
+from src.plugins.amazonq_detector import AmazonQDetector
 
 # cv2ライブラリを条件付きでインポート
 try:
@@ -326,8 +328,8 @@ class KiroRecovery:
                             # 画面をキャプチャ
                             screenshot = self.screen_capture.capture_screen(region)
 
-                            # ModeManagerで検出・実行を試行
-                            result = self.mode_manager.detect_and_execute(screenshot)
+                            # ModeManagerで検出・実行を試行（監視エリアのオフセットを考慮）
+                            result = self._detect_and_execute_with_offset(screenshot, (x, y))
                             if result:
                                 logger.info(f"監視エリア '{area_name}' で状態検出・実行: {result.state_type}")
                                 break  # 検出・実行されたら他のエリアはスキップ
@@ -379,6 +381,46 @@ class KiroRecovery:
                 time.sleep(5)  # エラー時は少し長く待機
 
         logger.info("監視終了")
+    
+    def _detect_and_execute_with_offset(self, screenshot: np.ndarray, region_offset: tuple[int, int]) -> Optional[DetectionResult]:
+        """監視エリアのオフセットを考慮した検出・実行
+        
+        Args:
+            screenshot: 画面キャプチャ
+            region_offset: 監視エリアのオフセット (x, y)
+            
+        Returns:
+            DetectionResult: 実行された検出結果、何も実行されなかった場合はNone
+        """
+        active_detectors = self.mode_manager.get_active_detectors()
+        
+        if not active_detectors:
+            logger.debug("アクティブな検出器がありません")
+            return None
+        
+        # 各検出器で状態検出を試行
+        for detector in active_detectors:
+            try:
+                # AmazonQ検出器の場合はオフセットを考慮
+                if isinstance(detector, AmazonQDetector):
+                    result = detector.detect_state(screenshot, region_offset)
+                else:
+                    result = detector.detect_state(screenshot)
+                
+                if result and result.is_valid():
+                    logger.info(f"状態検出成功: {detector.name} - {result.state_type}")
+                    
+                    # 復旧アクションを実行
+                    if detector.execute_recovery_action(result):
+                        logger.info(f"復旧アクション実行成功: {detector.name}")
+                        return result
+                    else:
+                        logger.warning(f"復旧アクション実行失敗: {detector.name}")
+                        
+            except Exception as e:
+                logger.error(f"検出器エラー: {detector.name} - {e}", exc_info=True)
+        
+        return None
 
     def _handle_error_detection(self, error_type: str) -> None:
         """エラー検出時の処理"""
@@ -403,14 +445,31 @@ class KiroRecovery:
             )
 
     def start_monitoring(self) -> Optional[threading.Thread]:
-        """監視開始"""
+        """監視開始（モードに応じたテンプレートチェック）"""
         if self.monitoring:
             logger.warning("既に監視中です")
             return None
 
-        if not self.error_templates:
-            logger.warning("エラーテンプレートが読み込まれていません")
-            return None
+        # 現在のモードに応じてテンプレートの存在をチェック
+        current_mode = self.mode_manager.get_current_mode()
+        active_detectors = self.mode_manager.get_active_detectors()
+        
+        if current_mode == "amazonq":
+            # AmazonQモードの場合はAmazonQ検出器のテンプレートをチェック
+            amazonq_detector = self.mode_manager.get_detector("amazonq")
+            if not amazonq_detector or len(amazonq_detector.run_button_templates) == 0:
+                logger.warning("AmazonQテンプレートが読み込まれていません")
+                # AmazonQモードでもテンプレートがない場合は監視を続行（テンプレートなしでも動作する）
+        elif current_mode == "kiro":
+            # Kiroモードの場合はKiroエラーテンプレートをチェック
+            if not self.error_templates:
+                logger.warning("Kiroエラーテンプレートが読み込まれていません")
+                return None
+        else:
+            # 自動モードの場合はいずれかの検出器が有効であればOK
+            if not active_detectors:
+                logger.warning("有効な検出器がありません")
+                return None
 
         try:
             self.monitoring = True
@@ -421,7 +480,7 @@ class KiroRecovery:
             monitor_thread.daemon = True
             monitor_thread.start()
 
-            logger.info("監視を開始しました")
+            logger.info(f"監視を開始しました（モード: {current_mode}）")
             return monitor_thread
 
         except Exception as e:

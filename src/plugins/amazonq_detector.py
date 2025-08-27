@@ -65,7 +65,7 @@ class AmazonQDetector(BaseDetector):
         
         logger.info(f"▶RUNボタンテンプレート読み込み完了: {len(self.run_button_templates)}個")
     
-    def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
+    def detect_state(self, screenshot: np.ndarray, region_offset: tuple[int, int] = (0, 0)) -> Optional[DetectionResult]:
         """▶RUNボタンを検出
         
         Args:
@@ -100,11 +100,15 @@ class AmazonQDetector(BaseDetector):
                     best_match = result
                     best_template_name = template_name
                     
-                    # テンプレートの中心座標を計算
+                    # テンプレートの中心座標を計算（監視エリア内の相対座標）
                     h, w = template.shape
-                    center_x = max_loc[0] + w // 2
-                    center_y = max_loc[1] + h // 2
-                    best_position = (center_x, center_y)
+                    relative_center_x = max_loc[0] + w // 2
+                    relative_center_y = max_loc[1] + h // 2
+                    
+                    # 監視エリアのオフセットを加えて絶対座標に変換
+                    absolute_x = relative_center_x + region_offset[0]
+                    absolute_y = relative_center_y + region_offset[1]
+                    best_position = (absolute_x, absolute_y)
                 
                 logger.debug(f"テンプレートマッチング: {template_name} - 信頼度: {max_val:.3f}")
                 
