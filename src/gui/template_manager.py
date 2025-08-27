@@ -135,6 +135,10 @@ class TemplateManager:
         add_button = ttk.Button(toolbar, text="新規追加", command=self.add_template)
         add_button.pack(side=tk.LEFT, padx=(0, 5))
 
+        # 範囲選択で追加ボタン
+        select_button = ttk.Button(toolbar, text="範囲選択で追加", command=self.add_template_with_selection)
+        select_button.pack(side=tk.LEFT, padx=(0, 5))
+
         # インポートボタン
         import_button = ttk.Button(toolbar, text="インポート", command=self.import_template)
         import_button.pack(side=tk.LEFT, padx=(0, 5))
@@ -356,6 +360,43 @@ class TemplateManager:
             logger.error(f"テンプレート追加エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの追加に失敗しました: {e}")
 
+    def add_template_with_selection(self):
+        """範囲選択でKiroテンプレートを追加"""
+        try:
+            from src.gui.template_capture_dialog import TemplateCaptureDialog
+            
+            # ダイアログを一時的に隠す
+            self.dialog.withdraw()
+            
+            # 範囲選択ダイアログを表示
+            capture_dialog = TemplateCaptureDialog(self.parent)
+            result = capture_dialog.show()
+            
+            # ダイアログを再表示
+            self.dialog.deiconify()
+            
+            if result:
+                selected_image, template_name = result
+                
+                # テンプレートを保存
+                import cv2
+                dest_path = os.path.join(self.template_folder, f"{template_name}.png")
+                
+                os.makedirs(self.template_folder, exist_ok=True)
+                cv2.imwrite(dest_path, selected_image)
+                
+                messagebox.showinfo("完了", f"Kiroテンプレート '{template_name}' を追加しました")
+                logger.info(f"範囲選択でKiroテンプレートを追加: {template_name}")
+                
+                self.load_templates()
+                
+        except Exception as e:
+            logger.error(f"範囲選択テンプレート追加エラー: {e}")
+            messagebox.showerror("エラー", f"範囲選択テンプレートの追加に失敗しました: {e}")
+            # エラー時もダイアログを再表示
+            if hasattr(self, 'dialog') and self.dialog:
+                self.dialog.deiconify()
+    
     def import_template(self):
         """テンプレートをインポート"""
         # 現在はadd_templateと同じ処理
@@ -457,6 +498,7 @@ class TemplateManager:
         toolbar.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Button(toolbar, text="新規追加", command=self.add_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(toolbar, text="範囲選択で追加", command=self.add_amazonq_template_with_selection).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(toolbar, text="削除", command=self.delete_amazonq_template).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(toolbar, text="更新", command=self.refresh_amazonq_templates).pack(side=tk.LEFT, padx=(0, 5))
     
@@ -522,6 +564,43 @@ class TemplateManager:
         except Exception as e:
             logger.error(f"AmazonQテンプレート追加エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの追加に失敗しました: {e}")
+    
+    def add_amazonq_template_with_selection(self):
+        """範囲選択でAmazonQテンプレートを追加"""
+        try:
+            from src.gui.template_capture_dialog import TemplateCaptureDialog
+            
+            # ダイアログを一時的に隠す
+            self.dialog.withdraw()
+            
+            # 範囲選択ダイアログを表示
+            capture_dialog = TemplateCaptureDialog(self.parent)
+            result = capture_dialog.show()
+            
+            # ダイアログを再表示
+            self.dialog.deiconify()
+            
+            if result:
+                selected_image, template_name = result
+                
+                # テンプレートを保存
+                import cv2
+                dest_path = os.path.join(self.amazonq_folder, f"{template_name}.png")
+                
+                os.makedirs(self.amazonq_folder, exist_ok=True)
+                cv2.imwrite(dest_path, selected_image)
+                
+                messagebox.showinfo("完了", f"▶RUNボタンテンプレート '{template_name}' を追加しました")
+                logger.info(f"範囲選択でAmazonQテンプレートを追加: {template_name}")
+                
+                self.refresh_amazonq_templates()
+                
+        except Exception as e:
+            logger.error(f"範囲選択テンプレート追加エラー: {e}")
+            messagebox.showerror("エラー", f"範囲選択テンプレートの追加に失敗しました: {e}")
+            # エラー時もダイアログを再表示
+            if hasattr(self, 'dialog') and self.dialog:
+                self.dialog.deiconify()
     
     def delete_amazonq_template(self):
         """選択されたAmazonQテンプレートを削除"""

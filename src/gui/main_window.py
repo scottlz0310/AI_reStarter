@@ -106,7 +106,8 @@ class MainWindow:
             self.stop_monitoring,
             self.save_template,
             self.send_recovery_command,
-            self.open_monitor_area_settings
+            self.open_monitor_area_settings,
+            self.save_template_with_selection  # 範囲選択コールバックを追加
         )
 
     def setup_menu(self):
@@ -237,6 +238,67 @@ class MainWindow:
             self.monitor_widget.add_log(f"テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート保存エラー: {e}")
             logger.error(f"テンプレート保存エラー: {e}")
+    
+    def save_template_with_selection(self):
+        """範囲選択でテンプレート保存"""
+        try:
+            from src.gui.template_capture_dialog import TemplateCaptureDialog
+            
+            # メインウィンドウを一時的に隠す
+            self.root.withdraw()
+            
+            # 範囲選択ダイアログを表示
+            capture_dialog = TemplateCaptureDialog(self.root)
+            result = capture_dialog.show()
+            
+            # メインウィンドウを再表示
+            self.root.deiconify()
+            
+            if result:
+                selected_image, template_name = result
+                
+                # 現在のモードに応じて保存
+                current_mode = self.mode_manager.get_current_mode()
+                
+                if current_mode == "amazonq":
+                    # AmazonQテンプレートとして保存
+                    amazonq_detector = self.mode_manager.get_detector("amazonq")
+                    if amazonq_detector and amazonq_detector.add_template(template_name, selected_image):
+                        success_msg = f"AmazonQテンプレート '{template_name}' を範囲選択で保存しました"
+                        if hasattr(self, 'monitor_widget'):
+                            self.monitor_widget.add_log(success_msg)
+                        messagebox.showinfo("完了", success_msg)
+                        logger.info(success_msg)
+                    else:
+                        error_msg = f"AmazonQテンプレート '{template_name}' の保存に失敗しました"
+                        if hasattr(self, 'monitor_widget'):
+                            self.monitor_widget.add_log(error_msg)
+                        messagebox.showerror("エラー", error_msg)
+                else:
+                    # Kiroテンプレートとして保存
+                    import cv2
+                    import os
+                    templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
+                    dest_path = os.path.join(templates_dir, f"{template_name}.png")
+                    
+                    os.makedirs(templates_dir, exist_ok=True)
+                    cv2.imwrite(dest_path, selected_image)
+                    
+                    # テンプレートを再読み込み
+                    self.kiro_recovery.reload_error_templates()
+                    
+                    success_msg = f"Kiroテンプレート '{template_name}' を範囲選択で保存しました"
+                    if hasattr(self, 'monitor_widget'):
+                        self.monitor_widget.add_log(success_msg)
+                    messagebox.showinfo("完了", success_msg)
+                    logger.info(success_msg)
+                
+        except Exception as e:
+            logger.error(f"範囲選択テンプレート保存エラー: {e}")
+            messagebox.showerror("エラー", f"範囲選択テンプレートの保存に失敗しました: {e}")
+            # エラー時もメインウィンドウを再表示
+            if hasattr(self, 'root') and self.root:
+                self.root.deiconify()
 
     def send_recovery_command(self):
         """復旧コマンド送信"""
@@ -363,6 +425,8 @@ class MainWindow:
         """ホットキー: 監視停止"""
         self.monitor_widget.add_log("ホットキー: 監視停止要求")
         self.stop_monitoring()
+    
+
 
     def on_closing(self):
         """ウィンドウクローズ時の処理"""
