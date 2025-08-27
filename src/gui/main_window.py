@@ -240,65 +240,31 @@ class MainWindow:
             logger.error(f"テンプレート保存エラー: {e}")
     
     def save_template_with_selection(self):
-        """範囲選択でテンプレート保存"""
+        """範囲選択でテンプレート保存（テンプレート管理と同じ処理）"""
         try:
-            from src.gui.template_capture_dialog import TemplateCaptureDialog
+            from src.gui.template_manager import TemplateManager
             
-            # メインウィンドウを一時的に隠す
-            self.root.withdraw()
+            # テンプレート管理を開く
+            template_manager = TemplateManager(self.root, self.config_manager)
             
-            # 範囲選択ダイアログを表示
-            capture_dialog = TemplateCaptureDialog(self.root)
-            result = capture_dialog.show()
+            # 現在のモードに応じてアクティブタブを設定
+            current_mode = self.mode_manager.get_current_mode()
+            if current_mode == "amazonq":
+                template_manager.set_active_tab("amazonq")
+            else:
+                template_manager.set_active_tab("kiro")
             
-            # メインウィンドウを再表示
-            self.root.deiconify()
+            template_manager.show()
             
-            if result:
-                selected_image, template_name = result
-                
-                # 現在のモードに応じて保存
-                current_mode = self.mode_manager.get_current_mode()
-                
-                if current_mode == "amazonq":
-                    # AmazonQテンプレートとして保存
-                    amazonq_detector = self.mode_manager.get_detector("amazonq")
-                    if amazonq_detector and amazonq_detector.add_template(template_name, selected_image):
-                        success_msg = f"AmazonQテンプレート '{template_name}' を範囲選択で保存しました"
-                        if hasattr(self, 'monitor_widget'):
-                            self.monitor_widget.add_log(success_msg)
-                        messagebox.showinfo("完了", success_msg)
-                        logger.info(success_msg)
-                    else:
-                        error_msg = f"AmazonQテンプレート '{template_name}' の保存に失敗しました"
-                        if hasattr(self, 'monitor_widget'):
-                            self.monitor_widget.add_log(error_msg)
-                        messagebox.showerror("エラー", error_msg)
-                else:
-                    # Kiroテンプレートとして保存
-                    import cv2
-                    import os
-                    templates_dir = self.config_manager.get("error_templates_dir", "error_templates")
-                    dest_path = os.path.join(templates_dir, f"{template_name}.png")
-                    
-                    os.makedirs(templates_dir, exist_ok=True)
-                    cv2.imwrite(dest_path, selected_image)
-                    
-                    # テンプレートを再読み込み
-                    self.kiro_recovery.reload_error_templates()
-                    
-                    success_msg = f"Kiroテンプレート '{template_name}' を範囲選択で保存しました"
-                    if hasattr(self, 'monitor_widget'):
-                        self.monitor_widget.add_log(success_msg)
-                    messagebox.showinfo("完了", success_msg)
-                    logger.info(success_msg)
+            # 範囲選択を直接呼び出し
+            if current_mode == "amazonq":
+                template_manager.add_amazonq_template_with_selection()
+            else:
+                template_manager.add_template_with_selection()
                 
         except Exception as e:
             logger.error(f"範囲選択テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"範囲選択テンプレートの保存に失敗しました: {e}")
-            # エラー時もメインウィンドウを再表示
-            if hasattr(self, 'root') and self.root:
-                self.root.deiconify()
 
     def send_recovery_command(self):
         """復旧コマンド送信"""

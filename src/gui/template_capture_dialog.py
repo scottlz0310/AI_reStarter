@@ -52,7 +52,7 @@ class TemplateCaptureDialog:
             # ダイアログウィンドウを作成
             self.dialog = tk.Toplevel(self.parent)
             self.dialog.title("テンプレート範囲選択")
-            self.dialog.geometry("1200x800")  # 固定サイズに変更
+            self.dialog.geometry("1600x900")  # 固定サイズ
             self.dialog.transient(self.parent)
             self.dialog.grab_set()
             
@@ -87,9 +87,13 @@ class TemplateCaptureDialog:
         )
         tk.Label(instruction_frame, text=instruction_text, font=("Arial", 10)).pack()
         
-        # キャンバスフレーム（スクロール可能）
+        # キャンバスフレーム（スクロール可能、高さ制限）
         canvas_frame = tk.Frame(main_frame)
         canvas_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        # キャンバスフレームの高さを制限してボタンエリアを確保
+        canvas_frame.pack_propagate(False)
+        canvas_frame.config(height=750)  # ボタンエリア用に150px確保
         
         # スクロールバー
         v_scrollbar = tk.Scrollbar(canvas_frame, orient=tk.VERTICAL)
@@ -135,9 +139,9 @@ class TemplateCaptureDialog:
         self.canvas.bind("<Enter>", lambda e: print("DEBUG: マウスがキャンバスに入った"))
         self.canvas.bind("<Leave>", lambda e: print("DEBUG: マウスがキャンバスから出た"))
         
-        # ボタンフレーム（固定位置）
-        button_frame = tk.Frame(main_frame, bg='lightgray', relief='raised', bd=2)
-        button_frame.pack(fill=tk.X, padx=10, pady=5, side=tk.BOTTOM)
+        # ボタンフレーム（最下部に固定配置）
+        button_frame = tk.Frame(self.dialog, bg='lightgray', relief='raised', bd=2)
+        button_frame.pack(fill=tk.X, padx=10, pady=5, side=tk.BOTTOM, before=main_frame)
         
         # ボタンを大きくして見やすく
         tk.Button(button_frame, text="保存", command=self.save_template, 
