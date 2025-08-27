@@ -36,7 +36,10 @@ class MockDetector(BaseDetector):
                 confidence=0.9,
                 position=(100, 200),
                 timestamp=0,
-                metadata={"template_name": "test_template.png", "recovery_action": "統合テスト用復旧アクション"},
+                metadata={
+                    "template_name": "test_template.png",
+                    "recovery_action": "統合テスト用復旧アクション",
+                },
             )
         return None
 
