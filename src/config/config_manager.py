@@ -72,8 +72,19 @@ class ConfigManager:
         return self.config.copy()
 
     def get(self, key: str, default: Any = None) -> Any:
-        """指定されたキーの設定値を取得"""
-        return self.config.get(key, default)
+        """指定されたキーの設定値を取得（ドット記法もサポート）"""
+        if '.' in key:
+            # ドット記法での階層アクセス（例: "amazonq.enabled"）
+            keys = key.split('.')
+            value = self.config
+            for k in keys:
+                if isinstance(value, dict) and k in value:
+                    value = value[k]
+                else:
+                    return default
+            return value
+        else:
+            return self.config.get(key, default)
 
     def set(self, key: str, value: Any) -> None:
         """設定値を更新"""
