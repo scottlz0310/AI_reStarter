@@ -26,6 +26,7 @@ class MainWindow:
         self.root = root
         self.config_manager = ConfigManager()
         self.kiro_recovery = KiroRecovery(self.config_manager)
+        self.mode_manager = self.kiro_recovery.mode_manager
         self.hotkey_manager = HotkeyManager()
 
         self.setup_ui()
@@ -35,11 +36,65 @@ class MainWindow:
 
         logger.info("メインウィンドウを初期化しました")
 
+    def setup_mode_selector(self):
+        """モード選択ウィジェットのセットアップ"""
+        # モード選択用の変数
+        self.mode_var = tk.StringVar(value=self.mode_manager.get_current_mode())
+        
+        # ラジオボタンでモード選択
+        modes = [
+            ("Kiro-IDEモード", "kiro"),
+            ("AmazonQモード", "amazonq"),
+            ("自動モード", "auto")
+        ]
+        
+        for i, (text, mode) in enumerate(modes):
+            rb = ttk.Radiobutton(
+                self.mode_frame,
+                text=text,
+                variable=self.mode_var,
+                value=mode,
+                command=self.on_mode_changed
+            )
+            rb.grid(row=0, column=i, padx=10, pady=5, sticky=tk.W)
+        
+        # モード状態表示ラベル
+        self.mode_status_label = ttk.Label(self.mode_frame, text="")
+        self.mode_status_label.grid(row=1, column=0, columnspan=3, padx=10, pady=5, sticky=tk.W)
+        
+        self.update_mode_status()
+    
+    def on_mode_changed(self):
+        """モード変更時の処理"""
+        new_mode = self.mode_var.get()
+        if self.mode_manager.switch_mode(new_mode):
+            self.monitor_widget.add_log(f"モードを切り替えました: {new_mode}")
+            self.update_mode_status()
+            logger.info(f"モード切り替え: {new_mode}")
+        else:
+            # 切り替え失敗時は元のモードに戻す
+            self.mode_var.set(self.mode_manager.get_current_mode())
+            messagebox.showerror("エラー", f"モードの切り替えに失敗しました: {new_mode}")
+    
+    def update_mode_status(self):
+        """モード状態の更新"""
+        status = self.mode_manager.get_mode_status()
+        current_mode = status['current_mode']
+        active_detectors = status['active_detectors']
+        
+        status_text = f"現在のモード: {current_mode} | アクティブな検出器: {', '.join(active_detectors) if active_detectors else 'なし'}"
+        self.mode_status_label.config(text=status_text)
+
     def setup_ui(self):
         """UIの初期化"""
         # メインフレーム
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # モード選択フレーム
+        self.mode_frame = ttk.LabelFrame(self.main_frame, text="動作モード")
+        self.mode_frame.pack(fill=tk.X, pady=(0, 10))
+        self.setup_mode_selector()
 
         # 監視状態ウィジェット
         self.monitor_widget = MonitorWidget(self.main_frame)
@@ -111,6 +166,9 @@ class MainWindow:
 
             # 監視ウィジェットの状態を更新
             self.monitor_widget.update_status(status)
+            
+            # モード状態も更新
+            self.update_mode_status()
 
         except Exception as e:
             logger.error(f"状態更新エラー: {e}")

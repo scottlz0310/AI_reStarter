@@ -143,6 +143,28 @@ def test_integration():
     logger.info("✓ 統合テスト成功")
 
 
+def test_kiro_recovery_integration():
+    """統合テスト: KiroRecoveryとModeManagerの統合"""
+    logger.info("=== KiroRecovery統合テスト開始 ===")
+    
+    # 設定管理オブジェクトを作成
+    config_manager = ConfigManager("kiro_config.json")
+    
+    # KiroRecoveryを初期化（ModeManagerが統合されている）
+    from src.core.kiro_recovery import KiroRecovery
+    kiro_recovery = KiroRecovery(config_manager)
+    
+    # ModeManagerが統合されていることを確認
+    assert hasattr(kiro_recovery, 'mode_manager')
+    assert kiro_recovery.mode_manager is not None
+    
+    # モード切り替えテスト
+    assert kiro_recovery.mode_manager.switch_mode("amazonq")
+    assert kiro_recovery.mode_manager.get_current_mode() == "amazonq"
+    
+    logger.info("✓ KiroRecovery統合テスト成功")
+
+
 def main():
     """メイン関数"""
     logger.info("AmazonQ統合テストを開始します")
@@ -152,6 +174,7 @@ def main():
         test_amazonq_detector()
         test_mode_manager()
         test_integration()
+        test_kiro_recovery_integration()
         
         logger.info("🎉 全てのテストが成功しました！")
         

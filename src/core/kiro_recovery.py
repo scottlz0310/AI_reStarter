@@ -14,6 +14,7 @@ import numpy as np
 from src.config.config_manager import ConfigManager
 from src.utils.image_processing import ImageProcessor
 from src.utils.screen_capture import ScreenCapture
+from src.core.mode_manager import ModeManager
 
 # cv2ライブラリを条件付きでインポート
 try:
@@ -68,6 +69,7 @@ class KiroRecovery:
         self.config_manager = config_manager
         self.screen_capture = ScreenCapture()
         self.image_processor = ImageProcessor()
+        self.mode_manager = ModeManager(config_manager)
 
         self.monitoring = False
         self.error_templates: dict[str, np.ndarray] = {}
@@ -324,31 +326,48 @@ class KiroRecovery:
                             # 画面をキャプチャ
                             screenshot = self.screen_capture.capture_screen(region)
 
-                            # エラーを検出
+                            # ModeManagerで検出・実行を試行
+                            result = self.mode_manager.detect_and_execute(screenshot)
+                            if result:
+                                logger.info(f"監視エリア '{area_name}' で状態検出・実行: {result.state_type}")
+                                break  # 検出・実行されたら他のエリアはスキップ
+                            
+                            # 従来のKiroエラー検出も並行実行
                             error_type = self.detect_error(screenshot)
-
                             if error_type:
                                 logger.info(f"監視エリア '{area_name}' でエラー検出: {error_type}")
                                 self._handle_error_detection(error_type)
-                                break  # エラーが見つかったら他のエリアはスキップ
+                                break
                 elif monitor_region:
                     # 従来のmonitor_regionが設定されている場合
                     logger.debug(f"従来の監視エリアを使用: {monitor_region}")
                     screenshot = self.screen_capture.capture_screen(monitor_region)
-                    error_type = self.detect_error(screenshot)
-
-                    if error_type:
-                        logger.info(f"従来の監視エリアでエラー検出: {error_type}")
-                        self._handle_error_detection(error_type)
+                    
+                    # ModeManagerで検出・実行を試行
+                    result = self.mode_manager.detect_and_execute(screenshot)
+                    if result:
+                        logger.info(f"従来の監視エリアで状態検出・実行: {result.state_type}")
+                    else:
+                        # 従来のKiroエラー検出も実行
+                        error_type = self.detect_error(screenshot)
+                        if error_type:
+                            logger.info(f"従来の監視エリアでエラー検出: {error_type}")
+                            self._handle_error_detection(error_type)
                 else:
                     # 監視エリアが設定されていない場合、画面全体を監視
                     logger.debug("監視エリアが設定されていません。画面全体を監視します。")
                     screenshot = self.screen_capture.capture_screen()
-                    error_type = self.detect_error(screenshot)
-
-                    if error_type:
-                        logger.info(f"画面全体でエラー検出: {error_type}")
-                        self._handle_error_detection(error_type)
+                    
+                    # ModeManagerで検出・実行を試行
+                    result = self.mode_manager.detect_and_execute(screenshot)
+                    if result:
+                        logger.info(f"画面全体で状態検出・実行: {result.state_type}")
+                    else:
+                        # 従来のKiroエラー検出も実行
+                        error_type = self.detect_error(screenshot)
+                        if error_type:
+                            logger.info(f"画面全体でエラー検出: {error_type}")
+                            self._handle_error_detection(error_type)
 
                 time.sleep(monitor_interval)
 
