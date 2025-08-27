@@ -35,8 +35,8 @@ class MockDetector(BaseDetector):
                 state_type="integration_test_error",
                 confidence=0.9,
                 position=(100, 200),
-                template_name="test_template.png",
-                recovery_action="統合テスト用復旧アクション",
+                timestamp=0,
+                metadata={"template_name": "test_template.png", "recovery_action": "統合テスト用復旧アクション"},
             )
         return None
 
@@ -92,7 +92,7 @@ class TestDetectionWorkflow:
     ):
         """設定管理との統合検出テスト"""
         # 設定から閾値を取得
-        threshold = config_manager.get_value("template_threshold", 0.8)
+        threshold = config_manager.get("template_threshold", 0.8)
 
         # 検出器を設定で初期化
         detector_config = {
@@ -197,8 +197,8 @@ class TestDetectionWorkflow:
         assert result1 is not None
 
         # 設定更新
-        config_manager.set_value("template_threshold", 0.95)
-        updated_threshold = config_manager.get_value("template_threshold")
+        config_manager.set("template_threshold", 0.95)
+        updated_threshold = config_manager.get("template_threshold")
 
         # 更新された設定での検出
         mock_detector.config["threshold"] = updated_threshold
