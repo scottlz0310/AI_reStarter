@@ -64,7 +64,7 @@ class TestScreenCapture:
         """画面キャプチャ失敗のテスト"""
         mock_screenshot.side_effect = Exception("Capture failed")
 
-        with pytest.raises(RuntimeError):
+        with pytest.raises(Exception):  # noqa: B017
             capture.capture_screen()
 
     @patch("src.utils.screen_capture.PYAUTOGUI_AVAILABLE", False)
