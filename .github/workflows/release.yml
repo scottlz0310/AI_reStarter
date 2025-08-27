@@ -23,6 +23,41 @@ jobs:
         pip install -e ".[dev]"
         pip install pyinstaller
 
+    - name: Check documentation consistency
+      run: |
+        echo "ドキュメント整合性チェック開始"
+
+        # バージョン整合性チェック
+        $tag = "${{ github.ref_name }}"
+        $version = $tag -replace '^v', ''
+        echo "リリースバージョン: $version"
+
+        # pyproject.tomlのバージョンチェック
+        $pyproject_version = (Get-Content pyproject.toml | Select-String 'version = "(.+)"').Matches[0].Groups[1].Value
+        if ($pyproject_version -ne $version) {
+          echo "エラー: pyproject.tomlのバージョン($pyproject_version)がタグ($version)と一致しません"
+          exit 1
+        }
+
+        # 必須ドキュメントファイルの存在チェック
+        $required_docs = @("README.md", "FEATURES.md", "RELEASE_NOTES.md", "docs/USER_MANUAL.md", "docs/TROUBLESHOOTING_GUIDE.md")
+        foreach ($doc in $required_docs) {
+          if (-not (Test-Path $doc)) {
+            echo "エラー: 必須ドキュメント $doc が見つかりません"
+            exit 1
+          }
+        }
+
+        # RELEASE_NOTES.mdに現在のバージョンが記載されているかチェック
+        $release_notes_content = Get-Content RELEASE_NOTES.md -Raw
+        if ($release_notes_content -notmatch "## \[?$version\]?") {
+          echo "エラー: RELEASE_NOTES.mdにバージョン $version の記載がありません"
+          exit 1
+        }
+
+        echo "ドキュメント整合性チェック完了"
+      shell: pwsh
+
     - name: Run tests
       run: |
         pytest tests/ --cov=src --cov-report=xml
