@@ -6,7 +6,9 @@
 import logging
 import tkinter as tk
 from tkinter import ttk
-from typing import Any, Callable, Optional
+from typing import Any
+from typing import Callable
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 

@@ -4,8 +4,8 @@ AmazonQDetectorクラスの単体テスト
 AmazonQ専用検出器の機能をテストします。
 """
 
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import numpy as np
 import pytest

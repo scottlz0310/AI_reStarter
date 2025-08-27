@@ -241,6 +241,8 @@ AI_reStarter/
 
 - [FEATURES.md](FEATURES.md): 詳細な機能説明
 - [RELEASE_NOTES.md](RELEASE_NOTES.md): リリースノート
+- [docs/USER_MANUAL.md](docs/USER_MANUAL.md): ユーザーマニュアル
+- [docs/TROUBLESHOOTING_GUIDE.md](docs/TROUBLESHOOTING_GUIDE.md): トラブルシューティングガイド
 - [docs/](docs/): 技術ドキュメント
 
 ## ライセンス

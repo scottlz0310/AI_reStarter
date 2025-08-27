@@ -7,8 +7,6 @@ DetectionResultクラスの単体テスト
 import time
 from unittest.mock import patch
 
-import pytest
-
 from src.core.detection_result import DetectionResult
 
 

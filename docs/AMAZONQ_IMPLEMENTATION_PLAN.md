@@ -15,15 +15,15 @@
 ```python
 class AmazonQDetector(BaseDetector):
     """AmazonQ用の▶RUNボタン検出・クリック機能"""
-    
+
     def __init__(self, config_manager: ConfigManager):
         self.config_manager = config_manager
         self.run_button_templates = {}
         self.load_run_button_templates()
-    
+
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """▶RUNボタンを検出"""
-        
+
     def execute_recovery_action(self, result: DetectionResult) -> bool:
         """▶RUNボタンをクリック"""
 ```
@@ -36,11 +36,11 @@ from abc import ABC, abstractmethod
 
 class BaseDetector(ABC):
     """検出器の基底クラス"""
-    
+
     @abstractmethod
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """状態を検出"""
-        
+
     @abstractmethod
     def execute_recovery_action(self, result: DetectionResult) -> bool:
         """復旧アクションを実行"""
@@ -68,15 +68,15 @@ class DetectionResult:
 ```python
 class ModeManager:
     """モード管理クラス"""
-    
+
     def __init__(self, config_manager: ConfigManager):
         self.current_mode = "auto"  # "kiro", "amazonq", "auto"
         self.detectors = {}
         self.setup_detectors()
-    
+
     def switch_mode(self, mode: str) -> bool:
         """モードを切り替え"""
-        
+
     def get_active_detectors(self) -> list[BaseDetector]:
         """アクティブな検出器を取得"""
 ```
@@ -121,11 +121,11 @@ class ModeManager:
 ```python
 class ModeSelectorWidget(ttk.Frame):
     """モード選択ウィジェット"""
-    
+
     def __init__(self, parent):
         # ラジオボタンでモード選択
         # - Kiro-IDEモード
-        # - AmazonQモード  
+        # - AmazonQモード
         # - 自動モード
 ```
 
@@ -135,7 +135,7 @@ class ModeSelectorWidget(ttk.Frame):
 ```python
 class AmazonQSettingsDialog:
     """AmazonQ用設定ダイアログ"""
-    
+
     def __init__(self, parent, config_manager):
         # 監視エリア設定
         # テンプレート管理
@@ -166,20 +166,20 @@ amazonq_templates/
 ```python
 def detect_run_button(self, screenshot: np.ndarray) -> Optional[tuple[int, int]]:
     """▶RUNボタンを検出して座標を返す"""
-    
+
     for template_name, template in self.run_button_templates.items():
         result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        
+
         if max_val >= self.detection_threshold:
             # テンプレートの中心座標を計算
             h, w = template.shape
             center_x = max_loc[0] + w // 2
             center_y = max_loc[1] + h // 2
-            
+
             logger.info(f"▶RUNボタン検出: {template_name} (信頼度: {max_val:.3f})")
             return (center_x, center_y)
-    
+
     return None
 ```
 
@@ -188,16 +188,16 @@ def detect_run_button(self, screenshot: np.ndarray) -> Optional[tuple[int, int]]
 ```python
 def click_run_button(self, position: tuple[int, int]) -> bool:
     """▶RUNボタンをクリック"""
-    
+
     try:
         x, y = position
         logger.info(f"▶RUNボタンをクリック: 座標({x}, {y})")
-        
+
         pyautogui.click(x, y)
         time.sleep(self.config_manager.get("amazonq.click_delay", 1.0))
-        
+
         return True
-        
+
     except Exception as e:
         logger.error(f"▶RUNボタンクリックエラー: {e}")
         return False
@@ -208,15 +208,15 @@ def click_run_button(self, position: tuple[int, int]) -> bool:
 ```python
 def auto_detect_mode(self, screenshot: np.ndarray) -> str:
     """スクリーンショットからモードを自動判定"""
-    
+
     # AmazonQ検出を試行
     if self.amazonq_detector.detect_run_button(screenshot):
         return "amazonq"
-    
+
     # Kiro-IDEエラー検出を試行
     if self.kiro_recovery.detect_error(screenshot):
         return "kiro"
-    
+
     # デフォルトはKiroモード
     return "kiro"
 ```

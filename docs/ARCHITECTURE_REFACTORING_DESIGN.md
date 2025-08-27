@@ -83,7 +83,7 @@ if __name__ == "__main__":
 # src/gui/main_window.py
 class MainWindow(QMainWindow):
     """メインウィンドウ - 統合GUI"""
-    
+
     def __init__(self):
         super().__init__()
         self.config_manager = ConfigManager()
@@ -91,42 +91,42 @@ class MainWindow(QMainWindow):
         self.setup_ui()
         self.setup_menu()
         self.setup_status_bar()
-    
+
     def setup_ui(self):
         """UIの初期化"""
         # メインウィジェット
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        
+
         # レイアウト
         self.layout = QVBoxLayout(self.central_widget)
-        
+
         # モード選択
         self.mode_selector = ModeSelectorWidget()
         self.layout.addWidget(self.mode_selector)
-        
+
         # 監視状態ウィジェット
         self.monitor_widget = MonitorWidget()
         self.layout.addWidget(self.monitor_widget)
-        
+
         # 制御ボタン
         self.control_buttons = ControlButtonsWidget()
         self.layout.addWidget(self.control_buttons)
-    
+
     def setup_menu(self):
         """メニューバーの設定"""
         menubar = self.menuBar()
-        
+
         # ファイルメニュー
         file_menu = menubar.addMenu('ファイル')
         file_menu.addAction('設定', self.open_settings)
         file_menu.addAction('終了', self.close)
-        
+
         # ツールメニュー
         tools_menu = menubar.addMenu('ツール')
         tools_menu.addAction('テンプレート管理', self.open_template_manager)
         tools_menu.addAction('ログ表示', self.show_logs)
-    
+
     def open_settings(self):
         """設定ダイアログを開く"""
         dialog = SettingsDialog(self.config_manager, self)
@@ -139,47 +139,47 @@ class MainWindow(QMainWindow):
 # src/gui/settings_dialog.py
 class SettingsDialog(QDialog):
     """設定ダイアログ"""
-    
+
     def __init__(self, config_manager, parent=None):
         super().__init__(parent)
         self.config_manager = config_manager
         self.setup_ui()
         self.load_current_settings()
-    
+
     def setup_ui(self):
         """UIの初期化"""
         self.setWindowTitle("設定")
         self.setModal(True)
-        
+
         layout = QVBoxLayout(self)
-        
+
         # タブウィジェット
         self.tab_widget = QTabWidget()
         layout.addWidget(self.tab_widget)
-        
+
         # 基本設定タブ
         self.general_tab = GeneralSettingsTab()
         self.tab_widget.addTab(self.general_tab, "基本設定")
-        
+
         # Kiro-IDE設定タブ
         self.kiro_tab = KiroSettingsTab()
         self.tab_widget.addTab(self.kiro_tab, "Kiro-IDE")
-        
+
         # AmazonQ設定タブ
         self.amazonq_tab = AmazonQSettingsTab()
         self.tab_widget.addTab(self.amazonq_tab, "AmazonQ")
-        
+
         # ボタン
         button_layout = QHBoxLayout()
         self.ok_button = QPushButton("OK")
         self.cancel_button = QPushButton("キャンセル")
         self.apply_button = QPushButton("適用")
-        
+
         button_layout.addWidget(self.apply_button)
         button_layout.addStretch()
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.ok_button)
-        
+
         layout.addLayout(button_layout)
 ```
 
@@ -188,24 +188,24 @@ class SettingsDialog(QDialog):
 # src/gui/monitor_widget.py
 class MonitorWidget(QWidget):
     """監視状態を表示するウィジェット"""
-    
+
     def __init__(self):
         super().__init__()
         self.setup_ui()
-    
+
     def setup_ui(self):
         """UIの初期化"""
         layout = QVBoxLayout(self)
-        
+
         # 状態表示
         self.status_group = QGroupBox("監視状態")
         status_layout = QGridLayout(self.status_group)
-        
+
         self.mode_label = QLabel("モード: 未設定")
         self.status_label = QLabel("状態: 停止中")
         self.template_count_label = QLabel("テンプレート: 0個")
         self.last_action_label = QLabel("最終アクション: なし")
-        
+
         status_layout.addWidget(QLabel("モード:"), 0, 0)
         status_layout.addWidget(self.mode_label, 0, 1)
         status_layout.addWidget(QLabel("状態:"), 1, 0)
@@ -214,28 +214,28 @@ class MonitorWidget(QWidget):
         status_layout.addWidget(self.template_count_label, 2, 1)
         status_layout.addWidget(QLabel("最終アクション:"), 3, 0)
         status_layout.addWidget(self.last_action_label, 3, 1)
-        
+
         layout.addWidget(self.status_group)
-        
+
         # ログ表示
         self.log_group = QGroupBox("ログ")
         log_layout = QVBoxLayout(self.log_group)
-        
+
         self.log_text = QTextEdit()
         self.log_text.setMaximumHeight(150)
         self.log_text.setReadOnly(True)
-        
+
         log_layout.addWidget(self.log_text)
-        
+
         layout.addWidget(self.log_group)
-    
+
     def update_status(self, mode: str, status: str, template_count: int, last_action: str):
         """状態を更新"""
         self.mode_label.setText(f"モード: {mode}")
         self.status_label.setText(f"状態: {status}")
         self.template_count_label.setText(f"テンプレート: {template_count}個")
         self.last_action_label.setText(f"最終アクション: {last_action}")
-    
+
     def add_log(self, message: str):
         """ログを追加"""
         timestamp = QDateTime.currentDateTime().toString("HH:mm:ss")
@@ -247,36 +247,36 @@ class MonitorWidget(QWidget):
 # src/config/config_manager.py
 class ConfigManager:
     """設定管理クラス"""
-    
+
     def __init__(self):
         self.config_dir = "config"
         self.kiro_config_file = os.path.join(self.config_dir, "kiro_config.json")
         self.amazonq_config_file = os.path.join(self.config_dir, "amazonq_config.json")
         self.general_config_file = os.path.join(self.config_dir, "general_config.json")
-        
+
         self.ensure_config_directory()
         self.load_all_configs()
-    
+
     def ensure_config_directory(self):
         """設定ディレクトリの存在確認・作成"""
         if not os.path.exists(self.config_dir):
             os.makedirs(self.config_dir)
-    
+
     def load_all_configs(self):
         """全設定ファイルを読み込み"""
         self.general_config = self.load_config(self.general_config_file, self.get_default_general_config())
         self.kiro_config = self.load_config(self.kiro_config_file, self.get_default_kiro_config())
         self.amazonq_config = self.load_config(self.amazonq_config_file, self.get_default_amazonq_config())
-    
+
     def get_current_mode(self) -> str:
         """現在のモードを取得"""
         return self.general_config.get("mode", "auto")
-    
+
     def set_mode(self, mode: str):
         """モードを設定"""
         self.general_config["mode"] = mode
         self.save_config(self.general_config_file, self.general_config)
-    
+
     def get_monitor_region(self, mode: str) -> Optional[tuple[int, int, int, int]]:
         """指定モードの監視エリアを取得"""
         if mode == "kiro":
@@ -291,21 +291,21 @@ class ConfigManager:
 # src/core/kiro_recovery.py
 class KiroRecovery:
     """Kiro-IDE復旧機能（既存のKiroAutoRecoveryから分離）"""
-    
+
     def __init__(self, config: dict):
         self.config = config
         self.monitoring = False
         self.error_templates = {}
         self.load_error_templates()
-    
+
     def start_monitoring(self):
         """監視開始"""
         pass
-    
+
     def stop_monitoring(self):
         """監視停止"""
         pass
-    
+
     def detect_error(self, screenshot: np.ndarray) -> Optional[str]:
         """エラー検出"""
         pass
@@ -313,17 +313,17 @@ class KiroRecovery:
 # src/core/amazonq_detector.py
 class AmazonQDetector:
     """AmazonQ検出機能"""
-    
+
     def __init__(self, config: dict):
         self.config = config
         self.run_button_templates = {}
         self.state_templates = {}
         self.load_templates()
-    
+
     def detect_run_button(self, screenshot: np.ndarray) -> Optional[tuple[int, int]]:
         """▶RUNボタンを検出"""
         pass
-    
+
     def click_run_button(self, position: tuple[int, int]) -> bool:
         """▶RUNボタンをクリック"""
         pass
@@ -414,17 +414,17 @@ class AmazonQDetector:
 # src/core/base_detector.py
 class BaseDetector(ABC):
     """基底検出クラス - 全ての監視機能の基盤"""
-    
+
     @abstractmethod
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """状態を検出して結果を返す"""
         pass
-    
+
     @abstractmethod
     def execute_recovery_action(self, detection_result: DetectionResult) -> bool:
         """復旧アクションを実行"""
         pass
-    
+
     @abstractmethod
     def get_detection_config(self) -> dict:
         """検出設定を取得"""
@@ -433,21 +433,21 @@ class BaseDetector(ABC):
 # src/core/plugin_manager.py
 class PluginManager:
     """プラグイン管理クラス - 動的な機能追加を可能"""
-    
+
     def __init__(self):
         self.plugins = {}
         self.plugin_configs = {}
-    
+
     def load_plugin(self, plugin_name: str, plugin_class: type):
         """プラグインを動的に読み込み"""
         if issubclass(plugin_class, BaseDetector):
             self.plugins[plugin_name] = plugin_class()
             logger.info(f"プラグイン '{plugin_name}' を読み込みました")
-    
+
     def get_available_plugins(self) -> List[str]:
         """利用可能なプラグイン一覧を取得"""
         return list(self.plugins.keys())
-    
+
     def execute_plugin(self, plugin_name: str, screenshot: np.ndarray) -> Optional[bool]:
         """指定プラグインを実行"""
         if plugin_name in self.plugins:
@@ -469,7 +469,7 @@ class DetectionResult:
     position: Optional[tuple[int, int]] = None  # アクション位置
     metadata: dict = field(default_factory=dict)  # 追加情報
     timestamp: datetime = field(default_factory=datetime.now)
-    
+
     def is_actionable(self) -> bool:
         """アクション実行可能かチェック"""
         return self.confidence >= 0.7 and self.position is not None
@@ -477,21 +477,21 @@ class DetectionResult:
 # src/core/state_manager.py
 class StateManager:
     """状態管理クラス - 複数の検出結果を統合管理"""
-    
+
     def __init__(self):
         self.current_states = {}
         self.state_history = []
         self.recovery_actions = {}
-    
+
     def update_state(self, detector_name: str, result: DetectionResult):
         """状態を更新"""
         self.current_states[detector_name] = result
         self.state_history.append(result)
-        
+
         # 状態変化の検出
         if self._should_trigger_recovery(result):
             self._schedule_recovery_action(result)
-    
+
     def _should_trigger_recovery(self, result: DetectionResult) -> bool:
         """復旧アクションをトリガーすべきか判定"""
         # エラー状態、タイムアウト、スタック状態等の判定
@@ -506,7 +506,7 @@ class StateManager:
 # src/plugins/ai_state_detector.py
 class AIStateDetector(BaseDetector):
     """AI実装の停止状態を検出する汎用プラグイン"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -537,7 +537,7 @@ class AIStateDetector(BaseDetector):
                 "recovery_actions": ["clear_gpu_memory", "restart_gpu_service", "reduce_batch"]
             }
         }
-    
+
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """AI実装の状態を検出"""
         for state_name, state_info in self.state_patterns.items():
@@ -548,7 +548,7 @@ class AIStateDetector(BaseDetector):
                     metadata={"description": state_info["description"]}
                 )
         return None
-    
+
     def execute_recovery_action(self, result: DetectionResult) -> bool:
         """復旧アクションを実行"""
         state_name = result.state_type
@@ -563,7 +563,7 @@ class AIStateDetector(BaseDetector):
 # src/plugins/tensorflow_detector.py
 class TensorFlowDetector(BaseDetector):
     """TensorFlow特有の状態を検出・復旧"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -573,7 +573,7 @@ class TensorFlowDetector(BaseDetector):
             "memory_growth_failed": "メモリ成長失敗",
             "cudnn_error": "CuDNNエラー"
         }
-    
+
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """TensorFlow特有の状態を検出"""
         # TensorFlowのエラーメッセージ、ログ、UI状態を検出
@@ -582,7 +582,7 @@ class TensorFlowDetector(BaseDetector):
 # src/plugins/pytorch_detector.py
 class PyTorchDetector(BaseDetector):
     """PyTorch特有の状態を検出・復旧"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -595,7 +595,7 @@ class PyTorchDetector(BaseDetector):
 # src/plugins/jupyter_detector.py
 class JupyterDetector(BaseDetector):
     """Jupyter環境の状態を検出・復旧"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -659,7 +659,7 @@ class JupyterDetector(BaseDetector):
 # src/plugins/system_monitor.py
 class SystemMonitor(BaseDetector):
     """システムリソースを監視してAI処理の停止を検出"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -669,7 +669,7 @@ class SystemMonitor(BaseDetector):
             "gpu_usage": {"threshold": 0.98, "duration": 45},
             "disk_io": {"threshold": 100, "duration": 120}
         }
-    
+
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """システムリソースの異常を検出"""
         # スクリーンショットとシステムメトリクスを組み合わせて検出
@@ -681,7 +681,7 @@ class SystemMonitor(BaseDetector):
 # src/plugins/network_monitor.py
 class NetworkMonitor(BaseDetector):
     """ネットワーク状態を監視してAIサービスの停止を検出"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
@@ -699,31 +699,31 @@ class NetworkMonitor(BaseDetector):
 # src/plugins/pattern_learner.py
 class PatternLearner(BaseDetector):
     """ユーザーの復旧パターンを学習して自動化"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
         self.learned_patterns = {}
         self.pattern_database = "learned_patterns.json"
-    
+
     def learn_recovery_pattern(self, state: str, action: str, success: bool):
         """復旧パターンを学習"""
         if state not in self.learned_patterns:
             self.learned_patterns[state] = {}
-        
+
         if action not in self.learned_patterns[state]:
             self.learned_patterns[state][action] = {"success": 0, "failure": 0}
-        
+
         if success:
             self.learned_patterns[state][action]["success"] += 1
         else:
             self.learned_patterns[state][action]["failure"] += 1
-    
+
     def get_best_recovery_action(self, state: str) -> Optional[str]:
         """最適な復旧アクションを取得"""
         if state in self.learned_patterns:
             actions = self.learned_patterns[state]
-            best_action = max(actions.items(), 
+            best_action = max(actions.items(),
                             key=lambda x: x[1]["success"] / (x[1]["success"] + x[1]["failure"]))
             return best_action[0]
         return None
@@ -738,19 +738,19 @@ class MainWindow(QMainWindow):
     def setup_plugin_tabs(self):
         """プラグイン別の監視タブを設定"""
         self.plugin_tabs = QTabWidget()
-        
+
         # AI状態監視タブ
         self.ai_monitor_tab = AIMonitorTab(self.plugin_manager)
         self.plugin_tabs.addTab(self.ai_monitor_tab, "AI状態監視")
-        
+
         # システムリソースタブ
         self.system_tab = SystemMonitorTab(self.plugin_manager)
         self.plugin_tabs.addTab(self.system_tab, "システム監視")
-        
+
         # 学習パターンタブ
         self.pattern_tab = PatternLearningTab(self.plugin_manager)
         self.plugin_tabs.addTab(self.pattern_tab, "学習パターン")
-        
+
         self.layout.addWidget(self.plugin_tabs)
 ```
 

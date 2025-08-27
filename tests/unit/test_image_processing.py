@@ -4,9 +4,7 @@ ImageProcessorクラスの単体テスト
 画像処理機能をテストします。
 """
 
-import os
-import tempfile
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest

@@ -40,21 +40,21 @@ class KiroAutoRecovery:
 ```python
 class AmazonQDetector:
     """AmazonQ用の検出・実行クラス"""
-    
+
     def __init__(self, config: dict):
         self.config = config
         self.run_button_templates = {}
         self.state_templates = {}
         self.load_templates()
-    
+
     def detect_run_button(self, screenshot: np.ndarray) -> Optional[tuple[int, int]]:
         """▶RUNボタンを検出して座標を返す"""
         pass
-    
+
     def click_run_button(self, position: tuple[int, int]) -> bool:
         """▶RUNボタンをクリック"""
         pass
-    
+
     def monitor_execution_state(self, screenshot: np.ndarray) -> str:
         """実行状態を監視（実行中、完了、エラー等）"""
         pass
@@ -88,20 +88,20 @@ class AmazonQDetector:
 def monitor_loop(self) -> None:
     """メインの監視ループ"""
     logger.info(f"監視開始 - モード: {self.mode}")
-    
+
     while self.monitoring:
         try:
             screenshot = self.capture_screen(self.get_monitor_region())
-            
+
             if self.mode == "kiro":
                 self.handle_kiro_mode(screenshot)
             elif self.mode == "amazonq":
                 self.handle_amazonq_mode(screenshot)
             elif self.mode == "auto":
                 self.handle_auto_mode(screenshot)
-            
+
             time.sleep(self.config["monitor_interval"])
-            
+
         except Exception as e:
             logger.error(f"監視ループエラー: {e}")
             time.sleep(5)

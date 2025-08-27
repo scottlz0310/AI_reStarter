@@ -5,8 +5,8 @@
 
 import logging
 import tkinter as tk
-from tkinter import messagebox, simpledialog, ttk
-from typing import Any
+from tkinter import messagebox
+from tkinter import ttk
 
 from src.config.config_manager import ConfigManager
 

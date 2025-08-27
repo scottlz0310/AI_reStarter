@@ -5,7 +5,7 @@ extension-pkg-allow-list = cv2,win32gui,win32con
 generated-members = cv2.*
 
 [MESSAGES CONTROL]
-disable = 
+disable =
     C0103,  # invalid-name
     C0115,  # missing-class-docstring
     E1101,  # no-member

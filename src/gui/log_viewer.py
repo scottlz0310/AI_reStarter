@@ -7,8 +7,9 @@ import datetime
 import logging
 import os
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog, ttk
-from typing import Optional
+from tkinter import filedialog
+from tkinter import messagebox
+from tkinter import ttk
 
 logger = logging.getLogger(__name__)
 

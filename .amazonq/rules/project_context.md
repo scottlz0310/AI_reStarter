@@ -96,7 +96,7 @@ class TestBaseDetector:
         """抽象メソッドの実装チェック"""
         with pytest.raises(TypeError):
             BaseDetector()
-    
+
     @patch('src.core.base_detector.logger')
     def test_logging_in_detection(self, mock_logger):
         """検出処理でのログ出力テスト"""
@@ -123,18 +123,18 @@ logger = logging.getLogger(__name__)
 
 class NewFeatureDetector(BaseDetector):
     """新機能の検出・復旧プラグイン"""
-    
+
     def __init__(self, config: dict):
         super().__init__()
         self.config = config
         logger.info("新機能検出プラグインを初期化しました")
-    
+
     def detect_state(self, screenshot: np.ndarray) -> Optional[DetectionResult]:
         """状態を検出"""
         logger.debug("新機能の状態検出を開始")
         # 実装内容
         pass
-    
+
     def execute_recovery_action(self, result: DetectionResult) -> bool:
         """復旧アクションを実行"""
         logger.info(f"復旧アクションを実行: {result.state_type}")
@@ -164,12 +164,12 @@ logger = logging.getLogger(__name__)
 
 class NewFeatureWidget(QWidget):
     """新機能用のGUIウィジェット"""
-    
+
     def __init__(self):
         super().__init__()
         logger.debug("新機能ウィジェットを初期化")
         self.setup_ui()
-    
+
     def setup_ui(self):
         """UIの初期化"""
         layout = QVBoxLayout(self)
@@ -191,7 +191,7 @@ def update_config(self, new_config: dict):
     logger.info("設定を更新します")
     old_config = self.config.copy()
     self.config.update(new_config)
-    
+
     # 設定変更の検証
     if self._validate_config():
         logger.info("設定の更新が完了しました")
@@ -228,18 +228,18 @@ def update_config(self, new_config: dict):
 def complex_function(param1: str, param2: int) -> bool:
     """
     複雑な処理を行う関数
-    
+
     Args:
         param1: 文字列パラメータ（説明）
         param2: 数値パラメータ（説明）
-    
+
     Returns:
         bool: 処理結果（True: 成功, False: 失敗）
-    
+
     Raises:
         ValueError: パラメータが無効な場合
         RuntimeError: 処理中にエラーが発生した場合
-    
+
     Note:
         この関数は重い処理を行うため、非同期での実行を推奨
     """
@@ -318,4 +318,3 @@ Closes #123
 5. **ドキュメントの更新** - docstring、README等を更新しているか
 6. **設定の分離** - 設定ファイルを適切に分離しているか
 7. **仮想環境での実行** - 全てのコマンドを仮想環境で実行しているか
-

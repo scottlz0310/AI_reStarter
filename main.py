@@ -7,7 +7,6 @@ AI reStarter - メインエントリーポイント
 import logging
 import sys
 import tkinter as tk
-from tkinter import messagebox, ttk
 
 from src.gui.main_window import MainWindow
 

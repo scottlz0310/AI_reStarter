@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pyinstaller
+
+    - name: Run tests
+      run: |
+        pytest tests/ --cov=src --cov-report=xml
+
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --windowed --name AI_reStarter main.py
+
+    - name: Create release package
+      run: |
+        mkdir release
+        copy dist\AI_reStarter.exe release\
+        copy README.md release\
+        copy kiro_config.json release\
+        xcopy error_templates release\error_templates\ /E /I
+        xcopy amazonq_templates release\amazonq_templates\ /E /I
+        powershell Compress-Archive -Path release\* -DestinationPath AI_reStarter-${{ github.ref_name }}.zip
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: AI reStarter ${{ github.ref_name }}
+        body: |
+          ## 🎉 AI reStarter ${{ github.ref_name }}
+
+          ### 📦 ダウンロード
+          - Windows実行ファイル: AI_reStarter-${{ github.ref_name }}.zip
+
+          ### 🚀 インストール方法
+          1. ZIPファイルをダウンロード・解凍
+          2. AI_reStarter.exeを実行
+
+          ### 📋 変更内容
+          詳細は[RELEASE_NOTES.md](RELEASE_NOTES.md)を参照
+        files: |
+          AI_reStarter-${{ github.ref_name }}.zip
+        draft: false
+        prerelease: false

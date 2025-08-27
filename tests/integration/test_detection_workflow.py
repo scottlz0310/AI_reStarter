@@ -4,8 +4,7 @@
 複数のモジュール間の連携による検出・復旧プロセスをテストします。
 """
 
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -13,7 +12,6 @@ import pytest
 from src.config.config_manager import ConfigManager
 from src.core.base_detector import BaseDetector
 from src.core.detection_result import DetectionResult
-from src.utils.image_processing import ImageProcessor
 from src.utils.screen_capture import ScreenCapture
 
 

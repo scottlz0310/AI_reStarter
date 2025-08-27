@@ -4,7 +4,8 @@ ScreenCaptureクラスの単体テスト
 画面キャプチャ機能をテストします。
 """
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import numpy as np
 import pytest

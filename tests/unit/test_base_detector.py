@@ -5,7 +5,7 @@ BaseDetectorクラスの単体テスト
 """
 
 from typing import Optional
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
