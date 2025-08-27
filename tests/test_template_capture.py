@@ -2,22 +2,32 @@
 テンプレート範囲選択機能のテスト
 """
 
-import tkinter as tk
 import unittest
 from unittest.mock import Mock, patch
 
 import numpy as np
+import pytest
+
+try:
+    import tkinter as tk
+    TKINTER_AVAILABLE = True
+except ImportError:
+    TKINTER_AVAILABLE = False
 
 from src.gui.template_capture_dialog import TemplateCaptureDialog
 
 
+@pytest.mark.skipif(not TKINTER_AVAILABLE, reason="tkinter is not available")
 class TestTemplateCaptureDialog(unittest.TestCase):
     """テンプレート範囲選択ダイアログのテスト"""
 
     def setUp(self):
         """テスト前の準備"""
-        self.root = tk.Tk()
-        self.root.withdraw()  # テスト中は非表示
+        try:
+            self.root = tk.Tk()
+            self.root.withdraw()  # テスト中は非表示
+        except Exception as e:
+            self.skipTest(f"tkinter initialization failed: {e}")
 
     def tearDown(self):
         """テスト後のクリーンアップ"""

@@ -65,20 +65,21 @@ pip install -e ".[docs]"
 
 ## 使用方法
 
-### 1. 初期設定
+### 1. アプリケーション起動
 
-#### 設定ファイル作成
+#### GUIアプリケーションの起動
 ```bash
-python kiro_auto_recovery.py --create-config
+python main.py
 ```
+
+#### 初期設定
+GUIアプリケーション内で以下の設定を行います：
+1. 設定ダイアログから監視間隔や復旧コマンドを設定
+2. 監視エリア設定で画面の監視範囲を指定
+3. テンプレート管理でエラー検出用の画像テンプレートを登録
 
 #### 画面座標設定（重要）
-**⚠️ 重要: マルチモニター環境では、Kiro-IDEをメインディスプレイに配置してください**
-
-設定GUIを使用して監視エリアとチャット入力位置を設定：
-```bash
-python kiro_setup.py
-```
+**⚠️ 重要: マルチモニター環境では、AI-IDEをメインディスプレイに配置してください**
 
 このスクリプトは以下の手順で設定を行います：
 1. Kiro-IDEウィンドウを前面に移動
@@ -93,18 +94,17 @@ python kiro_setup.py
 
 ### 2. エラーテンプレート保存
 
-#### 手動保存
-```bash
-python kiro_auto_recovery.py --template "compilation_error"
-```
+#### GUI経由での保存
+メインウィンドウの「テンプレート管理」タブから：
+1. 「新規テンプレート作成」ボタンをクリック
+2. 画面範囲を選択してテンプレートを保存
+3. テンプレート名を入力して保存
 
 #### ホットキー保存
 アプリケーション実行中に`Ctrl+Alt+S`を押すと、現在の画面からエラーテンプレートを保存できます。
 
 ### 3. 監視開始
-```bash
-python kiro_auto_recovery.py
-```
+メインウィンドウの「監視」タブから「監視開始」ボタンをクリックして監視を開始します。
 
 ## ホットキー操作
 
@@ -190,17 +190,29 @@ make help
 
 ```
 AI_reStarter/
-├── kiro_auto_recovery.py    # メインスクリプト
-├── kiro_setup.py           # 設定GUIアプリケーション
-├── kiro_config.json        # 設定ファイル
-├── error_templates/        # エラー画像テンプレート
-├── test_scripts/          # 試行スクリプト（Gitから除外）
-├── pyproject.toml         # プロジェクト設定
-├── .pre-commit-config.yaml # pre-commit設定
-├── .flake8                # flake8設定
-├── .pylintrc             # pylint設定
-├── Makefile              # 開発用コマンド
-└── README.md             # このファイル
+├── main.py                    # メインエントリーポイント
+├── src/                       # ソースコード
+│   ├── config/                # 設定管理
+│   ├── core/                  # コア機能
+│   ├── gui/                   # GUIコンポーネント
+│   ├── plugins/               # プラグイン（検出器）
+│   └── utils/                 # ユーティリティ
+├── tests/                     # テストコード
+│   ├── unit/                  # 単体テスト
+│   └── integration/           # 統合テスト
+├── docs/                      # ドキュメント
+├── scripts/                   # 開発・運用スクリプト
+├── playground/                # 開発・テスト用ファイル
+├── error_templates/           # エラー画像テンプレート
+├── amazonq_templates/         # AmazonQ用テンプレート
+├── archive/                   # 旧バージョンファイル
+├── kiro_config.json           # 設定ファイル
+├── pyproject.toml             # プロジェクト設定
+├── .pre-commit-config.yaml    # pre-commit設定
+├── .flake8                    # flake8設定
+├── .pylintrc                  # pylint設定
+├── Makefile                   # 開発用コマンド
+└── README.md                  # このファイル
 ```
 
 ## トラブルシューティング
@@ -208,17 +220,28 @@ AI_reStarter/
 ### よくある問題
 
 1. **画面キャプチャが真っ黒になる**
-   - Kiro-IDEをメインディスプレイに移動してください
+   - AI-IDEをメインディスプレイに移動してください
    - Windowsのディスプレイ設定で、メインディスプレイを左側に配置してください
-   - 設定GUIで座標を再設定してください
+   - メインウィンドウの監視エリア設定で座標を再設定してください
 
-2. **復旧コマンドが入力されない**
-   - チャット入力位置が正しく設定されているか確認してください
-   - Kiro-IDEウィンドウが前面にあるか確認してください
+2. **復旧アクションが実行されない**
+   - AmazonQの実行ボタンのテンプレートが正しく登録されているか確認してください
+   - AI-IDEウィンドウが前面にあるか確認してください
+   - テンプレートマッチングの闾値を調整してみてください
 
 3. **ホットキーが動作しない**
    - 管理者権限で実行している場合、ホットキー機能が無効になる場合があります
    - 通常の権限で実行してください
+
+4. **GUIアプリケーションが起動しない**
+   - tkinterが正しくインストールされているか確認してください
+   - Windows Store版Pythonを使用している場合は、公式インストーラー版を推奨します
+
+## ドキュメント
+
+- [FEATURES.md](FEATURES.md): 詳細な機能説明
+- [RELEASE_NOTES.md](RELEASE_NOTES.md): リリースノート
+- [docs/](docs/): 技術ドキュメント
 
 ## ライセンス
 
