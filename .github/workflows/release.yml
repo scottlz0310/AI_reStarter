@@ -50,7 +50,7 @@ jobs:
 
         # RELEASE_NOTES.mdに現在のバージョンが記載されているかチェック
         $release_notes_content = Get-Content RELEASE_NOTES.md -Raw
-        if ($release_notes_content -notmatch "## \[?$version\]?") {
+        if ($release_notes_content -notmatch "## \[?バージョン $version\]?") {
           echo "エラー: RELEASE_NOTES.mdにバージョン $version の記載がありません"
           exit 1
         }
