@@ -6,8 +6,7 @@ AmazonQ設定ダイアログ
 
 import logging
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 logger = logging.getLogger(__name__)
 

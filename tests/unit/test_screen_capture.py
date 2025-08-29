@@ -4,8 +4,7 @@
 画面キャプチャ機能をテストします。
 """
 
-from unittest.mock import Mock
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest

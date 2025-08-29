@@ -5,9 +5,7 @@
 
 import logging
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import simpledialog
-from tkinter import ttk
+from tkinter import messagebox, simpledialog, ttk
 
 from src.config.config_manager import ConfigManager
 from src.core.kiro_recovery import KiroRecovery
@@ -17,6 +15,7 @@ from src.gui.monitor_widget import MonitorWidget
 from src.gui.settings_dialog import SettingsDialog
 from src.gui.template_manager import TemplateManager
 from src.utils.hotkey_manager import HotkeyManager
+from src.utils.output_controller import output_controller
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +34,7 @@ class MainWindow:
         self.setup_menu()
         self.setup_hotkeys()
         self.setup_timers()
+        self.setup_output_controller()
 
         logger.info("メインウィンドウを初期化しました")
 
@@ -147,6 +147,8 @@ class MainWindow:
             label="監視エリア設定", command=self.open_monitor_area_settings
         )
         tools_menu.add_command(label="AmazonQ設定", command=self.open_amazonq_settings)
+        tools_menu.add_separator()
+        tools_menu.add_command(label="出力制御", command=self.show_output_control)
 
         # ヘルプメニュー
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -174,6 +176,15 @@ class MainWindow:
         # 状態更新タイマー
         self.update_status()
 
+    def setup_output_controller(self):
+        """出力制御システムの設定"""
+        try:
+            # 出力制御システムを初期化
+            output_controller.info("出力制御システムを初期化しました", "main_window")
+            logger.debug("出力制御システムを設定しました")
+        except Exception as e:
+            logger.error(f"出力制御システム設定エラー: {e}")
+
     def update_status(self):
         """状態の更新"""
         try:
@@ -197,25 +208,25 @@ class MainWindow:
         try:
             if self.kiro_recovery.start_monitoring():
                 self.monitor_widget.add_log("監視を開始しました")
-                logger.info("監視を開始しました")
+                output_controller.info("監視を開始しました", "main_window")
             else:
                 self.monitor_widget.add_log("監視の開始に失敗しました")
                 messagebox.showwarning("警告", "監視の開始に失敗しました")
-                logger.error("監視の開始に失敗しました")
+                output_controller.error("監視の開始に失敗しました", "main_window")
         except Exception as e:
             self.monitor_widget.add_log(f"監視開始エラー: {e}")
             messagebox.showerror("エラー", f"監視開始エラー: {e}")
-            logger.error(f"監視開始エラー: {e}")
+            output_controller.error(f"監視開始エラー: {e}", "main_window")
 
     def stop_monitoring(self):
         """監視停止"""
         try:
             self.kiro_recovery.stop_monitoring()
             self.monitor_widget.add_log("監視を停止しました")
-            logger.info("監視を停止しました")
+            output_controller.info("監視を停止しました", "main_window")
         except Exception as e:
             self.monitor_widget.add_log(f"監視停止エラー: {e}")
-            logger.error(f"監視停止エラー: {e}")
+            output_controller.error(f"監視停止エラー: {e}", "main_window")
 
     def save_template(self):
         """テンプレート保存（現在のモードに応じたテンプレートを保存）"""
@@ -334,10 +345,24 @@ class MainWindow:
         try:
             log_viewer = LogViewer(self.root)
             log_viewer.show()
-            logger.info("ログ表示を開きました")
+            output_controller.info("ログ表示を開きました", "main_window")
         except Exception as e:
-            logger.error(f"ログ表示表示エラー: {e}")
+            output_controller.error(f"ログ表示表示エラー: {e}", "main_window")
             messagebox.showerror("エラー", f"ログ表示の表示に失敗しました: {e}")
+
+    def show_output_control(self):
+        """出力制御ダイアログを表示"""
+        try:
+            from src.gui.log_viewer import OutputControlDialog
+
+            control_dialog = OutputControlDialog(self.root, output_controller)
+            control_dialog.show()
+            output_controller.info("出力制御ダイアログを開きました", "main_window")
+        except Exception as e:
+            output_controller.error(f"出力制御ダイアログ表示エラー: {e}", "main_window")
+            messagebox.showerror(
+                "エラー", f"出力制御ダイアログの表示に失敗しました: {e}"
+            )
 
     def open_monitor_area_settings(self):
         """監視エリア設定を開く"""
@@ -421,9 +446,12 @@ class MainWindow:
             # ホットキーをクリア
             self.hotkey_manager.clear_hotkeys()
 
-            logger.info("メインウィンドウを閉じました")
+            # 出力制御システムをリセット
+            output_controller.restore_stdout()
+
+            output_controller.info("メインウィンドウを閉じました", "main_window")
             self.root.destroy()
 
         except Exception as e:
-            logger.error(f"ウィンドウクローズエラー: {e}")
+            output_controller.error(f"ウィンドウクローズエラー: {e}", "main_window")
             self.root.destroy()

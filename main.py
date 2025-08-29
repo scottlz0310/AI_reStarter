@@ -9,6 +9,7 @@ import sys
 import tkinter as tk
 
 from src.gui.main_window import MainWindow
+from src.utils.output_controller import output_controller
 
 # ログ設定
 logging.basicConfig(
@@ -26,7 +27,8 @@ logger = logging.getLogger(__name__)
 def main():
     """メインエントリーポイント"""
     try:
-        logger.info("AI reStarter を起動しています...")
+        # 出力制御システムを初期化
+        output_controller.info("AI reStarter を起動しています...", "main")
 
         # ルートウィンドウの作成
         root = tk.Tk()
@@ -39,13 +41,13 @@ def main():
         # クローズイベントの設定
         root.protocol("WM_DELETE_WINDOW", main_window.on_closing)
 
-        logger.info("メインウィンドウを表示しました")
+        output_controller.info("メインウィンドウを表示しました", "main")
 
         # メインループの開始
         root.mainloop()
 
     except Exception as e:
-        logger.critical(f"アプリケーション起動エラー: {e}", exc_info=True)
+        output_controller.critical(f"アプリケーション起動エラー: {e}", "main")
         sys.exit(1)
 
 

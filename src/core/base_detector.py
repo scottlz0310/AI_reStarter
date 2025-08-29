@@ -5,10 +5,8 @@
 """
 
 import logging
-from abc import ABC
-from abc import abstractmethod
-from typing import TYPE_CHECKING
-from typing import Optional
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 

@@ -5,14 +5,12 @@
 
 import logging
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import simpledialog
+from tkinter import messagebox, simpledialog
 from typing import Optional
 
 import cv2
 import numpy as np
-from PIL import Image
-from PIL import ImageTk
+from PIL import Image, ImageTk
 
 from src.utils.screen_capture import ScreenCapture
 

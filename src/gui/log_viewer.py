@@ -7,9 +7,15 @@ import datetime
 import logging
 import os
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from typing import Optional
+
+from src.utils.output_controller import (
+    OutputController,
+    OutputLevel,
+    OutputTarget,
+    output_controller,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +29,9 @@ class LogViewer:
         self.log_files = []
         self.current_log_file = None
         self.log_content = []
+        self.realtime_logs = []  # リアルタイムログ
+        self.output_controller: OutputController | None = None
+        self.realtime_mode = False
 
         logger.debug("ログ表示GUIを初期化しました")
 
@@ -94,6 +103,16 @@ class LogViewer:
         search_button = ttk.Button(toolbar, text="検索", command=self.search_log)
         search_button.pack(side=tk.LEFT, padx=(0, 5))
 
+        # リアルタイムモードチェックボックス
+        self.realtime_mode_var = tk.BooleanVar(value=False)
+        realtime_check = ttk.Checkbutton(
+            toolbar,
+            text="リアルタイム",
+            variable=self.realtime_mode_var,
+            command=self.toggle_realtime_mode,
+        )
+        realtime_check.pack(side=tk.RIGHT, padx=(10, 0))
+
         # 自動更新チェックボックス
         self.auto_refresh_var = tk.BooleanVar(value=False)
         auto_refresh_check = ttk.Checkbutton(
@@ -103,6 +122,12 @@ class LogViewer:
             command=self.toggle_auto_refresh,
         )
         auto_refresh_check.pack(side=tk.RIGHT, padx=(10, 0))
+
+        # 出力制御ボタン
+        output_control_button = ttk.Button(
+            toolbar, text="出力制御", command=self.show_output_control
+        )
+        output_control_button.pack(side=tk.RIGHT, padx=(10, 0))
 
     def create_log_file_selector(self, parent):
         """ログファイル選択エリアの作成"""
@@ -210,6 +235,14 @@ class LogViewer:
             filter_frame, text="フィルタークリア", command=self.clear_filters
         )
         clear_filter_button.grid(row=1, column=4, padx=(10, 0), pady=(10, 0))
+
+        # ログクリアボタン
+        clear_realtime_button = ttk.Button(
+            filter_frame,
+            text="リアルタイムログクリア",
+            command=self.clear_realtime_logs,
+        )
+        clear_realtime_button.grid(row=1, column=5, padx=(10, 0), pady=(10, 0))
 
     def create_status_bar(self, parent):
         """ステータスバーの作成"""
@@ -528,8 +561,252 @@ class LogViewer:
                 5000, self.auto_refresh_callback
             )
 
+    def toggle_realtime_mode(self):
+        """リアルタイムモードの切り替え"""
+        self.realtime_mode = self.realtime_mode_var.get()
+
+        if self.realtime_mode:
+            # 出力コントローラーを初期化
+            self.output_controller = output_controller
+            self.output_controller.set_gui_callback(self.add_realtime_log)
+
+            # リアルタイムログ表示に切り替え
+            self.display_realtime_logs()
+            logger.info("リアルタイムモードを有効にしました")
+        else:
+            # ファイルモードに戻す
+            if self.output_controller:
+                self.output_controller.set_gui_callback(None)
+            self.display_log_content()
+            logger.info("リアルタイムモードを無効にしました")
+
+    def add_realtime_log(self, message: str, level: str) -> None:
+        """リアルタイムログを追加"""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = {
+            "timestamp": timestamp,
+            "level": level,
+            "message": message,
+            "line_num": len(self.realtime_logs) + 1,
+        }
+
+        self.realtime_logs.append(log_entry)
+
+        # リアルタイムモードの場合は即座表示更新
+        if self.realtime_mode:
+            self.dialog.after_idle(self.update_realtime_display)
+
+    def display_realtime_logs(self):
+        """リアルタイムログを表示"""
+        try:
+            self.log_text.delete(1.0, tk.END)
+
+            for log_entry in self.realtime_logs:
+                if not self.should_display_realtime_log(log_entry):
+                    continue
+
+                line_text = f"{log_entry['timestamp']} [{log_entry['level']}] {log_entry['message']}\n"
+                self.log_text.insert(tk.END, line_text)
+
+                # レベル別の色付け
+                self.apply_log_level_color(log_entry["level"])
+
+            # 自動スクロール
+            self.log_text.see(tk.END)
+
+            # ステータス更新
+            self.status_label.config(
+                text=f"リアルタイムログ行数: {len(self.realtime_logs)}"
+            )
+
+        except Exception as e:
+            logger.error(f"リアルタイムログ表示エラー: {e}")
+
+    def update_realtime_display(self):
+        """リアルタイム表示を更新"""
+        if self.realtime_mode:
+            # 最新のログエントリを追加
+            if self.realtime_logs:
+                latest_log = self.realtime_logs[-1]
+                if self.should_display_realtime_log(latest_log):
+                    line_text = f"{latest_log['timestamp']} [{latest_log['level']}] {latest_log['message']}\n"
+                    self.log_text.insert(tk.END, line_text)
+                    self.apply_log_level_color(latest_log["level"])
+                    self.log_text.see(tk.END)
+
+                    # ステータス更新
+                    self.status_label.config(
+                        text=f"リアルタイムログ行数: {len(self.realtime_logs)}"
+                    )
+
+    def should_display_realtime_log(self, log_entry: dict) -> bool:
+        """リアルタイムログを表示すべきか判定"""
+        # ログレベルフィルター
+        if (
+            self.log_level_var.get() != "ALL"
+            and log_entry["level"] != self.log_level_var.get()
+        ):
+            return False
+
+        # キーワードフィルター
+        keyword = self.keyword_var.get().strip()
+        if keyword and keyword.lower() not in log_entry["message"].lower():
+            return False
+
+        return True
+
+    def apply_log_level_color(self, level: str) -> None:
+        """ログレベル別の色付けを適用"""
+        try:
+            # タグを設定
+            if level == "ERROR":
+                self.log_text.tag_config("error", foreground="red")
+            elif level == "CRITICAL":
+                self.log_text.tag_config(
+                    "critical", foreground="red", background="yellow"
+                )
+            elif level == "WARNING":
+                self.log_text.tag_config("warning", foreground="orange")
+            elif level == "DEBUG":
+                self.log_text.tag_config("debug", foreground="gray")
+        except Exception as e:
+            logger.error(f"色付けエラー: {e}")
+
+    def clear_realtime_logs(self):
+        """リアルタイムログをクリア"""
+        self.realtime_logs.clear()
+        if self.realtime_mode:
+            self.display_realtime_logs()
+        logger.debug("リアルタイムログをクリアしました")
+
+    def show_output_control(self):
+        """出力制御ダイアログを表示"""
+        try:
+            control_dialog = OutputControlDialog(self.dialog, output_controller)
+            control_dialog.show()
+        except Exception as e:
+            logger.error(f"出力制御ダイアログ表示エラー: {e}")
+            messagebox.showerror(
+                "エラー", f"出力制御ダイアログの表示に失敗しました: {e}"
+            )
+
     def close(self):
         """ダイアログを閉じる"""
         self.stop_auto_refresh()
+
+        # リアルタイムモードを無効化
+        if self.output_controller:
+            self.output_controller.set_gui_callback(None)
+
         logger.info("ログ表示GUIを閉じました")
+        self.dialog.destroy()
+
+
+class OutputControlDialog:
+    """出力制御ダイアログ"""
+
+    def __init__(self, parent: tk.Toplevel, controller: OutputController):
+        self.parent = parent
+        self.controller = controller
+        self.dialog = None
+
+    def show(self):
+        """ダイアログを表示"""
+        self.dialog = tk.Toplevel(self.parent)
+        self.dialog.title("出力制御設定")
+        self.dialog.geometry("400x300")
+        self.dialog.transient(self.parent)
+        self.dialog.grab_set()
+
+        self.setup_ui()
+        self.load_current_settings()
+
+    def setup_ui(self):
+        """ユーザーインターフェースを設定"""
+        main_frame = ttk.Frame(self.dialog, padding="10")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # 出力先選択
+        target_frame = ttk.LabelFrame(main_frame, text="出力先選択", padding="10")
+        target_frame.pack(fill=tk.X, pady=(0, 10))
+
+        self.target_var = tk.StringVar()
+        targets = [
+            ("コンソールのみ", OutputTarget.CONSOLE_ONLY.value),
+            ("ログファイルのみ", OutputTarget.LOG_ONLY.value),
+            ("GUIログのみ", OutputTarget.GUI_ONLY.value),
+            ("コンソール + ログファイル", OutputTarget.CONSOLE_AND_LOG.value),
+            ("コンソール + GUIログ", OutputTarget.CONSOLE_AND_GUI.value),
+            ("ログファイル + GUIログ", OutputTarget.LOG_AND_GUI.value),
+            ("全て", OutputTarget.ALL.value),
+        ]
+
+        for i, (text, value) in enumerate(targets):
+            ttk.Radiobutton(
+                target_frame, text=text, variable=self.target_var, value=value
+            ).grid(row=i // 2, column=i % 2, sticky=tk.W, padx=(0, 20), pady=2)
+
+        # 個別制御
+        control_frame = ttk.LabelFrame(main_frame, text="個別制御", padding="10")
+        control_frame.pack(fill=tk.X, pady=(0, 10))
+
+        self.console_var = tk.BooleanVar()
+        self.log_var = tk.BooleanVar()
+        self.gui_var = tk.BooleanVar()
+
+        ttk.Checkbutton(
+            control_frame, text="コンソール出力", variable=self.console_var
+        ).pack(anchor=tk.W)
+        ttk.Checkbutton(
+            control_frame, text="ログファイル出力", variable=self.log_var
+        ).pack(anchor=tk.W)
+        ttk.Checkbutton(control_frame, text="GUIログ出力", variable=self.gui_var).pack(
+            anchor=tk.W
+        )
+
+        # ボタン
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+
+        ttk.Button(button_frame, text="適用", command=self.apply_settings).pack(
+            side=tk.LEFT, padx=(0, 10)
+        )
+        ttk.Button(button_frame, text="リセット", command=self.reset_settings).pack(
+            side=tk.LEFT, padx=(0, 10)
+        )
+        ttk.Button(button_frame, text="閉じる", command=self.close).pack(side=tk.RIGHT)
+
+    def load_current_settings(self):
+        """現在の設定を読み込み"""
+        status = self.controller.get_status()
+        self.target_var.set(status["output_target"])
+        self.console_var.set(status["console_enabled"])
+        self.log_var.set(status["log_enabled"])
+        self.gui_var.set(status["gui_enabled"])
+
+    def apply_settings(self):
+        """設定を適用"""
+        try:
+            # 出力先設定
+            target = OutputTarget(self.target_var.get())
+            self.controller.set_output_target(target)
+
+            # 個別制御設定
+            self.controller.enable_console_output(self.console_var.get())
+            self.controller.enable_log_output(self.log_var.get())
+            self.controller.enable_gui_output(self.gui_var.get())
+
+            messagebox.showinfo("完了", "出力制御設定を適用しました")
+
+        except Exception as e:
+            messagebox.showerror("エラー", f"設定の適用に失敗しました: {e}")
+
+    def reset_settings(self):
+        """設定をリセット"""
+        self.controller.set_output_target(OutputTarget.ALL)
+        self.load_current_settings()
+        messagebox.showinfo("完了", "設定をリセットしました")
+
+    def close(self):
+        """ダイアログを閉じる"""
         self.dialog.destroy()
