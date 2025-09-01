@@ -7,7 +7,8 @@ import logging
 import tkinter as tk
 from collections.abc import Callable
 from tkinter import ttk
-from typing import Any, Optional
+from typing import Any
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 

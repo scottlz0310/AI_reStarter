@@ -6,7 +6,8 @@
 import logging
 import tkinter as tk
 from contextlib import suppress
-from tkinter import messagebox, ttk
+from tkinter import messagebox
+from tkinter import ttk
 from typing import Optional
 
 from src.config.config_manager import ConfigManager
@@ -430,7 +431,8 @@ class MonitorAreaDialog:
             screenshot = pyautogui.screenshot()
 
             # PIL画像をPhotoImageに変換
-            from PIL import Image, ImageTk
+            from PIL import Image
+            from PIL import ImageTk
 
             # キャンバスサイズに合わせてリサイズ
             scaled_width = int(screen_width * scale)

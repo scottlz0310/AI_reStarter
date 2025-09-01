@@ -6,10 +6,13 @@
 import logging
 import os
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog
+from tkinter import messagebox
+from tkinter import ttk
 from typing import Any
 
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL import ImageTk
 
 from src.config.config_manager import ConfigManager
 

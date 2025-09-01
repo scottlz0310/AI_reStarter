@@ -6,7 +6,8 @@
 
 import logging
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox
+from tkinter import ttk
 
 logger = logging.getLogger(__name__)
 

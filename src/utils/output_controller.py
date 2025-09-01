@@ -8,7 +8,8 @@ import sys
 import threading
 from collections.abc import Callable
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
+from typing import Optional
 
 
 class OutputLevel(Enum):
