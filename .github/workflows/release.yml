@@ -70,15 +70,13 @@ jobs:
       run: |
         pyinstaller --onefile --windowed --name AI_reStarter main.py
 
+    - name: Test executable
+      run: |
+        python scripts/test_executable.py
+
     - name: Create release package
       run: |
-        mkdir release
-        copy dist\AI_reStarter.exe release\
-        copy README.md release\
-        copy kiro_config.json release\
-        xcopy error_templates release\error_templates\ /E /I
-        xcopy amazonq_templates release\amazonq_templates\ /E /I
-        powershell Compress-Archive -Path release\* -DestinationPath AI_reStarter-${{ github.ref_name }}.zip
+        python scripts/create_release_package.py
 
     - name: Create Release
       uses: softprops/action-gh-release@v1

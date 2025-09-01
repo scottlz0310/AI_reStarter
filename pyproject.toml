@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-restarter"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI reStarter - AI統合IDE用自動復旧システム"
 authors = [{name = "Kiro Development Team"}]
 readme = "README.md"
