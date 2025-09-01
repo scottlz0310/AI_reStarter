@@ -4,6 +4,15 @@ on:
   push:
     tags:
       - 'v*'
+  create:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.2.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
