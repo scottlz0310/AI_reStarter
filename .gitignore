@@ -185,3 +185,16 @@ test_scripts/
 # OS
 .DS_Store
 Thumbs.db
+
+# Added by add-autogen-gitignore.ps1 on 2025-09-03T15:56:23.8024992+09:00
+.venv/
+*.pyo
+*.pyd
+*.whl
+.env.*
+.vscode.bak.*
+uv.lock
+*.sqlite3
+*.db
+node_modules/
+requirements.txt
