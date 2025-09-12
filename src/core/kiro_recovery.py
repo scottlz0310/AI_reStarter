@@ -653,10 +653,32 @@ class KiroRecovery:
 
     def get_status(self) -> dict[str, any]:
         """現在の状態を取得"""
+        current_mode = self.mode_manager.get_current_mode()
+
+        # 現在のモードに応じたテンプレート数を取得
+        template_count = 0
+        if current_mode == "amazonq":
+            amazonq_detector = self.mode_manager.get_detector("amazonq")
+            if amazonq_detector and hasattr(amazonq_detector, "run_button_templates"):
+                template_count = len(amazonq_detector.run_button_templates)
+        elif current_mode == "kiro":
+            template_count = len(self.error_templates)
+        else:  # autoモード
+            # 全てのテンプレート数を合計
+            template_count = len(self.error_templates)
+            amazonq_detector = self.mode_manager.get_detector("amazonq")
+            if amazonq_detector and hasattr(amazonq_detector, "run_button_templates"):
+                template_count += len(amazonq_detector.run_button_templates)
+
+        logger.debug(
+            f"ステータス取得: モード={current_mode}, テンプレート数={template_count}"
+        )
+
         return {
             "monitoring": self.monitoring,
             "recovery_attempts": self.recovery_attempts,
             "max_recovery_attempts": self.max_recovery_attempts,
-            "template_count": len(self.error_templates),
+            "template_count": template_count,
             "last_error_time": self.last_error_time,
+            "current_mode": current_mode,
         }

@@ -226,6 +226,15 @@ class MonitorWidget(ttk.Frame):
     def update_status(self, status_data: dict[str, Any]):
         """状態を更新"""
         try:
+            # モードの更新
+            current_mode = status_data.get("current_mode", "kiro")
+            mode_display = {
+                "kiro": "Kiro-IDE",
+                "amazonq": "AmazonQ",
+                "auto": "自動",
+            }.get(current_mode, current_mode)
+            self.mode_label.config(text=f"モード: {mode_display}")
+
             # 監視状態の更新
             monitoring = status_data.get("monitoring", False)
             self.status_label.config(

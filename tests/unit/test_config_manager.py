@@ -200,7 +200,9 @@ class TestConfigManager:
 
     @patch("src.config.config_manager.ConfigManager._setup_logging")
     @patch("builtins.open", side_effect=PermissionError("Permission denied"))
-    def test_save_config_permission_error(self, mock_file, mock_setup_logging, temp_dir):
+    def test_save_config_permission_error(
+        self, mock_file, mock_setup_logging, temp_dir
+    ):
         """設定ファイル保存時の権限エラーテスト"""
         config_path = temp_dir / "test.json"
         manager = ConfigManager(str(config_path))
