@@ -15,7 +15,6 @@ from typing import Optional
 
 from src.utils.output_controller import OutputController
 from src.utils.output_controller import OutputLevel
-from src.utils.output_controller import OutputTarget
 from src.utils.output_controller import output_controller
 
 logger = logging.getLogger(__name__)
@@ -727,26 +726,6 @@ class OutputControlDialog:
         main_frame = ttk.Frame(self.dialog, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # 出力先選択
-        target_frame = ttk.LabelFrame(main_frame, text="出力先選択", padding="10")
-        target_frame.pack(fill=tk.X, pady=(0, 10))
-
-        self.target_var = tk.StringVar()
-        targets = [
-            ("コンソールのみ", OutputTarget.CONSOLE_ONLY.value),
-            ("ログファイルのみ", OutputTarget.LOG_ONLY.value),
-            ("GUIログのみ", OutputTarget.GUI_ONLY.value),
-            ("コンソール + ログファイル", OutputTarget.CONSOLE_AND_LOG.value),
-            ("コンソール + GUIログ", OutputTarget.CONSOLE_AND_GUI.value),
-            ("ログファイル + GUIログ", OutputTarget.LOG_AND_GUI.value),
-            ("全て", OutputTarget.ALL.value),
-        ]
-
-        for i, (text, value) in enumerate(targets):
-            ttk.Radiobutton(
-                target_frame, text=text, variable=self.target_var, value=value
-            ).grid(row=i // 2, column=i % 2, sticky=tk.W, padx=(0, 20), pady=2)
-
         # 個別制御
         control_frame = ttk.LabelFrame(main_frame, text="個別制御", padding="10")
         control_frame.pack(fill=tk.X, pady=(0, 10))
@@ -780,7 +759,6 @@ class OutputControlDialog:
     def load_current_settings(self):
         """現在の設定を読み込み"""
         status = self.controller.get_status()
-        self.target_var.set(status["output_target"])
         self.console_var.set(status["console_enabled"])
         self.log_var.set(status["log_enabled"])
         self.gui_var.set(status["gui_enabled"])
@@ -788,10 +766,6 @@ class OutputControlDialog:
     def apply_settings(self):
         """設定を適用"""
         try:
-            # 出力先設定
-            target = OutputTarget(self.target_var.get())
-            self.controller.set_output_target(target)
-
             # 個別制御設定
             self.controller.enable_console_output(self.console_var.get())
             self.controller.enable_log_output(self.log_var.get())
@@ -804,7 +778,9 @@ class OutputControlDialog:
 
     def reset_settings(self):
         """設定をリセット"""
-        self.controller.set_output_target(OutputTarget.ALL)
+        self.controller.enable_console_output(True)
+        self.controller.enable_log_output(True)
+        self.controller.enable_gui_output(True)
         self.load_current_settings()
         messagebox.showinfo("完了", "設定をリセットしました")
 

@@ -138,6 +138,11 @@ omit = [
 [tool.setuptools]
 py-modules = ["kiro_auto_recovery", "kiro_setup"]
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+]
+
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",

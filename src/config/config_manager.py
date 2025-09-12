@@ -5,7 +5,9 @@
 
 import json
 import logging
+import logging.handlers
 import os
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -14,7 +16,7 @@ logger = logging.getLogger(__name__)
 class ConfigManager:
     """設定管理クラス - 既存の設定管理機能を分離"""
 
-    def __init__(self, config_file: str = "kiro_config.json"):
+    def __init__(self, config_file: str = "config.local.json"):
         """
         初期化
         Args:
@@ -22,6 +24,7 @@ class ConfigManager:
         """
         self.config_file = config_file
         self.config = self.load_config(config_file)
+        self._setup_logging()
         logger.info(f"設定ファイル '{config_file}' を読み込みました")
 
     def load_config(self, config_file: str) -> dict[str, Any]:
@@ -45,6 +48,15 @@ class ConfigManager:
             "chat_input_position": None,  # [x, y] 座標
             "monitor_region": None,  # [x, y, width, height]
             "template_threshold": 0.8,
+            "logging": {
+                "level": "INFO",
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "file_enabled": True,
+                "file_path": "logs/ai_restarter.log",
+                "console_enabled": True,
+                "max_file_size": "10MB",
+                "backup_count": 5,
+            },
         }
 
         try:
@@ -54,6 +66,14 @@ class ConfigManager:
                     default_config.update(user_config)
                     logger.info(f"ユーザー設定を読み込みました: {config_file}")
             else:
+                # テンプレートファイルから読み込み
+                template_file = "config.template.json"
+                if os.path.exists(template_file):
+                    with open(template_file, encoding="utf-8") as f:
+                        template_config = json.load(f)
+                        default_config.update(template_config)
+                    logger.info(f"テンプレート設定を読み込みました: {template_file}")
+
                 logger.info(
                     f"設定ファイルが存在しません。デフォルト設定を使用し、設定ファイルを作成します: {config_file}"
                 )
@@ -199,6 +219,15 @@ class ConfigManager:
                 "chat_input_position": [800, 600],
                 "monitor_region": [0, 0, 1920, 1080],
                 "template_threshold": 0.8,
+                "logging": {
+                    "level": "INFO",
+                    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                    "file_enabled": True,
+                    "file_path": "logs/ai_restarter.log",
+                    "console_enabled": True,
+                    "max_file_size": "10MB",
+                    "backup_count": 5,
+                },
             }
 
             with open(self.config_file, "w", encoding="utf-8") as f:
@@ -209,3 +238,52 @@ class ConfigManager:
         except Exception as e:
             logger.error(f"サンプル設定ファイル作成エラー: {e}")
             return False
+
+    def _setup_logging(self) -> None:
+        """ログ設定を初期化"""
+        log_config = self.config.get("logging", {})
+
+        # ログレベル設定
+        level = getattr(logging, log_config.get("level", "INFO").upper())
+
+        # ルートロガーの設定
+        root_logger = logging.getLogger()
+        root_logger.setLevel(level)
+
+        # 既存のハンドラーをクリア
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+
+        # フォーマッター設定
+        formatter = logging.Formatter(
+            log_config.get(
+                "format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            )
+        )
+
+        # コンソールハンドラー
+        if log_config.get("console_enabled", True):
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            root_logger.addHandler(console_handler)
+
+        # ファイルハンドラー
+        if log_config.get("file_enabled", True):
+            log_path = Path(log_config.get("file_path", "logs/ai_restarter.log"))
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # ファイルサイズの解析
+            max_size = log_config.get("max_file_size", "10MB")
+            if isinstance(max_size, str) and max_size.endswith("MB"):
+                max_bytes = int(max_size[:-2]) * 1024 * 1024
+            else:
+                max_bytes = 10 * 1024 * 1024
+
+            file_handler = logging.handlers.RotatingFileHandler(
+                log_path,
+                maxBytes=max_bytes,
+                backupCount=log_config.get("backup_count", 5),
+                encoding="utf-8",
+            )
+            file_handler.setFormatter(formatter)
+            root_logger.addHandler(file_handler)

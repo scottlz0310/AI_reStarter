@@ -8,18 +8,9 @@ import logging
 import sys
 import tkinter as tk
 
+from src.config.config_manager import ConfigManager
 from src.gui.main_window import MainWindow
 from src.utils.output_controller import output_controller
-
-# ログ設定
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("ai_restarter.log", encoding="utf-8"),
-        logging.StreamHandler(),
-    ],
-)
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +18,11 @@ logger = logging.getLogger(__name__)
 def main():
     """メインエントリーポイント"""
     try:
+        # 設定管理システムを初期化（ログ設定も含む）
+        config_manager = ConfigManager()
+
         # 出力制御システムを初期化
+        output_controller.set_config_manager(config_manager)
         output_controller.info("AI reStarter を起動しています...", "main")
 
         # ルートウィンドウの作成

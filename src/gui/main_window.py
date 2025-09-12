@@ -27,7 +27,7 @@ class MainWindow:
 
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.config_manager = ConfigManager()
+        self.config_manager = ConfigManager("config.local.json")
         self.kiro_recovery = KiroRecovery(self.config_manager)
         self.mode_manager = self.kiro_recovery.mode_manager
         self.hotkey_manager = HotkeyManager()

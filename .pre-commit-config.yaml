@@ -8,6 +8,7 @@ repos:
       - id: end-of-file-fixer         # ファイル末尾改行を自動追加
       - id: check-yaml                # YAML形式チェック
       - id: check-added-large-files   # 大きなファイルの追加を防止
+        exclude: '^(error_templates|amazonq_templates)/'
       - id: check-merge-conflict      # マージコンフリクトマーカーをチェック
 
   # Ruff - 高速なリンター・フォーマッター（最優先）
@@ -16,7 +17,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]  # 自動修正を実行
+        exclude: '^(playground|error_templates|amazonq_templates)/'
       - id: ruff-format                        # コードフォーマット
+        exclude: '^(playground|error_templates|amazonq_templates)/'
 
   # Black - コードフォーマッター
   - repo: https://github.com/psf/black
@@ -25,6 +28,7 @@ repos:
       - id: black
         language_version: python3
         files: '^(src|tests|main\.py).*\.py$'
+        exclude: '^(playground|error_templates|amazonq_templates)/'
 
   # isort - インポート文の整理
   - repo: https://github.com/pycqa/isort
@@ -33,3 +37,4 @@ repos:
       - id: isort
         args: ["--profile", "black", "--force-single-line"]
         files: '^(src|tests|main\.py).*\.py$'
+        exclude: '^(playground|error_templates|amazonq_templates)/'

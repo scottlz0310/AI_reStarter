@@ -166,10 +166,11 @@ cython_debug/
 #  *.ipr
 #  *.iws
 
-# Kiro Auto Recovery specific
-kiro_config.json
+# AI reStarter specific
+config.local.json
 error_templates/
-kiro_recovery.log
+amazonq_templates/
+logs/
 *.png
 *.jpg
 *.jpeg

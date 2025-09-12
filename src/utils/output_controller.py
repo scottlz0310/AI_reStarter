@@ -22,29 +22,17 @@ class OutputLevel(Enum):
     CRITICAL = "CRITICAL"
 
 
-class OutputTarget(Enum):
-    """出力先"""
-
-    CONSOLE_ONLY = "console_only"  # コンソールのみ
-    LOG_ONLY = "log_only"  # ログファイルのみ
-    GUI_ONLY = "gui_only"  # GUIログウィンドウのみ
-    CONSOLE_AND_LOG = "console_and_log"  # コンソール + ログファイル
-    CONSOLE_AND_GUI = "console_and_gui"  # コンソール + GUIログウィンドウ
-    LOG_AND_GUI = "log_and_gui"  # ログファイル + GUIログウィンドウ
-    ALL = "all"  # 全て
-
-
 class OutputController:
     """出力制御システム"""
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self._gui_callback: Callable[[str, str], None] | None = None
-        self._output_target = OutputTarget.ALL
         self._console_enabled = True
         self._log_enabled = True
         self._gui_enabled = True
         self._lock = threading.Lock()
+        self._config_manager = None
 
         # 元の標準出力を保存
         self._original_stdout = sys.stdout
@@ -58,54 +46,34 @@ class OutputController:
             self._gui_callback = callback
             self.logger.debug("GUIコールバックを設定しました")
 
-    def set_output_target(self, target: OutputTarget) -> None:
-        """出力先を設定"""
-        with self._lock:
-            self._output_target = target
-            self._update_output_flags()
-            self.logger.info(f"出力先を設定しました: {target.value}")
-
-    def _update_output_flags(self) -> None:
-        """出力フラグを更新"""
-        target = self._output_target
-
-        self._console_enabled = target in [
-            OutputTarget.CONSOLE_ONLY,
-            OutputTarget.CONSOLE_AND_LOG,
-            OutputTarget.CONSOLE_AND_GUI,
-            OutputTarget.ALL,
-        ]
-
-        self._log_enabled = target in [
-            OutputTarget.LOG_ONLY,
-            OutputTarget.CONSOLE_AND_LOG,
-            OutputTarget.LOG_AND_GUI,
-            OutputTarget.ALL,
-        ]
-
-        self._gui_enabled = target in [
-            OutputTarget.GUI_ONLY,
-            OutputTarget.CONSOLE_AND_GUI,
-            OutputTarget.LOG_AND_GUI,
-            OutputTarget.ALL,
-        ]
+    def set_config_manager(self, config_manager) -> None:
+        """設定マネージャーを設定"""
+        self._config_manager = config_manager
+        if config_manager:
+            log_config = config_manager.get("logging", {})
+            self._console_enabled = log_config.get("console_enabled", True)
+            self._log_enabled = log_config.get("file_enabled", True)
+            self._gui_enabled = log_config.get("gui_enabled", True)
 
     def enable_console_output(self, enabled: bool = True) -> None:
         """コンソール出力の有効/無効を設定"""
         with self._lock:
             self._console_enabled = enabled
+            self._save_output_settings()
             self.logger.debug(f"コンソール出力: {'有効' if enabled else '無効'}")
 
     def enable_log_output(self, enabled: bool = True) -> None:
         """ログファイル出力の有効/無効を設定"""
         with self._lock:
             self._log_enabled = enabled
+            self._save_output_settings()
             self.logger.debug(f"ログファイル出力: {'有効' if enabled else '無効'}")
 
     def enable_gui_output(self, enabled: bool = True) -> None:
         """GUIログウィンドウ出力の有効/無効を設定"""
         with self._lock:
             self._gui_enabled = enabled
+            self._save_output_settings()
             self.logger.debug(f"GUIログウィンドウ出力: {'有効' if enabled else '無効'}")
 
     def output(
@@ -193,12 +161,29 @@ class OutputController:
     def get_status(self) -> dict[str, Any]:
         """現在の出力設定状態を取得"""
         return {
-            "output_target": self._output_target.value,
             "console_enabled": self._console_enabled,
             "log_enabled": self._log_enabled,
             "gui_enabled": self._gui_enabled,
             "gui_callback_set": self._gui_callback is not None,
         }
+
+    def _save_output_settings(self) -> None:
+        """出力設定を設定ファイルに保存"""
+        if self._config_manager:
+            try:
+                config = self._config_manager.get_config()
+                if "logging" not in config:
+                    config["logging"] = {}
+
+                config["logging"]["console_enabled"] = self._console_enabled
+                config["logging"]["file_enabled"] = self._log_enabled
+                config["logging"]["gui_enabled"] = self._gui_enabled
+
+                self._config_manager.config = config
+                self._config_manager.save_config()
+
+            except Exception as e:
+                self.logger.error(f"出力設定保存エラー: {e}")
 
 
 class OutputRedirector:

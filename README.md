@@ -85,7 +85,7 @@ GUIアプリケーション内で以下の設定を行います：
 1. Kiro-IDEウィンドウを前面に移動
 2. 監視エリアの左上と右下をクリックして設定
 3. チャット入力欄をクリックして位置を設定
-4. 設定を`kiro_config.json`に保存
+4. 設定を`config.local.json`に保存
 
 **注意事項:**
 - マルチモニター環境では、Kiro-IDEをメインディスプレイ（座標0,0が左上のディスプレイ）に配置してください
@@ -150,7 +150,12 @@ make help
 
 ## 設定
 
-`kiro_config.json`で以下の設定が可能です：
+設定は以下のファイルで管理されます：
+
+- `config.template.json`: テンプレート設定（バージョン管理対象）
+- `config.local.json`: ローカル設定（個人用、.gitignoreで除外）
+
+`config.local.json`で以下の設定が可能です：
 
 ```json
 {
@@ -206,7 +211,9 @@ AI_reStarter/
 ├── error_templates/           # エラー画像テンプレート
 ├── amazonq_templates/         # AmazonQ用テンプレート
 ├── archive/                   # 旧バージョンファイル
-├── kiro_config.json           # 設定ファイル
+├── config.template.json       # テンプレート設定ファイル
+├── config.local.json          # ローカル設定ファイル（.gitignoreで除外）
+├── logs/                      # ログファイル
 ├── pyproject.toml             # プロジェクト設定
 ├── .pre-commit-config.yaml    # pre-commit設定
 ├── .flake8                    # flake8設定

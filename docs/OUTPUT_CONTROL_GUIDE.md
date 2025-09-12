@@ -120,21 +120,21 @@ logger = logging.getLogger(__name__)
 class MyModule:
     def __init__(self):
         output_controller.info("MyModuleを初期化しました", "my_module")
-    
+
     def process_data(self, data):
         try:
             output_controller.debug(f"データ処理開始: {len(data)}件", "my_module")
-            
+
             # 処理実行
             result = self._do_process(data)
-            
+
             output_controller.info(f"データ処理完了: {len(result)}件", "my_module")
             return result
-            
+
         except Exception as e:
             output_controller.error(f"データ処理エラー: {e}", "my_module")
             raise
-    
+
     def _do_process(self, data):
         # 実際の処理
         return data
@@ -151,15 +151,15 @@ class MyWindow:
     def __init__(self, root):
         self.root = root
         self.setup_ui()
-        
+
         # GUIログウィンドウのコールバックを設定
         output_controller.set_gui_callback(self.add_log_message)
-    
+
     def setup_ui(self):
         # ログ表示エリア
         self.log_text = tk.Text(self.root)
         self.log_text.pack(fill=tk.BOTH, expand=True)
-    
+
     def add_log_message(self, message: str, level: str):
         """ログメッセージをGUIに追加"""
         import datetime
@@ -167,7 +167,7 @@ class MyWindow:
         log_line = f"[{timestamp}] [{level}] {message}\n"
         self.log_text.insert(tk.END, log_line)
         self.log_text.see(tk.END)
-    
+
     def on_button_click(self):
         output_controller.info("ボタンがクリックされました", "my_window")
 ```

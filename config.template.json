@@ -1,0 +1,32 @@
+{
+  "monitor_interval": 2.0,
+  "action_delay": 0.5,
+  "max_recovery_attempts": 3,
+  "recovery_cooldown": 30,
+  "error_templates_dir": "error_templates",
+  "recovery_commands": [
+    "続行してください",
+    "エラーを修正して続行",
+    "タスクを再開してください"
+  ],
+  "custom_commands": {
+    "compilation_error": "コンパイルエラーを修正して続行してください",
+    "runtime_error": "ランタイムエラーを解決して再実行してください",
+    "timeout_error": "タイムアウトエラー、再度実行してください"
+  },
+  "chat_input_position": null,
+  "monitor_region": null,
+  "template_threshold": 0.8,
+  "monitor_areas": [],
+  "mode": "amazonq",
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file_enabled": true,
+    "file_path": "logs/ai_restarter.log",
+    "console_enabled": true,
+    "gui_enabled": true,
+    "max_file_size": "10MB",
+    "backup_count": 5
+  }
+}

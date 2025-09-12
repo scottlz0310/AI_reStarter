@@ -13,7 +13,9 @@ from tkinter import ttk
 # プロジェクトルートをパスに追加
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.utils.output_controller import OutputLevel, OutputTarget, output_controller
+from src.utils.output_controller import OutputLevel
+from src.utils.output_controller import OutputTarget
+from src.utils.output_controller import output_controller
 
 
 def test_output_control():
