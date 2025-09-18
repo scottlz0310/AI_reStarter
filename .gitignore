@@ -273,3 +273,13 @@ temp/
 tmp/
 yarn-debug.log*
 yarn-error.log*
+
+# Auto-generated entries from templates
+*.dll
+*.dylib
+*.exe
+*.exe~
+*.out
+*.test
+go.work
+vendor/
