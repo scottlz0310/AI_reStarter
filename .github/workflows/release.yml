@@ -4,9 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+      - '!renovate/**'
   create:
     tags:
       - 'v*'
+      - '!renovate/**'
   workflow_dispatch:
     inputs:
       tag:
@@ -42,8 +44,15 @@ jobs:
 
         # バージョン整合性チェック
         $tag = "${{ github.ref_name }}"
+        echo "リリースバージョン: $tag"
+
+        # Renovateボットのタグをスキップ
+        if ($tag -match '^renovate/') {
+          echo "Renovateボットのタグのため、リリース処理をスキップします"
+          exit 0
+        }
+
         $version = $tag -replace '^v', ''
-        echo "リリースバージョン: $version"
 
         # pyproject.tomlのバージョンチェック
         $pyproject_version = (Get-Content pyproject.toml | Select-String 'version = "(.+)"').Matches[0].Groups[1].Value
