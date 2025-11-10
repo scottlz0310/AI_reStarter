@@ -1,40 +1,29 @@
-# AI reStarter Pre-commit設定 - 自動リフォーマット重視
+# AI reStarter Pre-commit設定 - モダン化版
+# リンター: ruff (lint + format)
+# 型チェック: mypy
+# その他: pre-commit-hooks
 repos:
-  # 基本的なファイル整理（自動修正）
+  # 基本的なファイル整理
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      - id: trailing-whitespace        # 行末空白を自動削除
-      - id: end-of-file-fixer         # ファイル末尾改行を自動追加
-      - id: check-yaml                # YAML形式チェック
-      - id: check-added-large-files   # 大きなファイルの追加を防止
-        exclude: '^(error_templates|amazonq_templates)/'
-      - id: check-merge-conflict      # マージコンフリクトマーカーをチェック
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
 
-  # Ruff - 高速なリンター・フォーマッター（最優先）
+  # Ruff - リンター・フォーマッター統合
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.15
+    rev: v0.8.0
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]  # 自動修正を実行
-        exclude: '^(playground|error_templates|amazonq_templates)/'
-      - id: ruff-format                        # コードフォーマット
-        exclude: '^(playground|error_templates|amazonq_templates)/'
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
 
-  # Black - コードフォーマッター
-  - repo: https://github.com/psf/black
-    rev: 24.1.1
+  # mypy - 型チェック
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
     hooks:
-      - id: black
-        language_version: python3
-        files: '^(src|tests|main\.py).*\.py$'
-        exclude: '^(playground|error_templates|amazonq_templates)/'
-
-  # isort - インポート文の整理
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ["--profile", "black", "--force-single-line"]
-        files: '^(src|tests|main\.py).*\.py$'
-        exclude: '^(playground|error_templates|amazonq_templates)/'
+      - id: mypy
+        additional_dependencies: ["types-Pillow"]

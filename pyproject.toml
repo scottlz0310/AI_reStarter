@@ -10,8 +10,6 @@ authors = [{name = "Kiro Development Team"}]
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
-
-
 keywords = ["ai", "restarter", "amazonq", "auto-recovery", "screen-capture", "error-detection", "template-matching"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -29,61 +27,22 @@ dependencies = [
     "keyboard>=0.13.5",
     "pywin32>=306; sys_platform == 'win32'",
     "pyperclip>=1.8.2",
-
 ]
 
-[project.optional-dependencies]
-dev = [
-    "black>=24.1.0",
-    "flake8>=7.0.0",
-    "isort>=5.13.0",
-    "mypy>=1.8.0",
-    "pylint>=3.0.0",
-    "ruff>=0.1.0",
-    "pre-commit>=3.6.0",
-    "pytest>=8.0.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.12.0",
-    "types-Pillow>=10.0.0",
-    "memory-profiler>=0.61.0",
-]
-test = [
-    "pytest>=8.0.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.12.0",
-]
-docs = [
-    "sphinx>=7.2.0",
-    "sphinx-rtd-theme>=2.0.0",
-    "ipython>=8.21.0",
-]
-
-[tool.black]
+[tool.ruff]
+target-version = "py311"
 line-length = 88
-target-version = ['py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+# Black互換性を保持しつつ、幅広いチェックを実施
+lint.select = ["ALL"]
+lint.ignore = ["D", "ANN", "COM812", "ISC001"]
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["kiro_auto_recovery"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.mypy]
 python_version = "3.11"
+strict = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -140,7 +99,23 @@ py-modules = ["kiro_auto_recovery", "kiro_setup"]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.3.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "pre-commit>=4.0.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.12.0",
+    "types-Pillow>=10.0.0",
+]
+test = [
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.12.0",
+]
+docs = [
+    "sphinx>=7.2.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "ipython>=8.21.0",
 ]
 
 [tool.coverage.report]
