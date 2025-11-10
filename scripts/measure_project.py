@@ -2,6 +2,7 @@
 """
 プロジェクト規模測定スクリプト
 """
+
 import os
 from pathlib import Path
 

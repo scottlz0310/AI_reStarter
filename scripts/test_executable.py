@@ -2,6 +2,7 @@
 """
 実行ファイルの動作テストスクリプト
 """
+
 import os
 import subprocess
 import sys

@@ -2,6 +2,7 @@
 """
 Release trigger helper script
 """
+
 import subprocess
 import sys
 import time

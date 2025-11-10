@@ -2,6 +2,7 @@
 """
 AI reStarter リリースビルドスクリプト
 """
+
 import os
 import shutil
 import subprocess

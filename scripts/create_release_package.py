@@ -2,6 +2,7 @@
 """
 Release package creation script
 """
+
 import os
 import shutil
 import zipfile

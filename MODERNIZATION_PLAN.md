@@ -188,7 +188,7 @@ description = "Amazon Q Developer用設定"
 # 監視領域（相対座標 0.0-1.0）
 [profiles.monitor_region]
 x = 0.1      # 左端からの相対位置
-y = 0.2      # 上端からの相対位置  
+y = 0.2      # 上端からの相対位置
 width = 0.8  # 幅の相対サイズ
 height = 0.6 # 高さの相対サイズ
 
@@ -337,7 +337,7 @@ mkdir -p templates
 ```
 
 ### 実装順序
-1. **環境整備**: 
+1. **環境整備**:
    - 既存ファイル削除
    - pyproject.toml統合設定
    - src/レイアウトプロジェクト構造作成
