@@ -247,7 +247,7 @@ class TestRunner:
         return subprocess.run(cmd, cwd=self.project_root).returncode
 
 
-def main():
+def main() -> None:
     """メイン関数"""
     import argparse
 

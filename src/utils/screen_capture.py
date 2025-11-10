@@ -25,7 +25,7 @@ except Exception:
 class ScreenCapture:
     """画面キャプチャ機能クラス"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """初期化"""
         if not PYAUTOGUI_AVAILABLE:
             logger.warning("pyautoguiが利用できません。画面キャプチャ機能は無効です。")
@@ -59,7 +59,7 @@ class ScreenCapture:
             screenshot_np = np.array(screenshot)
             screenshot_gray = self._convert_to_grayscale(screenshot_np)
 
-            return cast(np.ndarray, screenshot_gray)
+            return screenshot_gray
 
         except Exception as e:
             logger.error(f"画面キャプチャエラー: {e}")

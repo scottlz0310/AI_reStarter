@@ -6,8 +6,11 @@
 
 import logging
 import tkinter as tk
+from collections.abc import Callable
 from tkinter import messagebox
 from tkinter import ttk
+from typing import Any
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +21,12 @@ class ModeSelectorWidget(ttk.Frame):
     システムの動作モードを選択するためのGUIウィジェットです。
     """
 
-    def __init__(self, parent, mode_manager, on_mode_changed=None):
+    def __init__(
+        self,
+        parent: Any,
+        mode_manager: Any,
+        on_mode_changed: Callable[[str], None] | None = None,
+    ) -> None:
         """モード選択ウィジェットを初期化
 
         Args:
@@ -33,7 +41,7 @@ class ModeSelectorWidget(ttk.Frame):
         self.setup_ui()
         logger.debug("モード選択ウィジェットを初期化しました")
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # モード選択用の変数
         self.mode_var = tk.StringVar(value=self.mode_manager.get_current_mode())
@@ -70,7 +78,7 @@ class ModeSelectorWidget(ttk.Frame):
 
         self.update_mode_status()
 
-    def on_mode_changed(self):
+    def on_mode_changed(self) -> None:
         """モード変更時の処理"""
         new_mode = self.mode_var.get()
 
@@ -97,7 +105,7 @@ class ModeSelectorWidget(ttk.Frame):
             messagebox.showerror("エラー", f"モード切り替えエラー: {e}")
             logger.error(f"モード切り替えエラー: {e}", exc_info=True)
 
-    def update_mode_status(self):
+    def update_mode_status(self) -> None:
         """モード状態の更新"""
         try:
             status = self.mode_manager.get_mode_status()
@@ -125,7 +133,7 @@ class ModeSelectorWidget(ttk.Frame):
             logger.error(f"モード状態更新エラー: {e}")
             self.mode_status_label.config(text="状態取得エラー")
 
-    def refresh_mode(self):
+    def refresh_mode(self) -> None:
         """モード状態を強制更新"""
         current_mode = self.mode_manager.get_current_mode()
         self.mode_var.set(current_mode)
@@ -140,7 +148,7 @@ class ModeSelectorWidget(ttk.Frame):
         """
         return self.mode_var.get()
 
-    def set_enabled(self, enabled: bool):
+    def set_enabled(self, enabled: bool) -> None:
         """ウィジェットの有効/無効を設定
 
         Args:

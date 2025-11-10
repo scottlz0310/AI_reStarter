@@ -7,6 +7,8 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from typing import Any
+from typing import Optional
 
 from src.config.config_manager import ConfigManager
 
@@ -16,14 +18,14 @@ logger = logging.getLogger(__name__)
 class SettingsDialog:
     """設定ダイアログ"""
 
-    def __init__(self, parent: tk.Tk, config_manager: ConfigManager):
+    def __init__(self, parent: Any, config_manager: ConfigManager) -> None:
         self.parent = parent
         self.config_manager = config_manager
-        self.dialog = None
+        self.dialog: tk.Toplevel | None = None
 
         logger.debug("設定ダイアログを初期化しました")
 
-    def show(self):
+    def show(self) -> None:
         """設定ダイアログを表示"""
         try:
             # ダイアログウィンドウの作成
@@ -47,7 +49,7 @@ class SettingsDialog:
             logger.error(f"設定ダイアログ表示エラー: {e}")
             messagebox.showerror("エラー", f"設定ダイアログの表示に失敗しました: {e}")
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # メインフレーム
         main_frame = ttk.Frame(self.dialog, padding="10")
@@ -62,7 +64,7 @@ class SettingsDialog:
         # ボタンフレーム
         self.create_button_frame(main_frame)
 
-    def create_general_settings(self, parent):
+    def create_general_settings(self, parent: Any) -> None:
         """一般設定セクション"""
         frame = ttk.LabelFrame(parent, text="一般設定", padding="10")
         frame.pack(fill=tk.X, pady=(0, 10))
@@ -88,7 +90,7 @@ class SettingsDialog:
         )
         auto_start_check.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(10, 0))
 
-    def create_monitoring_settings(self, parent):
+    def create_monitoring_settings(self, parent: Any) -> None:
         """監視設定セクション"""
         frame = ttk.LabelFrame(parent, text="監視設定", padding="10")
         frame.pack(fill=tk.X, pady=(0, 10))
@@ -124,7 +126,7 @@ class SettingsDialog:
         )
         screenshot_folder_entry.grid(row=2, column=1, sticky=tk.W, pady=(10, 0))
 
-    def create_recovery_settings(self, parent):
+    def create_recovery_settings(self, parent: Any) -> None:
         """復旧設定セクション"""
         frame = ttk.LabelFrame(parent, text="復旧設定", padding="10")
         frame.pack(fill=tk.X, pady=(0, 10))
@@ -160,7 +162,7 @@ class SettingsDialog:
             row=2, column=0, columnspan=2, sticky=tk.W, pady=(10, 0)
         )
 
-    def create_hotkey_settings(self, parent):
+    def create_hotkey_settings(self, parent: Any) -> None:
         """ホットキー設定セクション"""
         frame = ttk.LabelFrame(parent, text="ホットキー設定", padding="10")
         frame.pack(fill=tk.X, pady=(0, 10))
@@ -183,7 +185,7 @@ class SettingsDialog:
         hotkey_label = ttk.Label(frame, text=hotkey_info, justify=tk.LEFT)
         hotkey_label.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(10, 0))
 
-    def create_button_frame(self, parent):
+    def create_button_frame(self, parent: Any) -> None:
         """ボタンフレームの作成"""
         button_frame = ttk.Frame(parent)
         button_frame.pack(fill=tk.X, pady=(20, 0))
@@ -202,7 +204,7 @@ class SettingsDialog:
         )
         restore_button.pack(side=tk.LEFT)
 
-    def load_current_settings(self):
+    def load_current_settings(self) -> None:
         """現在の設定を読み込み"""
         try:
             # 設定値を読み込み
@@ -232,7 +234,7 @@ class SettingsDialog:
             logger.error(f"設定読み込みエラー: {e}")
             messagebox.showerror("エラー", f"設定の読み込みに失敗しました: {e}")
 
-    def save_settings(self):
+    def save_settings(self) -> None:
         """設定を保存"""
         try:
             # 設定値を収集
@@ -259,7 +261,8 @@ class SettingsDialog:
             logger.info("設定を保存しました")
 
             # ダイアログを閉じる
-            self.dialog.destroy()
+            if self.dialog is not None:
+                self.dialog.destroy()
 
         except ValueError as e:
             logger.error(f"設定値の検証エラー: {e}")
@@ -271,7 +274,7 @@ class SettingsDialog:
             logger.error(f"設定保存エラー: {e}")
             messagebox.showerror("エラー", f"設定の保存に失敗しました: {e}")
 
-    def restore_defaults(self):
+    def restore_defaults(self) -> None:
         """デフォルト設定を復元"""
         try:
             # デフォルト設定を復元
@@ -288,7 +291,8 @@ class SettingsDialog:
             logger.error(f"デフォルト設定復元エラー: {e}")
             messagebox.showerror("エラー", f"デフォルト設定の復元に失敗しました: {e}")
 
-    def cancel(self):
+    def cancel(self) -> None:
         """キャンセル処理"""
         logger.info("設定ダイアログをキャンセルしました")
-        self.dialog.destroy()
+        if self.dialog is not None:
+            self.dialog.destroy()

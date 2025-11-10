@@ -22,7 +22,7 @@ except Exception:
 class HotkeyManager:
     """ホットキー管理クラス"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """初期化"""
         if not KEYBOARD_AVAILABLE:
             logger.warning(
@@ -31,7 +31,7 @@ class HotkeyManager:
         else:
             logger.info("ホットキー管理機能を初期化しました")
 
-    def setup_hotkeys(self, hotkey_handlers: dict[str, Callable]) -> bool:
+    def setup_hotkeys(self, hotkey_handlers: dict[str, Callable[[], None]]) -> bool:
         """
         ホットキーを設定
         Args:

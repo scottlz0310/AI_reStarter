@@ -16,7 +16,7 @@ if sys.platform == "win32":
     os.environ["PYTHONIOENCODING"] = "utf-8"
 
 
-def test_executable():
+def test_executable() -> bool:
     """実行ファイルの動作テスト"""
     exe_path = Path("dist/AI_reStarter.exe")
 
@@ -73,7 +73,7 @@ def test_executable():
         return False
 
 
-def test_release_package():
+def test_release_package() -> bool:
     """リリースパッケージのテスト"""
     # GitHub Actions環境ではリリースパッケージテストをスキップ
     if os.environ.get("GITHUB_ACTIONS") == "true":
@@ -109,7 +109,7 @@ def test_release_package():
         return False
 
 
-def main():
+def main() -> int:
     """メインテスト関数"""
     print("AI reStarter Build Test Started")
     print("=" * 50)

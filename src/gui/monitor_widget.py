@@ -16,21 +16,21 @@ logger = logging.getLogger(__name__)
 class MonitorWidget(ttk.Frame):
     """監視状態を表示するウィジェット（tkinter版）"""
 
-    def __init__(self, parent):
+    def __init__(self, parent: Any) -> None:
         super().__init__(parent)
 
         # コールバック関数
-        self.start_callback: Callable | None = None
-        self.stop_callback: Callable | None = None
-        self.save_template_callback: Callable | None = None
-        self.send_recovery_callback: Callable | None = None
-        self.monitor_area_callback: Callable | None = None
-        self.save_template_with_selection_callback: Callable | None = None
+        self.start_callback: Callable[[], None] | None = None
+        self.stop_callback: Callable[[], None] | None = None
+        self.save_template_callback: Callable[[], None] | None = None
+        self.send_recovery_callback: Callable[[], None] | None = None
+        self.monitor_area_callback: Callable[[], None] | None = None
+        self.save_template_with_selection_callback: Callable[[], None] | None = None
 
         self.setup_ui()
         logger.debug("監視状態ウィジェットを初期化しました")
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # 状態表示グループ
         self.setup_status_group()
@@ -44,7 +44,7 @@ class MonitorWidget(ttk.Frame):
         # 進捗表示グループ
         self.setup_progress_group()
 
-    def setup_status_group(self):
+    def setup_status_group(self) -> None:
         """状態表示グループの設定"""
         self.status_group = ttk.LabelFrame(self, text="監視状態")
         self.status_group.pack(fill=tk.X, padx=5, pady=5)
@@ -86,7 +86,7 @@ class MonitorWidget(ttk.Frame):
             row=4, column=0, sticky=tk.W, padx=5, pady=2
         )
 
-    def setup_control_group(self):
+    def setup_control_group(self) -> None:
         """制御ボタングループの設定"""
         self.control_group = ttk.LabelFrame(self, text="制御")
         self.control_group.pack(fill=tk.X, padx=5, pady=5)
@@ -137,7 +137,7 @@ class MonitorWidget(ttk.Frame):
         self.save_template_selection_button.pack(side=tk.LEFT, padx=2)
         self.send_recovery_button.pack(side=tk.LEFT, padx=2)
 
-    def setup_log_group(self):
+    def setup_log_group(self) -> None:
         """ログ表示グループの設定"""
         self.log_group = ttk.LabelFrame(self, text="ログ")
         self.log_group.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -159,7 +159,7 @@ class MonitorWidget(ttk.Frame):
         )
         self.clear_log_button.pack(pady=5)
 
-    def setup_progress_group(self):
+    def setup_progress_group(self) -> None:
         """進捗表示グループの設定"""
         self.progress_group = ttk.LabelFrame(self, text="進捗")
         self.progress_group.pack(fill=tk.X, padx=5, pady=5)
@@ -176,13 +176,13 @@ class MonitorWidget(ttk.Frame):
 
     def set_callbacks(
         self,
-        start_callback: Callable,
-        stop_callback: Callable,
-        save_template_callback: Callable,
-        send_recovery_callback: Callable,
-        monitor_area_callback: Callable | None = None,
-        save_template_with_selection_callback: Callable | None = None,
-    ):
+        start_callback: Callable[[], None],
+        stop_callback: Callable[[], None],
+        save_template_callback: Callable[[], None],
+        send_recovery_callback: Callable[[], None],
+        monitor_area_callback: Callable[[], None] | None = None,
+        save_template_with_selection_callback: Callable[[], None] | None = None,
+    ) -> None:
         """コールバック関数を設定"""
         self.start_callback = start_callback
         self.stop_callback = stop_callback
@@ -193,37 +193,37 @@ class MonitorWidget(ttk.Frame):
             save_template_with_selection_callback
         )
 
-    def _on_start_clicked(self):
+    def _on_start_clicked(self) -> None:
         """開始ボタンクリック時の処理"""
         if self.start_callback:
             self.start_callback()
 
-    def _on_stop_clicked(self):
+    def _on_stop_clicked(self) -> None:
         """停止ボタンクリック時の処理"""
         if self.stop_callback:
             self.stop_callback()
 
-    def _on_save_template_clicked(self):
+    def _on_save_template_clicked(self) -> None:
         """テンプレート保存ボタンクリック時の処理"""
         if self.save_template_callback:
             self.save_template_callback()
 
-    def _on_send_recovery_clicked(self):
+    def _on_send_recovery_clicked(self) -> None:
         """復旧コマンド送信ボタンクリック時の処理"""
         if self.send_recovery_callback:
             self.send_recovery_callback()
 
-    def _on_monitor_area_clicked(self):
+    def _on_monitor_area_clicked(self) -> None:
         """監視エリア設定ボタンクリック時の処理"""
         if self.monitor_area_callback:
             self.monitor_area_callback()
 
-    def _on_save_template_with_selection_clicked(self):
+    def _on_save_template_with_selection_clicked(self) -> None:
         """範囲選択でテンプレート保存ボタンクリック時の処理"""
         if self.save_template_with_selection_callback:
             self.save_template_with_selection_callback()
 
-    def update_status(self, status_data: dict[str, Any]):
+    def update_status(self, status_data: dict[str, Any]) -> None:
         """状態を更新"""
         try:
             # モードの更新
@@ -267,7 +267,7 @@ class MonitorWidget(ttk.Frame):
         except Exception as e:
             logger.error(f"状態更新エラー: {e}")
 
-    def add_log(self, message: str):
+    def add_log(self, message: str) -> None:
         """ログを追加"""
         try:
             import datetime
@@ -284,7 +284,7 @@ class MonitorWidget(ttk.Frame):
         except Exception as e:
             logger.error(f"ログ追加エラー: {e}")
 
-    def clear_log(self):
+    def clear_log(self) -> None:
         """ログをクリア"""
         try:
             self.log_text.delete(1.0, tk.END)
@@ -292,7 +292,7 @@ class MonitorWidget(ttk.Frame):
         except Exception as e:
             logger.error(f"ログクリアエラー: {e}")
 
-    def set_last_action(self, action: str):
+    def set_last_action(self, action: str) -> None:
         """最終アクションを設定"""
         try:
             self.last_action_label.config(text=f"最終アクション: {action}")
@@ -300,7 +300,7 @@ class MonitorWidget(ttk.Frame):
         except Exception as e:
             logger.error(f"最終アクション更新エラー: {e}")
 
-    def set_mode(self, mode: str):
+    def set_mode(self, mode: str) -> None:
         """モードを設定"""
         try:
             self.mode_label.config(text=f"モード: {mode}")

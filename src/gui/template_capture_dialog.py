@@ -7,6 +7,7 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
+from typing import Any
 from typing import Optional
 
 import cv2
@@ -22,19 +23,22 @@ logger = logging.getLogger(__name__)
 class TemplateCaptureDialog:
     """テンプレート範囲選択ダイアログ"""
 
-    def __init__(self, parent: tk.Tk):
-        self.parent = parent
-        self.screen_capture = ScreenCapture()
-        self.dialog = None
-        self.canvas = None
-        self.screenshot = None
-        self.photo_image = None
-        self.start_x = None
-        self.start_y = None
-        self.end_x = None
-        self.end_y = None
-        self.selection_rect = None
-        self.selected_region = None
+    def __init__(self, parent: Any) -> None:
+        self.parent: Any = parent
+        self.screen_capture: ScreenCapture = ScreenCapture()
+        self.dialog: tk.Toplevel | None = None
+        self.canvas: tk.Canvas | None = None
+        self.screenshot: np.ndarray | None = None
+        self.photo_image: ImageTk.PhotoImage | None = None
+        self.start_x: float | None = None
+        self.start_y: float | None = None
+        self.end_x: float | None = None
+        self.end_y: float | None = None
+        self.selection_rect: int | None = None
+        self.selected_region: tuple[np.ndarray, str] | None = None
+        self.image_item: int | None = None
+        self.info_label: tk.Label | None = None
+        self._last_motion_log: tuple[float, float] | None = None
 
         logger.debug("テンプレート範囲選択ダイアログを初期化")
 
@@ -48,9 +52,6 @@ class TemplateCaptureDialog:
         try:
             # 画面全体をキャプチャ
             self.screenshot = self.screen_capture.capture_screen()
-            if self.screenshot is None:
-                messagebox.showerror("エラー", "画面キャプチャに失敗しました")
-                return None
 
             # ダイアログウィンドウを作成
             self.dialog = tk.Toplevel(self.parent)
@@ -74,7 +75,7 @@ class TemplateCaptureDialog:
             messagebox.showerror("エラー", f"ダイアログの表示に失敗しました: {e}")
             return None
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # メインフレーム
         main_frame = tk.Frame(self.dialog)
@@ -186,9 +187,12 @@ class TemplateCaptureDialog:
         )
         self.info_label.pack(side=tk.RIGHT, padx=5, pady=5)
 
-    def display_screenshot(self):
+    def display_screenshot(self) -> None:
         """スクリーンショットをキャンバスに表示"""
         try:
+            if self.screenshot is None or self.canvas is None:
+                return
+
             # OpenCVからPILに変換
             if len(self.screenshot.shape) == 3:
                 # BGR to RGB
@@ -221,8 +225,11 @@ class TemplateCaptureDialog:
             logger.error(f"スクリーンショット表示エラー: {e}")
             messagebox.showerror("エラー", f"画像の表示に失敗しました: {e}")
 
-    def on_mouse_press(self, event):
+    def on_mouse_press(self, event: Any) -> None:
         """マウス押下時の処理"""
+        if self.canvas is None:
+            return
+
         # 既存の選択範囲をクリア（座標設定前に実行）
         self.clear_selection()
 
@@ -256,9 +263,9 @@ class TemplateCaptureDialog:
                 f"DEBUG: 座標情報 - start_x={self.start_x} ({type(self.start_x)}), start_y={self.start_y} ({type(self.start_y)})"
             )
 
-    def on_mouse_drag(self, event):
+    def on_mouse_drag(self, event: Any) -> None:
         """マウスドラッグ時の処理"""
-        if self.start_x is None or self.start_y is None:
+        if self.start_x is None or self.start_y is None or self.canvas is None:
             print("DEBUG: ドラッグ中だが開始座標が未設定")
             return
 
@@ -288,9 +295,10 @@ class TemplateCaptureDialog:
         # 選択範囲の情報を更新
         width = abs(current_x - self.start_x)
         height = abs(current_y - self.start_y)
-        self.info_label.config(text=f"選択範囲: {int(width)} x {int(height)} px")
+        if self.info_label is not None:
+            self.info_label.config(text=f"選択範囲: {int(width)} x {int(height)} px")
 
-    def on_mouse_release(self, event):
+    def on_mouse_release(self, event: Any) -> None:
         """マウス離した時の処理"""
         if self.start_x is None or self.start_y is None:
             return
@@ -304,17 +312,19 @@ class TemplateCaptureDialog:
 
         if width < 10 or height < 10:
             self.clear_selection()
-            self.info_label.config(text="選択範囲が小さすぎます（最小10x10px）")
+            if self.info_label is not None:
+                self.info_label.config(text="選択範囲が小さすぎます（最小10x10px）")
             return
 
         logger.debug(
             f"選択完了: ({self.start_x}, {self.start_y}) - ({self.end_x}, {self.end_y})"
         )
-        self.info_label.config(text=f"選択完了: {int(width)} x {int(height)} px")
+        if self.info_label is not None:
+            self.info_label.config(text=f"選択完了: {int(width)} x {int(height)} px")
 
-    def clear_selection(self):
+    def clear_selection(self) -> None:
         """選択範囲をクリア"""
-        if self.selection_rect:
+        if self.selection_rect and self.canvas is not None:
             self.canvas.delete(self.selection_rect)
             self.selection_rect = None
 
@@ -323,10 +333,10 @@ class TemplateCaptureDialog:
         # self.start_y = None
         self.end_x = None
         self.end_y = None
-        if hasattr(self, "info_label"):
+        if self.info_label is not None:
             self.info_label.config(text="範囲を選択してください")
 
-    def save_template(self):
+    def save_template(self) -> None:
         """選択範囲をテンプレートとして保存"""
         if (
             self.start_x is None
@@ -335,6 +345,9 @@ class TemplateCaptureDialog:
             or self.end_y is None
         ):
             messagebox.showwarning("警告", "範囲を選択してください")
+            return
+
+        if self.screenshot is None or self.dialog is None:
             return
 
         try:
@@ -382,13 +395,13 @@ class TemplateCaptureDialog:
             logger.error(f"テンプレート保存エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの保存に失敗しました: {e}")
 
-    def on_mouse_motion(self, event):
+    def on_mouse_motion(self, event: Any) -> None:
         """マウス移動時の処理（デバッグ用）"""
         x = float(event.x)
         y = float(event.y)
         # デバッグ情報を少なくする
         if (
-            hasattr(self, "_last_motion_log")
+            self._last_motion_log is not None
             and abs(x - self._last_motion_log[0]) < 50
             and abs(y - self._last_motion_log[1]) < 50
         ):
@@ -396,9 +409,9 @@ class TemplateCaptureDialog:
         self._last_motion_log = (x, y)
         # print(f"DEBUG: マウス移動 - x={x}, y={y}")  # コメントアウトして出力を減らす
 
-    def clear_selection_full(self):
+    def clear_selection_full(self) -> None:
         """完全な選択クリア（ボタン用）"""
-        if self.selection_rect:
+        if self.selection_rect and self.canvas is not None:
             self.canvas.delete(self.selection_rect)
             self.selection_rect = None
 
@@ -406,9 +419,11 @@ class TemplateCaptureDialog:
         self.start_y = None
         self.end_x = None
         self.end_y = None
-        self.info_label.config(text="範囲を選択してください")
+        if self.info_label is not None:
+            self.info_label.config(text="範囲を選択してください")
 
-    def cancel(self):
+    def cancel(self) -> None:
         """キャンセル"""
         self.selected_region = None
-        self.dialog.destroy()
+        if self.dialog is not None:
+            self.dialog.destroy()

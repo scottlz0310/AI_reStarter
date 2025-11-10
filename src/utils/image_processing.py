@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class ImageProcessor:
     """画像処理機能クラス"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """初期化"""
         logger.info("画像処理機能を初期化しました")
 
@@ -155,7 +155,7 @@ class ImageProcessor:
         Returns:
             テンプレート辞書
         """
-        templates = {}
+        templates: dict[str, np.ndarray] = {}
 
         try:
             if not os.path.exists(templates_dir):

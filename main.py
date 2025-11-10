@@ -15,7 +15,7 @@ from src.utils.output_controller import output_controller
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """メインエントリーポイント"""
     try:
         # 設定管理システムを初期化（ログ設定も含む）

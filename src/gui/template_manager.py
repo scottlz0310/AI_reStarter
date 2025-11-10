@@ -10,6 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from typing import Any
+from typing import Optional
 
 from PIL import Image
 from PIL import ImageTk
@@ -22,19 +23,19 @@ logger = logging.getLogger(__name__)
 class TemplateManager:
     """テンプレート管理GUI"""
 
-    def __init__(self, parent: tk.Tk, config_manager: ConfigManager):
+    def __init__(self, parent: tk.Tk, config_manager: ConfigManager) -> None:
         self.parent = parent
         self.config_manager = config_manager
-        self.dialog = None
-        self.template_folder = self.config_manager.get(
+        self.dialog: tk.Toplevel | None = None
+        self.template_folder: str = self.config_manager.get(
             "screenshot_folder", "error_templates"
         )
         self.templates: list[dict[str, Any]] = []
 
-        self.active_tab_mode = "kiro"  # デフォルトはKiro-IDEタブ
+        self.active_tab_mode: str = "kiro"  # デフォルトはKiro-IDEタブ
         logger.debug("テンプレート管理GUIを初期化しました")
 
-    def set_active_tab(self, tab_mode: str):
+    def set_active_tab(self, tab_mode: str) -> None:
         """アクティブにするタブを設定
 
         Args:
@@ -46,18 +47,18 @@ class TemplateManager:
         else:
             logger.warning(f"無効なタブモード: {tab_mode}")
 
-    def create_tab_control(self, parent):
+    def create_tab_control(self, parent: Any) -> None:
         """タブコントロールを作成"""
-        self.notebook = ttk.Notebook(parent)
+        self.notebook: ttk.Notebook = ttk.Notebook(parent)
         self.notebook.pack(fill=tk.BOTH, expand=True)
 
         # Kiro-IDEタブ
-        self.kiro_frame = ttk.Frame(self.notebook)
+        self.kiro_frame: ttk.Frame = ttk.Frame(self.notebook)
         self.notebook.add(self.kiro_frame, text="Kiro-IDEテンプレート")
         self.setup_kiro_tab()
 
         # AmazonQタブ
-        self.amazonq_frame = ttk.Frame(self.notebook)
+        self.amazonq_frame: ttk.Frame = ttk.Frame(self.notebook)
         self.notebook.add(self.amazonq_frame, text="AmazonQテンプレート")
         self.setup_amazonq_tab()
 
@@ -71,7 +72,7 @@ class TemplateManager:
             else:
                 self.notebook.select(0)  # Kiro-IDEタブを選択
 
-    def setup_kiro_tab(self):
+    def setup_kiro_tab(self) -> None:
         """従来のKiro-IDEタブのセットアップ"""
         self.template_folder = self.config_manager.get(
             "error_templates_dir", "error_templates"
@@ -86,9 +87,9 @@ class TemplateManager:
         # プレビューエリア
         self.create_preview_area(self.kiro_frame)
 
-    def setup_amazonq_tab(self):
+    def setup_amazonq_tab(self) -> None:
         """AmazonQタブのセットアップ"""
-        self.amazonq_folder = self.config_manager.get(
+        self.amazonq_folder: str = self.config_manager.get(
             "amazonq.run_button_templates_dir", "amazonq_templates"
         )
 
@@ -101,7 +102,7 @@ class TemplateManager:
         # プレビューエリア
         self.create_amazonq_preview_area(self.amazonq_frame)
 
-    def show(self):
+    def show(self) -> None:
         """テンプレート管理GUIを表示"""
         try:
             # ダイアログウィンドウの作成
@@ -128,7 +129,7 @@ class TemplateManager:
                 "エラー", f"テンプレート管理GUIの表示に失敗しました: {e}"
             )
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # メインフレーム
         main_frame = ttk.Frame(self.dialog, padding="10")
@@ -137,7 +138,7 @@ class TemplateManager:
         # タブコントロールを作成
         self.create_tab_control(main_frame)
 
-    def create_toolbar(self, parent):
+    def create_toolbar(self, parent: Any) -> None:
         """ツールバーの作成"""
         toolbar = ttk.Frame(parent)
         toolbar.pack(fill=tk.X, pady=(0, 10))
@@ -174,19 +175,19 @@ class TemplateManager:
 
         # 検索フィールド
         ttk.Label(toolbar, text="検索:").pack(side=tk.RIGHT, padx=(10, 5))
-        self.search_var = tk.StringVar()
+        self.search_var: tk.StringVar = tk.StringVar()
         self.search_var.trace("w", self.filter_templates)
         search_entry = ttk.Entry(toolbar, textvariable=self.search_var, width=20)
         search_entry.pack(side=tk.RIGHT)
 
-    def create_template_list(self, parent):
+    def create_template_list(self, parent: Any) -> None:
         """テンプレート一覧の作成"""
         list_frame = ttk.LabelFrame(parent, text="テンプレート一覧", padding="10")
         list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
         # ツリービュー
         columns = ("名前", "サイズ", "作成日", "説明")
-        self.template_tree = ttk.Treeview(
+        self.template_tree: ttk.Treeview = ttk.Treeview(
             list_frame, columns=columns, show="headings", height=10
         )
 
@@ -208,13 +209,13 @@ class TemplateManager:
         # 選択イベント
         self.template_tree.bind("<<TreeviewSelect>>", self.on_template_select)
 
-    def create_preview_area(self, parent):
+    def create_preview_area(self, parent: Any) -> None:
         """プレビューエリアの作成"""
         preview_frame = ttk.LabelFrame(parent, text="プレビュー", padding="10")
         preview_frame.pack(fill=tk.X, pady=(0, 10))
 
         # プレビューラベル
-        self.preview_label = ttk.Label(
+        self.preview_label: ttk.Label = ttk.Label(
             preview_frame, text="テンプレートを選択してください"
         )
         self.preview_label.pack(expand=True)
@@ -224,23 +225,23 @@ class TemplateManager:
         info_frame.pack(fill=tk.X, pady=(10, 0))
 
         # テンプレート情報
-        self.info_text = tk.Text(info_frame, height=4, width=50)
+        self.info_text: tk.Text = tk.Text(info_frame, height=4, width=50)
         self.info_text.pack(fill=tk.X)
 
-    def create_status_bar(self, parent):
+    def create_status_bar(self, parent: Any) -> None:
         """ステータスバーの作成"""
         status_frame = ttk.Frame(parent)
         status_frame.pack(fill=tk.X)
 
         # テンプレート数表示
-        self.status_label = ttk.Label(status_frame, text="テンプレート数: 0")
+        self.status_label: ttk.Label = ttk.Label(status_frame, text="テンプレート数: 0")
         self.status_label.pack(side=tk.LEFT)
 
         # 閉じるボタン
         close_button = ttk.Button(status_frame, text="閉じる", command=self.close)
         close_button.pack(side=tk.RIGHT)
 
-    def load_templates(self):
+    def load_templates(self) -> None:
         """テンプレートを読み込み"""
         try:
             self.templates.clear()
@@ -286,13 +287,13 @@ class TemplateManager:
             logger.error(f"テンプレート読み込みエラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの読み込みに失敗しました: {e}")
 
-    def format_date(self, timestamp):
+    def format_date(self, timestamp: float) -> str:
         """タイムスタンプを日付文字列に変換"""
         import datetime
 
         return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M")
 
-    def on_template_select(self, event):
+    def on_template_select(self, event: Any) -> None:
         """テンプレート選択時の処理"""
         selection = self.template_tree.selection()
         if not selection:
@@ -315,7 +316,7 @@ class TemplateManager:
         # 情報表示
         self.show_template_info(template_info)
 
-    def show_preview(self, template_info):
+    def show_preview(self, template_info: dict[str, Any]) -> None:
         """プレビューを表示"""
         try:
             # 画像を読み込み
@@ -330,13 +331,13 @@ class TemplateManager:
 
             # プレビューレベルを更新
             self.preview_label.config(image=photo, text="")
-            self.preview_label.image = photo  # 参照を保持
+            self.preview_label.image = photo  # type: ignore[attr-defined]  # 参照を保持
 
         except Exception as e:
             logger.error(f"プレビュー表示エラー: {e}")
             self.preview_label.config(image="", text="プレビュー表示エラー")
 
-    def show_template_info(self, template_info):
+    def show_template_info(self, template_info: dict[str, Any]) -> None:
         """テンプレート情報を表示"""
         try:
             info_text = f"""ファイル名: {template_info["name"]}
@@ -351,7 +352,7 @@ class TemplateManager:
         except Exception as e:
             logger.error(f"テンプレート情報表示エラー: {e}")
 
-    def add_template(self):
+    def add_template(self) -> None:
         """新規テンプレートを追加"""
         try:
             # ファイル選択ダイアログ
@@ -388,20 +389,22 @@ class TemplateManager:
             logger.error(f"テンプレート追加エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの追加に失敗しました: {e}")
 
-    def add_template_with_selection(self):
+    def add_template_with_selection(self) -> None:
         """範囲選択でKiroテンプレートを追加"""
         try:
             from src.gui.template_capture_dialog import TemplateCaptureDialog
 
             # ダイアログを一時的に隠す
-            self.dialog.withdraw()
+            if self.dialog:
+                self.dialog.withdraw()
 
             # 範囲選択ダイアログを表示
             capture_dialog = TemplateCaptureDialog(self.parent)
             result = capture_dialog.show()
 
             # ダイアログを再表示
-            self.dialog.deiconify()
+            if self.dialog:
+                self.dialog.deiconify()
 
             if result:
                 selected_image, template_name = result
@@ -430,12 +433,12 @@ class TemplateManager:
             if hasattr(self, "dialog") and self.dialog:
                 self.dialog.deiconify()
 
-    def import_template(self):
+    def import_template(self) -> None:
         """テンプレートをインポート"""
         # 現在はadd_templateと同じ処理
         self.add_template()
 
-    def delete_template(self):
+    def delete_template(self) -> None:
         """選択されたテンプレートを削除"""
         selection = self.template_tree.selection()
         if not selection:
@@ -471,7 +474,7 @@ class TemplateManager:
             logger.error(f"テンプレート削除エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの削除に失敗しました: {e}")
 
-    def edit_template(self):
+    def edit_template(self) -> None:
         """テンプレートを編集"""
         selection = self.template_tree.selection()
         if not selection:
@@ -508,12 +511,12 @@ class TemplateManager:
                 logger.error(f"テンプレート名変更エラー: {e}")
                 messagebox.showerror("エラー", f"ファイル名の変更に失敗しました: {e}")
 
-    def refresh_templates(self):
+    def refresh_templates(self) -> None:
         """テンプレート一覧を更新"""
         self.load_templates()
         logger.info("テンプレート一覧を更新しました")
 
-    def filter_templates(self, *args):
+    def filter_templates(self, *args: Any) -> None:
         """テンプレートをフィルタリング"""
         search_term = self.search_var.get().lower()
 
@@ -539,7 +542,7 @@ class TemplateManager:
                     ),
                 )
 
-    def create_amazonq_toolbar(self, parent):
+    def create_amazonq_toolbar(self, parent: Any) -> None:
         """ツールバーの作成（AmazonQ用）"""
         toolbar = ttk.Frame(parent)
         toolbar.pack(fill=tk.X, pady=(0, 10))
@@ -559,13 +562,13 @@ class TemplateManager:
             side=tk.LEFT, padx=(0, 5)
         )
 
-    def create_amazonq_template_list(self, parent):
+    def create_amazonq_template_list(self, parent: Any) -> None:
         """テンプレート一覧の作成（AmazonQ用）"""
         list_frame = ttk.LabelFrame(parent, text="▶RUNボタンテンプレート", padding="10")
         list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
         columns = ("名前", "サイズ", "作成日")
-        self.amazonq_tree = ttk.Treeview(
+        self.amazonq_tree: ttk.Treeview = ttk.Treeview(
             list_frame, columns=columns, show="headings", height=10
         )
 
@@ -583,12 +586,12 @@ class TemplateManager:
 
         self.amazonq_tree.bind("<<TreeviewSelect>>", self.on_amazonq_template_select)
 
-    def create_amazonq_preview_area(self, parent):
+    def create_amazonq_preview_area(self, parent: Any) -> None:
         """プレビューエリアの作成（AmazonQ用）"""
         preview_frame = ttk.LabelFrame(parent, text="プレビュー", padding="10")
         preview_frame.pack(fill=tk.X, pady=(0, 10))
 
-        self.amazonq_preview_label = ttk.Label(
+        self.amazonq_preview_label: ttk.Label = ttk.Label(
             preview_frame, text="テンプレートを選択してください"
         )
         self.amazonq_preview_label.pack(expand=True)
@@ -596,10 +599,10 @@ class TemplateManager:
         info_frame = ttk.Frame(preview_frame)
         info_frame.pack(fill=tk.X, pady=(10, 0))
 
-        self.amazonq_info_text = tk.Text(info_frame, height=4, width=50)
+        self.amazonq_info_text: tk.Text = tk.Text(info_frame, height=4, width=50)
         self.amazonq_info_text.pack(fill=tk.X)
 
-    def add_amazonq_template(self):
+    def add_amazonq_template(self) -> None:
         """新規AmazonQテンプレートを追加"""
         try:
             file_path = filedialog.askopenfilename(
@@ -631,20 +634,22 @@ class TemplateManager:
             logger.error(f"AmazonQテンプレート追加エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの追加に失敗しました: {e}")
 
-    def add_amazonq_template_with_selection(self):
+    def add_amazonq_template_with_selection(self) -> None:
         """範囲選択でAmazonQテンプレートを追加"""
         try:
             from src.gui.template_capture_dialog import TemplateCaptureDialog
 
             # ダイアログを一時的に隠す
-            self.dialog.withdraw()
+            if self.dialog:
+                self.dialog.withdraw()
 
             # 範囲選択ダイアログを表示
             capture_dialog = TemplateCaptureDialog(self.parent)
             result = capture_dialog.show()
 
             # ダイアログを再表示
-            self.dialog.deiconify()
+            if self.dialog:
+                self.dialog.deiconify()
 
             if result:
                 selected_image, template_name = result
@@ -673,7 +678,7 @@ class TemplateManager:
             if hasattr(self, "dialog") and self.dialog:
                 self.dialog.deiconify()
 
-    def delete_amazonq_template(self):
+    def delete_amazonq_template(self) -> None:
         """選択されたAmazonQテンプレートを削除"""
         selection = self.amazonq_tree.selection()
         if not selection:
@@ -702,7 +707,7 @@ class TemplateManager:
             logger.error(f"AmazonQテンプレート削除エラー: {e}")
             messagebox.showerror("エラー", f"テンプレートの削除に失敗しました: {e}")
 
-    def refresh_amazonq_templates(self):
+    def refresh_amazonq_templates(self) -> None:
         """AmazonQテンプレート一覧を更新"""
         try:
             self.amazonq_tree.delete(*self.amazonq_tree.get_children())
@@ -727,7 +732,7 @@ class TemplateManager:
         except Exception as e:
             logger.error(f"AmazonQテンプレート更新エラー: {e}")
 
-    def on_amazonq_template_select(self, event):
+    def on_amazonq_template_select(self, event: Any) -> None:
         """AmazonQテンプレート選択時の処理"""
         selection = self.amazonq_tree.selection()
         if not selection:
@@ -745,7 +750,7 @@ class TemplateManager:
             photo = ImageTk.PhotoImage(image)
 
             self.amazonq_preview_label.config(image=photo, text="")
-            self.amazonq_preview_label.image = photo
+            self.amazonq_preview_label.image = photo  # type: ignore[attr-defined]
 
         except Exception as e:
             logger.error(f"AmazonQプレビュー表示エラー: {e}")
@@ -765,7 +770,8 @@ class TemplateManager:
         except Exception as e:
             logger.error(f"AmazonQテンプレート情報表示エラー: {e}")
 
-    def close(self):
+    def close(self) -> None:
         """ダイアログを閉じる"""
         logger.info("テンプレート管理GUIを閉じました")
-        self.dialog.destroy()
+        if self.dialog:
+            self.dialog.destroy()

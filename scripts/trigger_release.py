@@ -8,7 +8,7 @@ import sys
 import time
 
 
-def trigger_release(version):
+def trigger_release(version: str) -> bool:
     """Release trigger with retry logic"""
     print(f"Triggering release for version {version}")
 

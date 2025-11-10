@@ -7,6 +7,7 @@ AmazonQ用検出器
 import logging
 import os
 import time
+from typing import Any
 from typing import Optional
 
 import cv2
@@ -26,7 +27,7 @@ class AmazonQDetector(BaseDetector):
     クリックして実行を開始する機能を提供します。
     """
 
-    def __init__(self, config_manager) -> None:
+    def __init__(self, config_manager: Any) -> None:
         """AmazonQ検出器を初期化
 
         Args:
@@ -190,7 +191,7 @@ class AmazonQDetector(BaseDetector):
         Returns:
             bool: 有効な場合True
         """
-        return self.config_manager.get("amazonq.enabled", True)
+        return bool(self.config_manager.get("amazonq.enabled", True))
 
     def add_template(self, template_name: str, template_image: np.ndarray) -> bool:
         """新しい▶RUNボタンテンプレートを追加

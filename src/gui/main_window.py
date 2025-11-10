@@ -8,6 +8,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import ttk
+from typing import Any
+from typing import Dict
+from typing import List
 
 from src.config.config_manager import ConfigManager
 from src.core.kiro_recovery import KiroRecovery
@@ -25,7 +28,7 @@ logger = logging.getLogger(__name__)
 class MainWindow:
     """メインウィンドウ - 統合GUI（tkinter版）"""
 
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.config_manager = ConfigManager("config.local.json")
         self.kiro_recovery = KiroRecovery(self.config_manager)
@@ -40,7 +43,7 @@ class MainWindow:
 
         logger.info("メインウィンドウを初期化しました")
 
-    def setup_mode_selector(self):
+    def setup_mode_selector(self) -> None:
         """モード選択ウィジェットのセットアップ"""
         # モード選択用の変数
         self.mode_var = tk.StringVar(value=self.mode_manager.get_current_mode())
@@ -70,7 +73,7 @@ class MainWindow:
 
         self.update_mode_status()
 
-    def on_mode_changed(self):
+    def on_mode_changed(self) -> None:
         """モード変更時の処理"""
         new_mode = self.mode_var.get()
         if self.mode_manager.switch_mode(new_mode):
@@ -84,7 +87,7 @@ class MainWindow:
                 "エラー", f"モードの切り替えに失敗しました: {new_mode}"
             )
 
-    def update_mode_status(self):
+    def update_mode_status(self) -> None:
         """モード状態の更新"""
         status = self.mode_manager.get_mode_status()
         current_mode = status["current_mode"]
@@ -93,7 +96,7 @@ class MainWindow:
         status_text = f"現在のモード: {current_mode} | アクティブな検出器: {', '.join(active_detectors) if active_detectors else 'なし'}"
         self.mode_status_label.config(text=status_text)
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # メインフレーム
         self.main_frame = ttk.Frame(self.root)
@@ -118,7 +121,7 @@ class MainWindow:
             self.save_template_with_selection,  # 範囲選択コールバックを追加
         )
 
-    def setup_menu(self):
+    def setup_menu(self) -> None:
         """メニューバーの設定"""
         menubar = tk.Menu(self.root)
         self.root.config(menu=menubar)
@@ -159,7 +162,7 @@ class MainWindow:
         help_menu.add_command(label="ホットキー一覧", command=self.show_hotkey_list)
         help_menu.add_command(label="バージョン情報", command=self.show_about)
 
-    def setup_hotkeys(self):
+    def setup_hotkeys(self) -> None:
         """ホットキーの設定"""
         hotkey_handlers = {
             "ctrl+alt+s": self.hotkey_save_template,
@@ -173,12 +176,12 @@ class MainWindow:
         else:
             logger.warning("ホットキーの設定に失敗しました")
 
-    def setup_timers(self):
+    def setup_timers(self) -> None:
         """タイマーの設定"""
         # 状態更新タイマー
         self.update_status()
 
-    def setup_output_controller(self):
+    def setup_output_controller(self) -> None:
         """出力制御システムの設定"""
         try:
             # 出力制御システムを初期化
@@ -187,7 +190,7 @@ class MainWindow:
         except Exception as e:
             logger.error(f"出力制御システム設定エラー: {e}")
 
-    def update_status(self):
+    def update_status(self) -> None:
         """状態の更新"""
         try:
             # KiroRecoveryの状態を取得
@@ -205,7 +208,7 @@ class MainWindow:
         # 1秒後に再度実行
         self.root.after(1000, self.update_status)
 
-    def start_monitoring(self):
+    def start_monitoring(self) -> None:
         """監視開始"""
         try:
             if self.kiro_recovery.start_monitoring():
@@ -220,7 +223,7 @@ class MainWindow:
             messagebox.showerror("エラー", f"監視開始エラー: {e}")
             output_controller.error(f"監視開始エラー: {e}", "main_window")
 
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> None:
         """監視停止"""
         try:
             self.kiro_recovery.stop_monitoring()
@@ -230,7 +233,7 @@ class MainWindow:
             self.monitor_widget.add_log(f"監視停止エラー: {e}")
             output_controller.error(f"監視停止エラー: {e}", "main_window")
 
-    def save_template(self):
+    def save_template(self) -> None:
         """テンプレート保存（現在のモードに応じたテンプレートを保存）"""
         try:
             # 現在のモードを取得
@@ -266,7 +269,7 @@ class MainWindow:
             messagebox.showerror("エラー", f"テンプレート保存エラー: {e}")
             logger.error(f"テンプレート保存エラー: {e}")
 
-    def save_template_with_selection(self):
+    def save_template_with_selection(self) -> None:
         """範囲選択でテンプレート保存（テンプレート管理と同じ処理）"""
         try:
             from src.gui.template_manager import TemplateManager
@@ -295,7 +298,7 @@ class MainWindow:
                 "エラー", f"範囲選択テンプレートの保存に失敗しました: {e}"
             )
 
-    def send_recovery_command(self):
+    def send_recovery_command(self) -> None:
         """復旧コマンド送信"""
         try:
             if self.kiro_recovery.send_recovery_command():
@@ -310,7 +313,7 @@ class MainWindow:
             messagebox.showerror("エラー", f"復旧コマンド送信エラー: {e}")
             logger.error(f"復旧コマンド送信エラー: {e}")
 
-    def open_settings(self):
+    def open_settings(self) -> None:
         """設定ダイアログを開く"""
         try:
             settings_dialog = SettingsDialog(self.root, self.config_manager)
@@ -320,7 +323,7 @@ class MainWindow:
             logger.error(f"設定ダイアログ表示エラー: {e}")
             messagebox.showerror("エラー", f"設定ダイアログの表示に失敗しました: {e}")
 
-    def open_template_manager(self):
+    def open_template_manager(self) -> None:
         """テンプレート管理を開く（現在のモードに応じたタブをアクティブに）"""
         try:
             template_manager = TemplateManager(self.root, self.config_manager)
@@ -342,23 +345,23 @@ class MainWindow:
             logger.error(f"テンプレート管理表示エラー: {e}")
             messagebox.showerror("エラー", f"テンプレート管理の表示に失敗しました: {e}")
 
-    def show_logs(self):
+    def show_logs(self) -> None:
         """ログ表示"""
         try:
             log_viewer = LogViewer(self.root)
-            log_viewer.show()
+            log_viewer.show()  # type: ignore[no-untyped-call]
             output_controller.info("ログ表示を開きました", "main_window")
         except Exception as e:
             output_controller.error(f"ログ表示表示エラー: {e}", "main_window")
             messagebox.showerror("エラー", f"ログ表示の表示に失敗しました: {e}")
 
-    def show_output_control(self):
+    def show_output_control(self) -> None:
         """出力制御ダイアログを表示"""
         try:
             from src.gui.log_viewer import OutputControlDialog
 
-            control_dialog = OutputControlDialog(self.root, output_controller)
-            control_dialog.show()
+            control_dialog = OutputControlDialog(self.root, output_controller)  # type: ignore[arg-type]
+            control_dialog.show()  # type: ignore[no-untyped-call]
             output_controller.info("出力制御ダイアログを開きました", "main_window")
         except Exception as e:
             output_controller.error(f"出力制御ダイアログ表示エラー: {e}", "main_window")
@@ -366,17 +369,17 @@ class MainWindow:
                 "エラー", f"出力制御ダイアログの表示に失敗しました: {e}"
             )
 
-    def open_monitor_area_settings(self):
+    def open_monitor_area_settings(self) -> None:
         """監視エリア設定を開く"""
         try:
             monitor_area_dialog = MonitorAreaDialog(self.root, self.config_manager)
-            monitor_area_dialog.show()
+            monitor_area_dialog.show()  # type: ignore[no-untyped-call]
             logger.info("監視エリア設定を開きました")
         except Exception as e:
             logger.error(f"監視エリア設定表示エラー: {e}")
             messagebox.showerror("エラー", f"監視エリア設定の表示に失敗しました: {e}")
 
-    def open_amazonq_settings(self):
+    def open_amazonq_settings(self) -> None:
         """AmazonQ設定ダイアログを開く"""
         try:
             from src.gui.amazonq_settings_dialog import AmazonQSettingsDialog
@@ -390,7 +393,7 @@ class MainWindow:
                 "エラー", f"AmazonQ設定ダイアログの表示に失敗しました: {e}"
             )
 
-    def show_hotkey_list(self):
+    def show_hotkey_list(self) -> None:
         """ホットキー一覧表示"""
         hotkeys = self.hotkey_manager.get_default_hotkeys()
         hotkey_text = "\n".join([f"{key}: {desc}" for key, desc in hotkeys.items()])
@@ -398,7 +401,7 @@ class MainWindow:
         messagebox.showinfo("ホットキー一覧", f"利用可能なホットキー:\n\n{hotkey_text}")
         logger.info("ホットキー一覧を表示しました")
 
-    def show_about(self):
+    def show_about(self) -> None:
         """バージョン情報表示"""
         about_text = """AI reStarter - AI-IDE自動復旧システム
 
@@ -412,19 +415,19 @@ class MainWindow:
         logger.info("バージョン情報を表示しました")
 
     # ホットキーハンドラー
-    def hotkey_save_template(self):
+    def hotkey_save_template(self) -> None:
         """ホットキー: テンプレート保存（現在のモードに応じたテンプレート）"""
         current_mode = self.mode_manager.get_current_mode()
         mode_name = "AmazonQ" if current_mode == "amazonq" else "Kiro"
         self.monitor_widget.add_log(f"ホットキー: {mode_name}テンプレート保存要求")
         self.save_template()
 
-    def hotkey_send_recovery(self):
+    def hotkey_send_recovery(self) -> None:
         """ホットキー: 復旧コマンド送信"""
         self.monitor_widget.add_log("ホットキー: 復旧コマンド送信要求")
         self.send_recovery_command()
 
-    def hotkey_toggle_pause(self):
+    def hotkey_toggle_pause(self) -> None:
         """ホットキー: 一時停止/再開"""
         if self.kiro_recovery.monitoring:
             self.stop_monitoring()
@@ -433,12 +436,12 @@ class MainWindow:
             self.start_monitoring()
             self.monitor_widget.add_log("ホットキー: 監視を再開しました")
 
-    def hotkey_stop_monitoring(self):
+    def hotkey_stop_monitoring(self) -> None:
         """ホットキー: 監視停止"""
         self.monitor_widget.add_log("ホットキー: 監視停止要求")
         self.stop_monitoring()
 
-    def on_closing(self):
+    def on_closing(self) -> None:
         """ウィンドウクローズ時の処理"""
         try:
             # 監視を停止

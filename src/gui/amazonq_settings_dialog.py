@@ -8,6 +8,7 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +16,10 @@ logger = logging.getLogger(__name__)
 class AmazonQSettingsDialog:
     """AmazonQ用設定ダイアログ"""
 
-    def __init__(self, parent, config_manager):
+    def __init__(self, parent: Any, config_manager: Any) -> None:
         self.parent = parent
         self.config_manager = config_manager
-        self.dialog = None
+        self.dialog: tk.Toplevel | None = None
 
         # 設定値を保持する変数
         self.enabled_var = tk.BooleanVar()
@@ -28,7 +29,7 @@ class AmazonQSettingsDialog:
 
         logger.debug("AmazonQ設定ダイアログを初期化しました")
 
-    def show(self):
+    def show(self) -> None:
         """ダイアログを表示"""
         self.dialog = tk.Toplevel(self.parent)
         self.dialog.title("AmazonQ設定")
@@ -50,7 +51,7 @@ class AmazonQSettingsDialog:
 
         logger.info("AmazonQ設定ダイアログを表示しました")
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """UIの初期化"""
         # メインフレーム
         main_frame = ttk.Frame(self.dialog)
@@ -89,7 +90,7 @@ class AmazonQSettingsDialog:
         self.threshold_label.pack(side=tk.LEFT, padx=(10, 0))
 
         # 閾値変更時のコールバック
-        self.detection_threshold_var.trace("w", self.on_threshold_changed)
+        self.detection_threshold_var.trace_add("write", self.on_threshold_changed)
 
         # クリック遅延
         ttk.Label(detection_frame, text="クリック遅延 (秒):").grid(
@@ -116,7 +117,7 @@ class AmazonQSettingsDialog:
             side=tk.RIGHT
         )
 
-    def load_settings(self):
+    def load_settings(self) -> None:
         """設定値を読み込み"""
         try:
             # 現在の設定値を取得
@@ -142,7 +143,7 @@ class AmazonQSettingsDialog:
             logger.error(f"設定読み込みエラー: {e}")
             messagebox.showerror("エラー", f"設定の読み込みに失敗しました: {e}")
 
-    def on_threshold_changed(self, *args):
+    def on_threshold_changed(self, *args: Any) -> None:
         """検出閾値変更時の処理"""
         threshold = self.detection_threshold_var.get()
         self.threshold_label.config(text=f"{threshold:.2f}")
@@ -207,13 +208,15 @@ class AmazonQSettingsDialog:
             messagebox.showerror("エラー", f"設定の保存中にエラーが発生しました: {e}")
             return False
 
-    def on_ok(self):
+    def on_ok(self) -> None:
         """OKボタン押下時の処理"""
         if self.validate_settings() and self.save_settings():
-            self.dialog.destroy()
+            if self.dialog is not None:
+                self.dialog.destroy()
             messagebox.showinfo("完了", "AmazonQ設定を保存しました")
 
-    def on_cancel(self):
+    def on_cancel(self) -> None:
         """キャンセルボタン押下時の処理"""
-        self.dialog.destroy()
+        if self.dialog is not None:
+            self.dialog.destroy()
         logger.debug("AmazonQ設定ダイアログをキャンセルしました")

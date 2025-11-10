@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 
-def count_lines_in_file(file_path):
+def count_lines_in_file(file_path: Path | str) -> int:
     """ファイルの行数をカウント"""
     try:
         with open(file_path, encoding="utf-8", errors="ignore") as f:
@@ -16,13 +16,16 @@ def count_lines_in_file(file_path):
         return 0
 
 
-def measure_directory(directory, extensions=None):
+def measure_directory(
+    directory: str | Path, extensions: list[str] | None = None
+) -> tuple[int, int]:
     """ディレクトリ内のファイル行数を測定"""
     if extensions is None:
         extensions = [".py"]
 
     total_lines = 0
     file_count = 0
+    dir_path = Path(directory)
 
     for root, _dirs, files in os.walk(directory):
         for file in files:
@@ -31,12 +34,12 @@ def measure_directory(directory, extensions=None):
                 lines = count_lines_in_file(file_path)
                 total_lines += lines
                 file_count += 1
-                print(f"  {file_path.relative_to(directory)}: {lines:,} lines")
+                print(f"  {file_path.relative_to(dir_path)}: {lines:,} lines")
 
     return total_lines, file_count
 
 
-def main():
+def main() -> None:
     """プロジェクト規模測定"""
     print("AI reStarter プロジェクト規模測定")
     print("=" * 50)

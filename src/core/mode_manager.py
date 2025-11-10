@@ -5,6 +5,7 @@
 """
 
 import logging
+from typing import Any
 from typing import Optional
 
 import numpy as np
@@ -29,14 +30,14 @@ class ModeManager:
 
     VALID_MODES = ["kiro", "amazonq", "auto"]
 
-    def __init__(self, config_manager) -> None:
+    def __init__(self, config_manager: Any) -> None:
         """モード管理システムを初期化
 
         Args:
             config_manager: 設定管理オブジェクト
         """
         self.config_manager = config_manager
-        self.current_mode = config_manager.get("mode", "auto")
+        self.current_mode: str = str(config_manager.get("mode", "auto"))
         self.detectors: dict[str, BaseDetector] = {}
 
         logger.info(f"モード管理システムを初期化: 初期モード={self.current_mode}")
@@ -193,7 +194,7 @@ class ModeManager:
         logger.info("検出器を再読み込みします")
         self._setup_detectors()
 
-    def get_mode_status(self) -> dict[str, any]:
+    def get_mode_status(self) -> dict[str, Any]:
         """現在のモード状態を取得
 
         Returns:

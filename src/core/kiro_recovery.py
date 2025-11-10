@@ -7,6 +7,7 @@ import logging
 import os
 import threading
 import time
+from typing import Any
 from typing import Optional
 
 import numpy as np
@@ -491,9 +492,12 @@ class KiroRecovery:
         if current_mode == "amazonq":
             # AmazonQモードの場合はAmazonQ検出器のテンプレートをチェック
             amazonq_detector = self.mode_manager.get_detector("amazonq")
-            if not amazonq_detector or len(amazonq_detector.run_button_templates) == 0:
-                logger.warning("AmazonQテンプレートが読み込まれていません")
-                # AmazonQモードでもテンプレートがない場合は監視を続行（テンプレートなしでも動作する）
+            if amazonq_detector and isinstance(amazonq_detector, AmazonQDetector):
+                if len(amazonq_detector.run_button_templates) == 0:
+                    logger.warning("AmazonQテンプレートが読み込まれていません")
+                    # AmazonQモードでもテンプレートがない場合は監視を続行（テンプレートなしでも動作する）
+            else:
+                logger.warning("AmazonQ検出器が見つかりません")
         elif current_mode == "kiro":
             # Kiroモードの場合はKiroエラーテンプレートをチェック
             if not self.error_templates:
@@ -568,11 +572,11 @@ class KiroRecovery:
                 )
                 # AmazonQ検出器にテンプレートを追加
                 amazonq_detector = self.mode_manager.get_detector("amazonq")
-                if amazonq_detector:
+                if amazonq_detector and isinstance(amazonq_detector, AmazonQDetector):
                     success = amazonq_detector.add_template(template_name, screenshot)
                     if success:
                         logger.info(f"AmazonQテンプレート保存成功: {template_name}")
-                    return success
+                    return bool(success)
                 else:
                     logger.error("AmazonQ検出器が見つかりません")
                     return False
@@ -619,7 +623,9 @@ class KiroRecovery:
 
                     # AmazonQ検出器のテンプレートを再読み込み
                     amazonq_detector = self.mode_manager.get_detector("amazonq")
-                    if amazonq_detector:
+                    if amazonq_detector and isinstance(
+                        amazonq_detector, AmazonQDetector
+                    ):
                         amazonq_detector._load_run_button_templates()
                     return True
                 else:
@@ -651,7 +657,7 @@ class KiroRecovery:
             logger.error(f"テンプレート削除エラー: {e}")
             return False
 
-    def get_status(self) -> dict[str, any]:
+    def get_status(self) -> dict[str, Any]:
         """現在の状態を取得"""
         current_mode = self.mode_manager.get_current_mode()
 
@@ -659,7 +665,7 @@ class KiroRecovery:
         template_count = 0
         if current_mode == "amazonq":
             amazonq_detector = self.mode_manager.get_detector("amazonq")
-            if amazonq_detector and hasattr(amazonq_detector, "run_button_templates"):
+            if amazonq_detector and isinstance(amazonq_detector, AmazonQDetector):
                 template_count = len(amazonq_detector.run_button_templates)
         elif current_mode == "kiro":
             template_count = len(self.error_templates)
@@ -667,7 +673,7 @@ class KiroRecovery:
             # 全てのテンプレート数を合計
             template_count = len(self.error_templates)
             amazonq_detector = self.mode_manager.get_detector("amazonq")
-            if amazonq_detector and hasattr(amazonq_detector, "run_button_templates"):
+            if amazonq_detector and isinstance(amazonq_detector, AmazonQDetector):
                 template_count += len(amazonq_detector.run_button_templates)
 
         logger.debug(

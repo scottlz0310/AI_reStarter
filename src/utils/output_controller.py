@@ -25,14 +25,14 @@ class OutputLevel(Enum):
 class OutputController:
     """出力制御システム"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
         self._gui_callback: Callable[[str, str], None] | None = None
         self._console_enabled = True
         self._log_enabled = True
         self._gui_enabled = True
         self._lock = threading.Lock()
-        self._config_manager = None
+        self._config_manager: Any = None
 
         # 元の標準出力を保存
         self._original_stdout = sys.stdout
@@ -46,7 +46,7 @@ class OutputController:
             self._gui_callback = callback
             self.logger.debug("GUIコールバックを設定しました")
 
-    def set_config_manager(self, config_manager) -> None:
+    def set_config_manager(self, config_manager: Any) -> None:
         """設定マネージャーを設定"""
         self._config_manager = config_manager
         if config_manager:
