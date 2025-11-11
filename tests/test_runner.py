@@ -52,7 +52,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_integration_tests(self, verbose: bool = True) -> int:
         """
@@ -80,7 +80,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_gui_tests(self, verbose: bool = True) -> int:
         """
@@ -108,7 +108,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_all_tests(self, verbose: bool = True, coverage_html: bool = False) -> int:
         """
@@ -138,7 +138,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_specific_test(self, test_path: str, verbose: bool = True) -> int:
         """
@@ -165,7 +165,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_tests_with_markers(self, markers: list[str], verbose: bool = True) -> int:
         """
@@ -195,7 +195,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def run_fast_tests(self, verbose: bool = True) -> int:
         """
@@ -223,7 +223,7 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
     def generate_coverage_report(self, format_type: str = "html") -> int:
         """
@@ -244,7 +244,7 @@ class TestRunner:
         elif format_type == "xml":
             cmd = [sys.executable, "-m", "coverage", "xml"]
 
-        return subprocess.run(cmd, cwd=self.project_root).returncode
+        return subprocess.run(cmd, cwd=self.project_root, check=False).returncode
 
 
 def main() -> None:

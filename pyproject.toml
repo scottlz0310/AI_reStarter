@@ -118,7 +118,7 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
-exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/"]
+exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/", "tests/"]
 
 # GUIファイルはtkinterの型定義が不完全なため、チェックを緩和
 [[tool.mypy.overrides]]

@@ -66,7 +66,8 @@ def config_file(temp_dir: Path, sample_config: dict[str, Any]) -> Path:
 def sample_image() -> np.ndarray:
     """テスト用のサンプル画像を生成するフィクスチャ"""
     # 100x100のRGB画像を作成
-    image = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
+    rng = np.random.default_rng()
+    image = rng.integers(0, 255, (100, 100, 3), dtype=np.uint8)
     return image
 
 
@@ -88,9 +89,10 @@ def mock_screen_capture():
 
     # デフォルトで100x100の画像を返すモック関数
     def mock_capture_func(*args, **kwargs):
-        return np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
+        rng = np.random.default_rng()
+        return rng.integers(0, 255, (100, 100, 3), dtype=np.uint8)
 
-    yield mock_capture_func
+    return mock_capture_func
 
 
 @pytest.fixture
