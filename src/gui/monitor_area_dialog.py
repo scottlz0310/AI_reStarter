@@ -29,6 +29,7 @@ class MonitorArea(TypedDict):
     enabled: bool
     description: str
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +45,9 @@ class MonitorAreaDialog:
         self.drag_start: tuple[int, int] | None = None
         self.drag_end: tuple[int, int] | None = None
         self.is_dragging = False
-        self.screenshot_photo: ImageTk.PhotoImage | None = None  # スクリーンショット画像の参照を保持
+        self.screenshot_photo: ImageTk.PhotoImage | None = (
+            None  # スクリーンショット画像の参照を保持
+        )
         self.chat_input_position: list[int] | None = None  # チャット入力欄の位置
 
         logger.debug("監視エリア設定ダイアログを初期化しました")

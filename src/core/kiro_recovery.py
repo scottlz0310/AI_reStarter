@@ -54,8 +54,9 @@ except Exception:
 
 # pyautoguiライブラリを条件付きでインポート（画面操作用）
 try:
-    import pyautogui
     from typing import TYPE_CHECKING
+
+    import pyautogui
 
     if TYPE_CHECKING:
         from typing import Any as _Window
@@ -146,7 +147,7 @@ class KiroRecovery:
 
         try:
             # Kiro-IDEウィンドウを探す
-            windows = getattr(pyautogui, "getAllWindows")()
+            windows = pyautogui.getAllWindows()
             kiro_windows = [w for w in windows if "- kiro" in w.title.lower()]
 
             # Qt-Theme-StudioのKiroウィンドウを優先
@@ -254,7 +255,7 @@ class KiroRecovery:
                 logger.error("pyautoguiが利用できません。ウィンドウ検索ができません。")
                 return False
 
-            windows = getattr(pyautogui, "getAllWindows")()
+            windows = pyautogui.getAllWindows()
 
             kiro_windows = [w for w in windows if "- kiro" in w.title.lower()]
             logger.debug(f"KiroIDE関連ウィンドウ数: {len(kiro_windows)}")
