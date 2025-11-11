@@ -6,7 +6,6 @@
 
 import logging
 from typing import Any
-from typing import Optional
 
 import numpy as np
 

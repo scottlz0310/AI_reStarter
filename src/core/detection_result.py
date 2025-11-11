@@ -8,7 +8,6 @@ import logging
 import time
 from dataclasses import dataclass
 from typing import Any
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,6 @@ from contextlib import suppress
 from tkinter import messagebox
 from tkinter import ttk
 from typing import TYPE_CHECKING
-from typing import Optional
 from typing import TypedDict
 
 from src.config.config_manager import ConfigManager

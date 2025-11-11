@@ -4,8 +4,6 @@
 """
 
 import logging
-from typing import Optional
-from typing import cast
 
 import numpy as np
 

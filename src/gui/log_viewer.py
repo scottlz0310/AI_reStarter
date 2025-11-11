@@ -9,13 +9,10 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-from tkinter import simpledialog
 from tkinter import ttk
-from typing import Optional
 from typing import TypedDict
 
 from src.utils.output_controller import OutputController
-from src.utils.output_controller import OutputLevel
 from src.utils.output_controller import output_controller
 
 logger = logging.getLogger(__name__)

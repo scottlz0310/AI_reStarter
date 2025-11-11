@@ -8,7 +8,6 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 from typing import Any
-from typing import Optional
 
 from src.config.config_manager import ConfigManager
 

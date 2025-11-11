@@ -8,7 +8,6 @@ import os
 import threading
 import time
 from typing import Any
-from typing import Optional
 
 import numpy as np
 
@@ -507,11 +506,10 @@ class KiroRecovery:
             if not self.error_templates:
                 logger.warning("Kiroエラーテンプレートが読み込まれていません")
                 return None
-        else:
-            # 自動モードの場合はいずれかの検出器が有効であればOK
-            if not active_detectors:
-                logger.warning("有効な検出器がありません")
-                return None
+        # 自動モードの場合はいずれかの検出器が有効であればOK
+        elif not active_detectors:
+            logger.warning("有効な検出器がありません")
+            return None
 
         try:
             self.monitoring = True

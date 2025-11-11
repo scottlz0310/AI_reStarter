@@ -8,7 +8,6 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from typing import Any
-from typing import Optional
 
 import cv2
 import numpy as np

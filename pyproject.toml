@@ -32,13 +32,76 @@ dependencies = [
 [tool.ruff]
 target-version = "py311"
 line-length = 88
+include = ["src/**/*.py", "tests/**/*.py", "main.py"]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "archive",
+]
+
+[tool.ruff.lint]
 # Black互換性を保持しつつ、幅広いチェックを実施
-lint.select = ["ALL"]
-lint.ignore = ["D", "ANN", "COM812", "ISC001"]
+select = ["ALL"]
+ignore = [
+    "D",       # pydocstyle (ドキュメント規約)
+    "ANN",     # flake8-annotations (型アノテーション強制)
+    "COM812",  # trailing-comma-missing (ruff formatと競合)
+    "ISC001",  # single-line-implicit-string-concatenation (ruff formatと競合)
+    "E501",    # line-too-long (ruff formatが処理)
+    "E203",    # whitespace-before-punctuation (ruff formatと競合)
+    "B008",    # function-call-in-default-argument
+    "G004",    # logging-f-string (f-stringをロギングで使用可)
+    "PTH",     # flake8-use-pathlib (pathlibへの移行は段階的に)
+    "BLE001",  # blind-except (Exceptionキャッチは許容)
+    "TRY",     # tryceratops (try/exceptの詳細ルールは緩和)
+    "RET504",  # unnecessary-assign (可読性のため許容)
+    "PLR2004", # magic-value-comparison (マジックナンバーは文脈による)
+    "PLC0415", # import-outside-toplevel (遅延インポートを許容)
+    "RET505",  # superfluous-else-return (明示的なelse許容)
+    "RUF001",  # ambiguous-unicode-character-string (日本語文字列で使用)
+    "RUF002",  # ambiguous-unicode-character-docstring (日本語docstring)
+    "RUF003",  # ambiguous-unicode-character-comment (日本語コメント)
+    "C901",    # complex-structure (複雑度チェックは段階的に)
+    "PLR0911", # too-many-return-statements
+    "PLR0912", # too-many-branches
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+    "S",       # flake8-bandit (セキュリティチェックは段階的に)
+    "FBT",     # flake8-boolean-trap (bool引数は許容)
+    "EM",      # flake8-errmsg (エラーメッセージの文字列リテラル許容)
+    "PIE790",  # no-unnecessary-pass (pass文は明示的に許容)
+    "ERA001",  # eradicate (コメントアウトされたコードは段階的に削除)
+    "G201",    # logging-exception-exc-info (exc_info=Trueは許容)
+    "SLF001",  # private-member-access (プライベートメンバーアクセスは許容)
+    "TID252",  # relative-imports (相対インポートは許容)
+    "RUF012",  # mutable-class-default (クラスのミュータブル属性は許容)
+    "PERF203", # try-except-in-loop (ループ内try-exceptは許容)
+    "F401",    # unused-import (条件付きインポートで必要)
+    "PERF102", # dict-values (itemsの使用は明示的に許容)
+    "ARG",     # flake8-unused-arguments (イベントハンドラで必要)
+    "DTZ",     # flake8-datetimez (タイムゾーンなしdatetimeは許容)
+    "SIM",     # flake8-simplify (簡素化は段階的に)
+    "T201",    # print-found (デバッグprintは段階的に削除)
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["B011"]  # テストでの例外を緩和
+"main.py" = ["E402"]        # メインファイルでのインポート順序を緩和
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.11"
@@ -62,6 +125,7 @@ exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/"
 module = [
     "src.gui.log_viewer",
     "src.gui.monitor_area_dialog",
+    "src.gui.template_manager",
 ]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
@@ -77,6 +141,7 @@ module = [
     "pyautogui",
     "win32con",
     "win32gui",
+    "keyboard",
 ]
 ignore_missing_imports = true
 

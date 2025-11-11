@@ -8,7 +8,6 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import ttk
-from typing import Any
 
 from src.config.config_manager import ConfigManager
 from src.core.kiro_recovery import KiroRecovery

@@ -8,7 +8,6 @@ import logging
 import os
 import time
 from typing import Any
-from typing import Optional
 
 import cv2
 import numpy as np

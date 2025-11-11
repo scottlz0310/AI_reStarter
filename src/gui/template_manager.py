@@ -10,7 +10,6 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from typing import Any
-from typing import Optional
 
 from PIL import Image
 from PIL import ImageTk
@@ -68,9 +67,9 @@ class TemplateManager:
         # アクティブタブを設定
         if hasattr(self, "active_tab_mode"):
             if self.active_tab_mode == "amazonq":
-                self.notebook.select(1)  # type: ignore[no-untyped-call]  # AmazonQタブを選択
+                self.notebook.select(1)
             else:
-                self.notebook.select(0)  # type: ignore[no-untyped-call]  # Kiro-IDEタブを選択
+                self.notebook.select(0)
 
     def setup_kiro_tab(self) -> None:
         """従来のKiro-IDEタブのセットアップ"""
@@ -176,7 +175,7 @@ class TemplateManager:
         # 検索フィールド
         ttk.Label(toolbar, text="検索:").pack(side=tk.RIGHT, padx=(10, 5))
         self.search_var: tk.StringVar = tk.StringVar()
-        self.search_var.trace("w", self.filter_templates)
+        self.search_var.trace("w", self.filter_templates)  # type: ignore[no-untyped-call]
         search_entry = ttk.Entry(toolbar, textvariable=self.search_var, width=20)
         search_entry.pack(side=tk.RIGHT)
 
