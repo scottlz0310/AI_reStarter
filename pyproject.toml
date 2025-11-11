@@ -129,7 +129,6 @@ exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/"
 module = [
     "src.gui.log_viewer",
     "src.gui.monitor_area_dialog",
-    "src.gui.template_manager",
 ]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
