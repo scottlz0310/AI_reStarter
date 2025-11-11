@@ -146,7 +146,7 @@ class KiroRecovery:
 
         try:
             # Kiro-IDEウィンドウを探す
-            windows = pyautogui.getAllWindows()
+            windows = pyautogui.getAllWindows()  # type: ignore[attr-defined]
             kiro_windows = [w for w in windows if "- kiro" in w.title.lower()]
 
             # Qt-Theme-StudioのKiroウィンドウを優先
@@ -254,7 +254,7 @@ class KiroRecovery:
                 logger.error("pyautoguiが利用できません。ウィンドウ検索ができません。")
                 return False
 
-            windows = pyautogui.getAllWindows()
+            windows = pyautogui.getAllWindows()  # type: ignore[attr-defined]
 
             kiro_windows = [w for w in windows if "- kiro" in w.title.lower()]
             logger.debug(f"KiroIDE関連ウィンドウ数: {len(kiro_windows)}")

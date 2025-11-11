@@ -111,7 +111,7 @@ class AmazonQDetector(BaseDetector):
                 result = cv2.matchTemplate(
                     gray_screenshot, template, cv2.TM_CCOEFF_NORMED
                 )
-                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+                _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(result)
 
                 if max_val > best_confidence:
                     best_confidence = max_val

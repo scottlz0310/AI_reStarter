@@ -67,9 +67,9 @@ class TemplateManager:
         # アクティブタブを設定
         if hasattr(self, "active_tab_mode"):
             if self.active_tab_mode == "amazonq":
-                self.notebook.select(1)  # type: ignore[no-untyped-call]
+                self.notebook.select(1)
             else:
-                self.notebook.select(0)  # type: ignore[no-untyped-call]
+                self.notebook.select(0)
 
     def setup_kiro_tab(self) -> None:
         """従来のKiro-IDEタブのセットアップ"""
@@ -749,7 +749,7 @@ class TemplateManager:
             photo = ImageTk.PhotoImage(image)
 
             self.amazonq_preview_label.config(image=photo, text="")
-            self.amazonq_preview_label.image = photo  # type: ignore[attr-defined]
+            self.amazonq_preview_label.image = photo  # type: ignore[attr-defined]  # 参照を保持
 
         except Exception as e:
             logger.error(f"AmazonQプレビュー表示エラー: {e}")

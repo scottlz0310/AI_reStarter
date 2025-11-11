@@ -71,7 +71,7 @@ class ImageProcessor:
                 # テンプレートマッチング
                 logger.debug(f"テンプレートマッチング実行: '{error_name}'")
                 result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
-                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+                _min_val, max_val, _min_loc, _max_loc = cv2.minMaxLoc(result)
 
                 logger.debug(
                     f"マッチング結果 '{error_name}': 信頼度={max_val:.3f}, 闾値={threshold}"
@@ -109,7 +109,7 @@ class ImageProcessor:
                 return None
 
             result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
-            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            _min_val, max_val, _min_loc, max_loc = cv2.minMaxLoc(result)
 
             if max_val >= threshold and template is not None:
                 # テンプレートの中心座標を返す

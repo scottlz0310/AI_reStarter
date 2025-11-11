@@ -32,10 +32,10 @@ jobs:
         uv pip install -e .
 
     - name: Lint with ruff
-      run: uv run ruff check src/ tests/ main.py
+      run: uv run ruff check .
 
     - name: Format check with ruff
-      run: uv run ruff format --check src/ tests/ main.py
+      run: uv run ruff format --check .
 
     - name: Type check with mypy
       run: uv run mypy src/
@@ -71,10 +71,10 @@ jobs:
         uv pip install -e .
 
     - name: Lint with ruff
-      run: uv run ruff check src/ tests/ main.py
+      run: uv run ruff check .
 
     - name: Format check with ruff
-      run: uv run ruff format --check src/ tests/ main.py
+      run: uv run ruff format --check .
 
     - name: Type check with mypy
       run: uv run mypy src/

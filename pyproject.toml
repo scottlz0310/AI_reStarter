@@ -155,6 +155,8 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
+    "-p", "pytest_cov",
+    "-p", "pytest_mock",
     "--strict-markers",
     "--strict-config",
     "--cov=src",
