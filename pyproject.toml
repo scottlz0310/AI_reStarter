@@ -69,6 +69,17 @@ check_untyped_defs = false
 warn_return_any = false
 warn_unreachable = false
 
+# 外部ライブラリの型スタブが利用できない場合は無視
+[[tool.mypy.overrides]]
+module = [
+    "cv2",
+    "numpy",
+    "pyautogui",
+    "win32con",
+    "win32gui",
+]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
