@@ -1,5 +1,34 @@
 # AI reStarter - リリースノート
 
+## バージョン 0.2.3 (2025-01-28)
+
+### 🎯 開発環境の最適化
+
+#### 設定の一元管理
+
+- **pyproject.toml中心化**: すべてのツール設定（ruff、mypy、pytest）をpyproject.tomlに統合
+- **pre-commitとCI/CDの統一**: ローカルとCI環境で同じコマンド・同じ結果を保証
+- **設定の重複排除**: 各ツールの引数や設定を削除し、pyproject.tomlから自動読み込み
+
+#### CI/CDパイプラインの改善
+
+- **実行効率化**: ruff/mypyの重複実行を削除し、pre-commitで一括処理
+- **Python 3.14対応**: classifiersに3.14を追加し、code-qualityジョブで先行検証
+- **mypy設定の最適化**: ファイル別の細かい制御を追加（warn_unused_ignoresの制御）
+
+#### コーディング規約の整理
+
+- **Amazonq規約統合**: `.amazonq/rules/coding_standards.md`にコーディング規約を一元化
+- **不要な規約ファイル削除**: 重複していた規約ファイルを整理
+
+### 📊 技術的指標
+
+- **pre-commitフック**: 100%パス（trailing-whitespace, yaml, ruff, ruff-format, mypy, pytest）
+- **設定の一貫性**: ローカル開発とCI環境で完全一致
+- **保守性**: 設定変更はpyproject.tomlのみで完結
+
+---
+
 ## バージョン 0.2.2 (2025-01-27)
 
 ### 🔧 バグ修正・改善
