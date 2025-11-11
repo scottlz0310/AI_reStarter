@@ -88,6 +88,11 @@ ignore = [
     "DTZ",     # flake8-datetimez (タイムゾーンなしdatetimeは許容)
     "SIM",     # flake8-simplify (簡素化は段階的に)
     "T201",    # print-found (デバッグprintは段階的に削除)
+    "RUF059",  # unused-unpacked-variable (cv2.minMaxLoc等で必要)
+    "NPY002",  # numpy-legacy-random (テストコードで legacy random使用許容)
+    "PT009",   # pytest-unittest-assertion (unittest形式のアサート許容)
+    "PT011",   # pytest-raises-too-broad (汎用Exception許容)
+    "PT012",   # pytest-raises-with-multiple-statements (複数文のraises許容)
 ]
 
 [tool.ruff.lint.isort]
