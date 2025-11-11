@@ -68,9 +68,9 @@ class TemplateManager:
         # アクティブタブを設定
         if hasattr(self, "active_tab_mode"):
             if self.active_tab_mode == "amazonq":
-                self.notebook.select(1)  # AmazonQタブを選択
+                self.notebook.select(1)  # type: ignore[no-untyped-call]  # AmazonQタブを選択
             else:
-                self.notebook.select(0)  # Kiro-IDEタブを選択
+                self.notebook.select(0)  # type: ignore[no-untyped-call]  # Kiro-IDEタブを選択
 
     def setup_kiro_tab(self) -> None:
         """従来のKiro-IDEタブのセットアップ"""

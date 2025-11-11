@@ -12,6 +12,7 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import ttk
 from typing import Optional
+from typing import TypedDict
 
 from src.utils.output_controller import OutputController
 from src.utils.output_controller import OutputLevel
@@ -20,16 +21,25 @@ from src.utils.output_controller import output_controller
 logger = logging.getLogger(__name__)
 
 
+class LogEntry(TypedDict):
+    """ログエントリの型定義"""
+
+    timestamp: str
+    level: str
+    message: str
+    line_num: int
+
+
 class LogViewer:
     """ログ表示GUI"""
 
     def __init__(self, parent: tk.Tk):
         self.parent = parent
         self.dialog = None
-        self.log_files = []
+        self.log_files: list[str] = []
         self.current_log_file = None
-        self.log_content = []
-        self.realtime_logs = []  # リアルタイムログ
+        self.log_content: list[str] = []
+        self.realtime_logs: list[LogEntry] = []  # リアルタイムログ
         self.output_controller: OutputController | None = None
         self.realtime_mode = False
 
@@ -583,7 +593,7 @@ class LogViewer:
     def add_realtime_log(self, message: str, level: str) -> None:
         """リアルタイムログを追加"""
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_entry = {
+        log_entry: LogEntry = {
             "timestamp": timestamp,
             "level": level,
             "message": message,
@@ -593,7 +603,7 @@ class LogViewer:
         self.realtime_logs.append(log_entry)
 
         # リアルタイムモードの場合は即座表示更新
-        if self.realtime_mode:
+        if self.realtime_mode and self.dialog:
             self.dialog.after_idle(self.update_realtime_display)
 
     def display_realtime_logs(self):
@@ -639,7 +649,7 @@ class LogViewer:
                         text=f"リアルタイムログ行数: {len(self.realtime_logs)}"
                     )
 
-    def should_display_realtime_log(self, log_entry: dict) -> bool:
+    def should_display_realtime_log(self, log_entry: LogEntry) -> bool:
         """リアルタイムログを表示すべきか判定"""
         # ログレベルフィルター
         if (

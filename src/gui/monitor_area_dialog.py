@@ -8,9 +8,26 @@ import tkinter as tk
 from contextlib import suppress
 from tkinter import messagebox
 from tkinter import ttk
+from typing import TYPE_CHECKING
 from typing import Optional
+from typing import TypedDict
 
 from src.config.config_manager import ConfigManager
+
+if TYPE_CHECKING:
+    from PIL import ImageTk
+
+
+class MonitorArea(TypedDict):
+    """監視エリアの型定義"""
+
+    name: str
+    x: int
+    y: int
+    width: int
+    height: int
+    enabled: bool
+    description: str
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +39,12 @@ class MonitorAreaDialog:
         self.parent = parent
         self.config_manager = config_manager
         self.dialog = None
-        self.monitor_areas: list[dict] = []
-        self.current_area: dict | None = None
+        self.monitor_areas: list[MonitorArea] = []
+        self.current_area: MonitorArea | None = None
         self.drag_start: tuple[int, int] | None = None
         self.drag_end: tuple[int, int] | None = None
         self.is_dragging = False
-        self.screenshot_photo = None  # スクリーンショット画像の参照を保持
+        self.screenshot_photo: ImageTk.PhotoImage | None = None  # スクリーンショット画像の参照を保持
         self.chat_input_position: list[int] | None = None  # チャット入力欄の位置
 
         logger.debug("監視エリア設定ダイアログを初期化しました")
@@ -1080,6 +1097,8 @@ class MonitorAreaDialog:
     def show_chat_setup_instructions(self) -> bool:
         """チャット欄設定の説明ダイアログを表示"""
         try:
+            if not self.dialog:
+                return False
             # 説明ダイアログを作成
             instruction_dialog = tk.Toplevel(self.dialog)
             instruction_dialog.title("チャット欄設定 - 手順説明")
@@ -1154,7 +1173,7 @@ class MonitorAreaDialog:
             logger.error(f"説明ダイアログ表示エラー: {e}")
             return False
 
-    def start_chat_setup(self, instruction_dialog):
+    def start_chat_setup(self, instruction_dialog: tk.Toplevel) -> None:
         """チャット欄設定を開始"""
         try:
             # 設定開始フラグを設定

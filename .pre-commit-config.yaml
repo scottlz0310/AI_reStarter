@@ -26,4 +26,5 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+        args: [--config-file=pyproject.toml]
         additional_dependencies: ["types-Pillow"]

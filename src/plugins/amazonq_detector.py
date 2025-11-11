@@ -65,7 +65,9 @@ class AmazonQDetector(BaseDetector):
         for template_file in template_files:
             template_path = os.path.join(self.templates_dir, template_file)
             try:
-                template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
+                template: np.ndarray | None = cv2.imread(
+                    template_path, cv2.IMREAD_GRAYSCALE
+                )
                 if template is not None:
                     template_name = os.path.splitext(template_file)[0]
                     self.run_button_templates[template_name] = template

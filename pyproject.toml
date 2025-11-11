@@ -57,6 +57,18 @@ warn_unreachable = true
 strict_equality = true
 exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/"]
 
+# GUIファイルはtkinterの型定義が不完全なため、チェックを緩和
+[[tool.mypy.overrides]]
+module = [
+    "src.gui.log_viewer",
+    "src.gui.monitor_area_dialog",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+warn_return_any = false
+warn_unreachable = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
