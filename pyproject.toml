@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "opencv-python>=4.8.0",
@@ -122,7 +123,8 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
-exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/", "tests/", "scripts/"]
+show_error_codes = true
+exclude = ["archive/", "htmlcov/", ".mypy_cache/", ".ruff_cache/", "playground/", "scripts/", "tests/"]
 
 # GUIファイルはtkinterの型定義が不完全なため、チェックを緩和
 [[tool.mypy.overrides]]
@@ -147,6 +149,13 @@ module = [
     "keyboard",
 ]
 ignore_missing_imports = true
+
+# pyautoguiの実行時専用属性（getAllWindows等）を使用するモジュール
+[[tool.mypy.overrides]]
+module = [
+    "src.core.kiro_recovery",
+]
+warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

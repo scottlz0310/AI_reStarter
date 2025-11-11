@@ -14,19 +14,31 @@ repos:
       - id: check-merge-conflict
 
   # Ruff - リンター・フォーマッター統合
+  # 設定はpyproject.tomlで一元管理
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.0
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix]
       - id: ruff-format
 
   # mypy - 型チェック
+  # 設定はpyproject.tomlで一元管理
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.13.0
     hooks:
       - id: mypy
-        args: [--config-file=pyproject.toml, --no-warn-unused-ignores]
-        exclude: ^(tests/|archive/|playground/|scripts/)
+        args: [src/, main.py]
+        pass_filenames: false
         additional_dependencies:
           - "types-Pillow"
+
+  # pytest - pre-commitでも最小限のテストを実行
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest (fast subset)
+        entry: uv run pytest -q
+        language: system
+        types: [python]
+        pass_filenames: false

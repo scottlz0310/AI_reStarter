@@ -31,17 +31,12 @@ jobs:
         uv sync --group dev
         uv pip install -e .
 
-    - name: Lint with ruff
-      run: uv run ruff check .
-
-    - name: Format check with ruff
-      run: uv run ruff format --check .
-
-    - name: Type check with mypy
-      run: uv run mypy src/
-
-    - name: Test with pytest
-      run: uv run pytest
+    # pre-commitで全てのチェックを実行（ruff, mypy, pytest含む）
+    # pyproject.tomlの設定を一元的に使用
+    - name: Run pre-commit hooks (includes ruff, mypy, pytest)
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
@@ -70,11 +65,9 @@ jobs:
         uv sync --group dev
         uv pip install -e .
 
-    - name: Lint with ruff
-      run: uv run ruff check .
-
-    - name: Format check with ruff
-      run: uv run ruff format --check .
-
-    - name: Type check with mypy
-      run: uv run mypy src/
+    # pre-commitで全てのチェックを実行（ruff, mypy含む）
+    # pyproject.tomlの設定を一元的に使用
+    - name: Run pre-commit hooks (includes ruff, mypy)
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
