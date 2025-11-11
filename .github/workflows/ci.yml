@@ -28,19 +28,20 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install -e . --group dev --system
+        uv sync --group dev
+        uv pip install -e .
 
     - name: Lint with ruff
-      run: python -m ruff check .
+      run: uv run ruff check src/ tests/ main.py
 
     - name: Format check with ruff
-      run: python -m ruff format --check .
+      run: uv run ruff format --check src/ tests/ main.py
 
     - name: Type check with mypy
-      run: python -m mypy src/ --config-file=pyproject.toml
+      run: uv run mypy src/
 
     - name: Test with pytest
-      run: python -m pytest tests/ --cov=. --cov-report=xml --cov-report=html
+      run: uv run pytest
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
@@ -49,30 +50,3 @@ jobs:
         flags: unittests
         name: codecov-umbrella
 
-  code-quality:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v5
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: "3.13"
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-
-    - name: Install dependencies
-      run: |
-        uv pip install -e . --group dev --system
-
-    - name: Lint with ruff
-      run: python -m ruff check .
-
-    - name: Format check with ruff
-      run: python -m ruff format --check .
-
-    - name: Type check with mypy
-      run: python -m mypy src/ --config-file=pyproject.toml
