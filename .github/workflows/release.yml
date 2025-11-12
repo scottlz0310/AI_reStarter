@@ -88,19 +88,19 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest tests/ --cov=src --cov-report=xml
+        uv run pytest tests/ --cov=src --cov-report=xml
 
     - name: Build executable
       run: |
-        pyinstaller --onefile --windowed --name AI_reStarter main.py
+        uv run pyinstaller --onefile --windowed --name AI_reStarter main.py
 
     - name: Test executable
       run: |
-        python scripts/test_executable.py
+        uv run python scripts/test_executable.py
 
     - name: Create release package
       run: |
-        python scripts/create_release_package.py
+        uv run python scripts/create_release_package.py
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
