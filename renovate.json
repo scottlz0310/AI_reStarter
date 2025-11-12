@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Python 3.14はGitHub Actionsでまだ利用できないため、3.13以下を維持",
+      "matchFileNames": [".github/workflows/**"],
+      "matchDepNames": ["python"],
+      "allowedVersions": "3.11 - 3.13"
+    }
   ]
 }
