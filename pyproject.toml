@@ -208,6 +208,7 @@ dev = [
     "pytest>=8.0.0",
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.12.0",
+    "psutil>=6.0.0",
     "types-Pillow>=10.0.0",
     "types-psutil>=6.0.0",
     "types-keyboard>=0.13.0",
