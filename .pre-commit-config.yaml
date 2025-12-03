@@ -5,7 +5,7 @@
 repos:
   # 基本的なファイル整理
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -16,7 +16,7 @@ repos:
   # Ruff - リンター・フォーマッター統合
   # 設定はpyproject.tomlで一元管理
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+    rev: v0.14.7
     hooks:
       - id: ruff
         args: [--fix]
@@ -25,7 +25,7 @@ repos:
   # mypy - 型チェック
   # 設定はpyproject.tomlで一元管理
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.19.0
     hooks:
       - id: mypy
         args: [src/, main.py]

@@ -119,7 +119,7 @@ def test_output_control():
     def test_multiple():
         """複数のメッセージを連続出力"""
         for i in range(5):
-            output_controller.info(f"連続メッセージ {i+1}/5", "test")
+            output_controller.info(f"連続メッセージ {i + 1}/5", "test")
             time.sleep(0.1)
 
     ttk.Button(button_frame, text="DEBUG", command=test_debug).pack(
