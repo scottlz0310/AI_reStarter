@@ -5,11 +5,16 @@ Windows画面監視による汎用IDE自動復旧システム。特定パター�
 
 ## 技術スタック
 
+### パッケージ管理
+- **パッケージマネージャー**: uv（高速な依存関係解決とインストール）
+- **依存関係更新**: Renovate（自動バージョン管理）
+- **ロックファイル**: uv.lock（再現可能なビルド）
+
 ### コア依存関係
 ```toml
 [project]
 name = "ai-restarter"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "opencv-python-headless>=4.8.0",  # 画像処理（GUI不要版）
     "pillow>=10.0.0",                  # 画像操作
@@ -27,7 +32,7 @@ ai-restarter = "ai_restarter.__main__:main"
 [dependency-groups]
 dev = [
     "ruff>=0.8.0",           # リンター・フォーマッター統合
-    "mypy>=1.13.0",          # 型チェック
+    "basedpyright>=1.21.0",  # 型チェック
     "pre-commit>=4.0.0",     # Git フック
 ]
 test = [
@@ -38,8 +43,8 @@ gui = ["tkinter"]              # 標準ライブラリ
 
 # pyproject.toml統合設定例
 [tool.ruff]
-target-version = "py311"
-line-length = 88
+target-version = "py313"
+line-length = 120  # モダンな画面幅に対応
 select = ["ALL"]
 ignore = ["D", "ANN", "COM812", "ISC001"]
 
@@ -47,10 +52,10 @@ ignore = ["D", "ANN", "COM812", "ISC001"]
 quote-style = "double"
 indent-style = "space"
 
-[tool.mypy]
-python_version = "3.11"
-strict = true
-warn_return_any = true
+[tool.basedpyright]
+pythonVersion = "3.13"
+typeCheckingMode = "all"  # 最も厳格な型チェック（AI実装の一貫性確保）
+reportMissingTypeStubs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -62,11 +67,12 @@ omit = ["tests/*", "src/ai_restarter/__main__.py"]
 ```
 
 ### 開発ツール統一
+- **パッケージ管理**: uv + Renovate
 - **リンター**: ruff のみ（black, isort, flake8, pylint を統合）
-- **型チェック**: mypy
+- **型チェック**: basedpyright（最も厳格な "all" モード）
 - **テスト**: pytest
 - **フォーマット**: ruff format
-- **設定ファイル**: pyproject.toml 一元化（ruff, mypy, pytest, coverage）
+- **設定ファイル**: pyproject.toml 一元化（ruff, basedpyright, pytest, coverage）
 - **アプリ設定**: profiles.toml（コメント対応、階層構造）
 
 ### 削除対象ファイル・ディレクトリ
@@ -93,7 +99,7 @@ omit = ["tests/*", "src/ai_restarter/__main__.py"]
 ```
 ScreenWatcher/
 ├── Core/                    # 監視エンジン
-│   ├── ProfileManager      # IDEプロファイル管理
+│   ├── ExecutionModeManager # 実行モード管理（click/chat/keyboard）
 │   ├── MonitorEngine       # 画面監視・マッチング
 │   ├── ActionEngine        # 自動アクション実行
 │   └── DisplayManager      # マルチモニター・DPI対応
@@ -103,7 +109,7 @@ ScreenWatcher/
 │   ├── ConfigViewer        # 設定確認・デバッグ
 │   └── OverlaySelector     # 視覚的領域選択
 └── Config/                 # 設定管理
-    ├── ProfileConfig       # IDEプロファイル設定
+    ├── TemplateConfig      # テンプレート設定（汎用的）
     ├── TemplateManager     # テンプレート画像管理
     └── LogManager          # ログレベル分離
 ```
@@ -113,10 +119,11 @@ ScreenWatcher/
 ### Phase 1: コア機能（最優先）
 **目標**: 基本的な監視・アクション実行機能
 
-#### 1.1 ProfileManager
-- IDEプロファイル切り替え（AmazonQ, Kiro-IDE, カスタム）
-- プロファイル別テンプレート・アクション管理
-- アクティブプロファイルの状態管理
+#### 1.1 ExecutionModeManager
+- 実行モード切り替え（click/chat/keyboard）
+- モード別テンプレート・アクション管理
+- アクティブモードの状態管理
+- テンプレートベースの汎用的な設定
 
 #### 1.2 MonitorEngine
 - 効率的な画面キャプチャ（3秒間隔、適応的調整）
@@ -172,38 +179,48 @@ ScreenWatcher/
 
 ### profiles.toml
 ```toml
-# AI reStarter プロファイル設定
+# AI reStarter 設定
 
 [global]
 # グローバル設定
 check_interval = 3.0        # 監視間隔（秒）
 adaptive_interval = true    # 適応的間隔調整
 log_level = "INFO"         # ログレベル
-active_profile = "AmazonQ" # アクティブプロファイル
+active_mode = "click"      # アクティブ実行モード（click/chat/keyboard）
 
-[[profiles]]
-name = "AmazonQ"
-description = "Amazon Q Developer用設定"
+[[templates]]
+name = "run_button"
+description = "実行ボタン検出用テンプレート"
+execution_mode = "click"  # このテンプレートの実行モード
 
 # 監視領域（相対座標 0.0-1.0）
-[profiles.monitor_region]
+[templates.monitor_region]
 x = 0.1      # 左端からの相対位置
 y = 0.2      # 上端からの相対位置
 width = 0.8  # 幅の相対サイズ
 height = 0.6 # 高さの相対サイズ
 
-# テンプレート設定
-[[profiles.templates]]
-name = "run_button"
-file = "amazonq_run.png"
-threshold = 0.8  # マッチング閾値
-description = "実行ボタンの検出用"
+# 画像マッチング設定
+[templates.matching]
+file = "run_button.png"  # テンプレート画像ファイル
+threshold = 0.8          # マッチング閾値
 
-# アクション設定
-[profiles.templates.action]
-type = "click"        # アクション種別
+# アクション設定（実行モード: click）
+[templates.action]
+type = "click"        # アクション種別（click/chat/keyboard）
 offset = [0, 0]      # クリック位置オフセット
 retry_count = 3      # リトライ回数
+
+# チャットコマンド例（実行モード: chat）
+# [templates.action]
+# type = "chat"
+# command = "/fix"
+# target_element = "chat_input"  # チャット入力欄のテンプレート名
+
+# キーボード操作例（実行モード: keyboard）
+# [templates.action]
+# type = "keyboard"
+# keys = ["ctrl", "shift", "p"]  # 送信するキー
 ```
 
 ## ログ戦略
@@ -267,23 +284,67 @@ retry_count = 3      # リトライ回数
 
 ## 実装戦略
 
-### ゼロベース実装
-1. 新ブランチでクリーンスタート
-2. 既存ディレクトリ・設定ファイルの完全削除
-3. pyproject.toml統合による設定一元化
-4. モダンなベストプラクティス適用
-5. AI実装による一貫性確保
+### ゼロベース実装（完全作り直し）
+1. **作業ブランチ作成**: `feature/v2-complete-rewrite`
+2. **既存コード全削除**: クリーンな状態から開始
+3. **pyproject.toml統合**: 全設定を一元化
+4. **モダンなベストプラクティス適用**: Python 3.13, uv, basedpyright
+5. **AI実装による一貫性確保**: 厳格な型チェックで品質保証
+
+### Git ワークフロー戦略
+
+#### Phase 1: 作業ブランチでの開発
+```bash
+# 1. 作業ブランチ作成
+git checkout -b feature/v2-complete-rewrite
+
+# 2. 既存ファイル全削除（git管理下）
+git rm -rf src/ tests/ playground/ scripts/
+git rm .flake8 .pylintrc Makefile .pre-commit-config.yaml 2>/dev/null || true
+
+# 3. 新構造で実装開始
+# （この段階で完全にクリーンな状態）
+```
+
+#### Phase 2: 完成後のmainマージ（安全な置き換え）
+```bash
+# 1. main ブランチに切り替え
+git checkout main
+
+# 2. main の既存ファイルを全削除（git除外ファイルの影響を排除）
+git rm -rf .
+git clean -fdx  # git除外ファイルも完全削除
+
+# 3. 作業ブランチの内容をマージ
+git checkout feature/v2-complete-rewrite -- .
+
+# 4. コミット
+git add .
+git commit -m "feat: complete rewrite with modern architecture (v2.0.0)"
+
+# 5. タグ付け
+git tag -a v2.0.0 -m "Version 2.0.0 - Complete modernization"
+```
+
+> [!CAUTION]
+> **main ブランチの全削除について**
+>
+> この戦略は、git除外ファイル（`__pycache__/`, `.venv/`, ビルド成果物など）が残留して新実装に悪影響を与えるのを防ぐためです。
+>
+> - **実行前**: 必ず作業ブランチが完全に動作することを確認
+> - **バックアップ**: 念のため main ブランチのタグを作成（`git tag backup-before-v2`）
+> - **レビュー**: 完全な置き換えであることをチーム全体で合意
 
 ### 移行サポート
-- 既存設定ファイル（JSON）の自動変換
-- 設定移行ツールの提供
-- 移行ガイドとドキュメント整備
+- 既存設定ファイル（JSON）の自動変換ツール
+- 設定移行ガイドとドキュメント整備
+- v1 → v2 移行チェックリスト
 
 ## 品質保証
 
 ### 静的解析
 - ruff による包括的チェック
-- mypy による型安全性確保
+- basedpyright による型安全性確保
 - pre-commit による自動品質チェック
 
 ### 継続的インテグレーション
@@ -333,7 +394,7 @@ mkdir -p templates
 
 # 4. pyproject.toml統合設定
 # 全ての開発設定をpyproject.tomlに統合
-# ruff, mypy, pytest設定を一元化
+# ruff, basedpyright, pytest設定を一元化
 ```
 
 ### 実装順序
@@ -341,7 +402,7 @@ mkdir -p templates
    - 既存ファイル削除
    - pyproject.toml統合設定
    - src/レイアウトプロジェクト構造作成
-2. **コア実装**: ProfileManager → MonitorEngine → ActionEngine
+2. **コア実装**: ExecutionModeManager → MonitorEngine → ActionEngine
 3. **UI実装**: SystemTray → SetupWizard → ConfigViewer
 4. **テスト**: 単体テスト → 統合テスト → パフォーマンステスト
 5. **移行ツール**: JSON→TOML変換、設定移行
@@ -356,7 +417,7 @@ AI_reStarter/
 │       ├── __main__.py        # python -m ai_restarter エントリー
 │       ├── core/              # コア機能
 │       │   ├── __init__.py
-│       │   ├── profile_manager.py
+│       │   ├── execution_mode_manager.py  # 実行モード管理
 │       │   ├── monitor_engine.py
 │       │   ├── action_engine.py
 │       │   └── display_manager.py
