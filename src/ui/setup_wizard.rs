@@ -48,17 +48,19 @@ impl eframe::App for SetupWizard {
 
         if !is_open {
              // If not open, we should hide the window.
-             // eframe doesn't strictly support "hiding" the main window easily without closing the context.
-             // BUT, we can use `ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false))`
              ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false));
 
-             // Sleep a bit to avoid busy loop if eframe keeps polling
-             // We MUST request repaint to ensure we wake up to check the lock again.
-             ctx.request_repaint_after(std::time::Duration::from_millis(250));
+             // Request repaint to ensure we wake up to check the lock again.
+             ctx.request_repaint_after(std::time::Duration::from_millis(500));
              return;
         } else {
+             // Make sure we are visible and focused
              ctx.send_viewport_cmd(egui::ViewportCommand::Visible(true));
-             // Also need to bring to front if just opened?
+             ctx.send_viewport_cmd(egui::ViewportCommand::Focus);
+
+             // Bring to front (z-order)
+             // Not all egui versions support z-order command directly, check docs or use Focus/Visible.
+             // Focus is usually enough.
         }
 
         // Handle window close event manually
