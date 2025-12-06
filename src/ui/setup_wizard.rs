@@ -26,11 +26,11 @@ impl SetupWizard {
              // But eframe always shows a window initially unless configured.
              // We'll rely on update logic to close/hide or show.
              // Actually, if we start main thread with eframe, we want the window.
-             // We'll treat this window as the "Settings" window. 
+             // We'll treat this window as the "Settings" window.
              // If we close it, it hides.
              ..Default::default()
         };
-        
+
         eframe::run_native(
             "AI reStarter Setup",
             options,
@@ -51,7 +51,7 @@ impl eframe::App for SetupWizard {
              // eframe doesn't strictly support "hiding" the main window easily without closing the context.
              // BUT, we can use `ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false))`
              ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false));
-             
+
              // Sleep a bit to avoid busy loop if eframe keeps polling
              std::thread::sleep(std::time::Duration::from_millis(100));
              return;
@@ -74,16 +74,83 @@ impl eframe::App for SetupWizard {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("AI reStarter Setup");
-            
+
             ui.separator();
 
             ui.heading("Templates");
-            
+
             // Lock config to access templates
-            if let Ok(config) = self.config.lock() {
-                for template in &config.templates {
-                    ui.label(format!("Name: {}", template.name));
-                    // TODO: Edit buttons
+            if let Ok(mut config) = self.config.lock() {
+                let mut remove_index = None;
+                for (i, template) in config.templates.iter_mut().enumerate() {
+                    ui.group(|ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("Name: {}", template.name));
+                            if ui.button("❌").clicked() {
+                                remove_index = Some(i);
+                            }
+                        });
+
+                        ui.label("Action Type:");
+                        ui.horizontal(|ui| {
+                            if ui.radio(matches!(template.action, crate::core::action::Action::Click { .. }), "Click").clicked() {
+                                template.action = crate::core::action::Action::Click { offset: (0, 0) };
+                            }
+                            if ui.radio(matches!(template.action, crate::core::action::Action::Chat { .. }), "Chat").clicked() {
+                                template.action = crate::core::action::Action::Chat { command: String::new() };
+                            }
+                            if ui.radio(matches!(template.action, crate::core::action::Action::Keyboard { .. }), "Keyboard").clicked() {
+                                template.action = crate::core::action::Action::Keyboard { keys: vec![String::new()] };
+                            }
+                        });
+
+                        match &mut template.action {
+                            crate::core::action::Action::Click { offset } => {
+                                ui.horizontal(|ui| {
+                                    ui.label("Offset X:");
+                                    ui.add(egui::DragValue::new(&mut offset.0));
+                                    ui.label("Y:");
+                                    ui.add(egui::DragValue::new(&mut offset.1));
+                                });
+                            }
+                            crate::core::action::Action::Chat { command } => {
+                                ui.horizontal(|ui| {
+                                    ui.label("Command:");
+                                    ui.text_edit_singleline(command);
+                                });
+                            }
+                            crate::core::action::Action::Keyboard { keys } => {
+                                ui.label("Keys sequence:");
+                                let mut remove_key = None;
+                                for (k_i, key) in keys.iter_mut().enumerate() {
+                                    ui.horizontal(|ui| {
+                                        ui.text_edit_singleline(key);
+                                        if ui.button("x").clicked() {
+                                            remove_key = Some(k_i);
+                                        }
+                                    });
+                                }
+                                if let Some(k) = remove_key {
+                                    keys.remove(k);
+                                }
+                                if ui.button("+ Add Key").clicked() {
+                                    keys.push(String::new());
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if let Some(i) = remove_index {
+                    config.templates.remove(i);
+                }
+
+                if ui.button("💾 Save Changes").clicked() {
+                     if let Err(e) = crate::config::loader::ConfigLoader::save("config.toml", &config) {
+                        tracing::error!("Failed to save config: {}", e);
+                    } else {
+                        tracing::info!("Config saved.");
+                    }
                 }
             }
 
@@ -103,7 +170,7 @@ impl eframe::App for SetupWizard {
                                 action: crate::core::action::Action::Click { offset: (10, 10) },
                             };
                             config.templates.push(new_template);
-                            
+
                             // Save config
                             if let Err(e) = crate::config::loader::ConfigLoader::save("config.toml", &config) {
                                 tracing::error!("Failed to save config: {}", e);

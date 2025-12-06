@@ -36,9 +36,13 @@ async fn main() -> anyhow::Result<()> {
     // Spawn Monitoring Loop
     let config_for_loop = global_config.clone();
     let monitor_engine = monitor_engine.clone();
+    let action_engine_for_loop = _action_engine.clone();
     let ui_state_for_loop = ui_state.clone();
-    
+
     tokio::spawn(async move {
+        // Cache for template images: Path -> Image
+        let mut template_cache: std::collections::HashMap<String, image::DynamicImage> = std::collections::HashMap::new();
+
         loop {
             let is_running = if let Ok(state) = ui_state_for_loop.is_monitoring.lock() {
                 *state
@@ -48,7 +52,7 @@ async fn main() -> anyhow::Result<()> {
 
             if is_running {
                 // tracing::debug!("Starting monitoring cycle...");
-                
+
                 // Capture screen
                 match monitor_engine.capture_screen() {
                     Ok(screen) => {
@@ -60,17 +64,43 @@ async fn main() -> anyhow::Result<()> {
                     };
 
                     for template in templates {
-                         // Load template image (TODO: Cache)
-                         if std::path::Path::new(&template.matching.file).exists() {
-                             match image::open(&template.matching.file) {
-                                Ok(tmpl_img) => {
-                                    if let Some(pos) = monitor_engine.find_template(&screen, &tmpl_img, template.matching.threshold) {
-                                        tracing::info!("Template '{}' found at: {:?}", template.name, pos);
-                                    }
-                                },
-                                Err(e) => tracing::error!("Failed to load template image {}: {}", template.matching.file, e),
+                         let file_path = &template.matching.file;
+
+                         // Check cache or load
+                         if !template_cache.contains_key(file_path) {
+                             if std::path::Path::new(file_path).exists() {
+                                 match image::open(file_path) {
+                                     Ok(img) => {
+                                         template_cache.insert(file_path.clone(), img);
+                                     },
+                                     Err(e) => {
+                                         tracing::error!("Failed to load template image {}: {}", file_path, e);
+                                         continue;
+                                     }
+                                 }
+                             } else {
+                                 continue;
                              }
-                        }
+                         }
+
+                         // Use cached image
+                         if let Some(tmpl_img) = template_cache.get(file_path) {
+                             if let Some(pos) = monitor_engine.find_template(&screen, tmpl_img, template.matching.threshold) {
+                                 tracing::info!("Template '{}' found at: {:?}", template.name, pos);
+
+                                 // Execute Action
+                                 match action_engine_for_loop.lock() {
+                                     Ok(mut engine) => {
+                                         if let Err(e) = engine.execute(&template.action, pos) {
+                                             tracing::error!("Failed to execute action for template '{}': {}", template.name, e);
+                                         } else {
+                                             tracing::info!("Action executed successfully for template '{}'", template.name);
+                                         }
+                                     }
+                                     Err(e) => tracing::error!("Failed to lock action engine: {}", e),
+                                 }
+                             }
+                         }
                     }
                 }
                 Err(e) => {
