@@ -53,7 +53,8 @@ impl eframe::App for SetupWizard {
              ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false));
 
              // Sleep a bit to avoid busy loop if eframe keeps polling
-             std::thread::sleep(std::time::Duration::from_millis(100));
+             // We MUST request repaint to ensure we wake up to check the lock again.
+             ctx.request_repaint_after(std::time::Duration::from_millis(250));
              return;
         } else {
              ctx.send_viewport_cmd(egui::ViewportCommand::Visible(true));
