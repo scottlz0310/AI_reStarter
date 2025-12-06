@@ -40,7 +40,7 @@ impl SetupWizard {
 }
 
 impl eframe::App for SetupWizard {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let mut is_open = false;
         if let Ok(state) = self.ui_state.is_open.lock() {
             is_open = *state;

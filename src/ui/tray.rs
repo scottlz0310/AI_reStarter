@@ -4,8 +4,8 @@ use crate::core::execution_mode::ExecutionMode;
 use std::sync::{Arc, Mutex};
 
 pub struct SystemTray {
-    tray: TrayItem,
-    current_mode: Arc<Mutex<ExecutionMode>>,
+    _tray: TrayItem,
+    _current_mode: Arc<Mutex<ExecutionMode>>,
 }
 
 use crate::config::loader::AppConfig;
@@ -17,11 +17,11 @@ impl SystemTray {
         let current_mode = Arc::new(Mutex::new(ExecutionMode::default()));
 
         tray.add_label("AI reStarter Status")?;
-        
+
         // We do not need config in the callback anymore if we just toggle state
         // But we might need it for other things later.
-        let _config_clone = config.clone(); 
-        
+        let _config_clone = config.clone();
+
         let ui_state_clone = ui_state.clone();
         tray.add_menu_item("Start Monitoring", move || {
              if let Ok(mut is_running) = ui_state_clone.is_monitoring.lock() {
@@ -64,6 +64,6 @@ impl SystemTray {
             std::process::exit(0);
         })?;
 
-        Ok(Self { tray, current_mode })
+        Ok(Self { _tray: tray, _current_mode: current_mode })
     }
 }

@@ -23,7 +23,7 @@ impl MonitorEngine {
             let hdc_mem = CreateCompatibleDC(Some(hdc_screen));
 
             let (width, height) = crate::core::display::DisplayManager::get_screen_size();
-            
+
             let hbitmap = CreateCompatibleBitmap(hdc_screen, width, height);
             let old_obj = SelectObject(hdc_mem, hbitmap.into());
 
@@ -43,7 +43,7 @@ impl MonitorEngine {
             };
 
             let mut pixels = vec![0u8; (width * height * 4) as usize];
-            
+
             GetDIBits(
                 hdc_mem,
                 hbitmap,
@@ -55,8 +55,8 @@ impl MonitorEngine {
             );
 
             SelectObject(hdc_mem, old_obj);
-            DeleteObject(hbitmap.into());
-            DeleteDC(hdc_mem);
+            let _ = DeleteObject(hbitmap.into());
+            let _ = DeleteDC(hdc_mem);
             ReleaseDC(Some(hwnd), hdc_screen);
 
             // Convert BGRA to RGBA
