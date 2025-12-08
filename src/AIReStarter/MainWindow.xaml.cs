@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows;
 using AIReStarter.Core;
@@ -9,6 +10,7 @@ public partial class MainWindow : Window
 {
     private readonly MonitorService _monitorService;
     private readonly DisplayManager _displayManager;
+    private bool _allowClose;
 
     public ObservableCollection<string> Monitors { get; } = new();
 
@@ -21,6 +23,18 @@ public partial class MainWindow : Window
         DataContext = this;
         RefreshMonitors();
         UpdateStatus();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        if (!_allowClose)
+        {
+            e.Cancel = true;
+            Hide();
+            return;
+        }
+
+        base.OnClosing(e);
     }
 
     private void RefreshMonitors()
@@ -50,5 +64,27 @@ public partial class MainWindow : Window
     {
         await _monitorService.StopAsync();
         UpdateStatus();
+    }
+
+    public void ShowFromTray()
+    {
+        if (Visibility != Visibility.Visible)
+        {
+            Show();
+        }
+
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
+        Activate();
+        Focus();
+        UpdateStatus();
+    }
+
+    public void AllowClose()
+    {
+        _allowClose = true;
     }
 }

@@ -27,6 +27,7 @@ public partial class App : System.Windows.Application
     private MonitorService? _monitorService;
     private SystemTrayManager? _trayManager;
     private bool _monitorStopped;
+    private MainWindow? _mainWindow;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -107,11 +108,12 @@ public partial class App : System.Windows.Application
         {
             Log.Information("トレイから終了要求を受けました。監視を停止します。");
             await StopMonitorAsync();
+            _mainWindow?.AllowClose();
             Shutdown();
-        });
+        }, ShowMainWindow);
 
-        var window = _host.Services.GetRequiredService<MainWindow>();
-        window.Show();
+        _mainWindow = _host.Services.GetRequiredService<MainWindow>();
+        _mainWindow.Show();
     }
 
     protected override async void OnExit(ExitEventArgs e)
@@ -150,6 +152,16 @@ public partial class App : System.Windows.Application
         }
 
         _monitorStopped = true;
+    }
+
+    private void ShowMainWindow()
+    {
+        if (_mainWindow is null)
+        {
+            return;
+        }
+
+        _mainWindow.ShowFromTray();
     }
 
     private static string? ResolveConfigPath()

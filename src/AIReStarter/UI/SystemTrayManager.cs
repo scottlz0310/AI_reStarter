@@ -26,11 +26,12 @@ public sealed class SystemTrayManager : IDisposable
         };
     }
 
-    public void Bind(MonitorService monitorService, Func<Task> shutdownAsync)
+    public void Bind(MonitorService monitorService, Func<Task> shutdownAsync, Action showWindow)
     {
         var menu = new ContextMenuStrip();
         menu.Items.Add("監視開始/再開", null, (_, _) => monitorService.Start());
         menu.Items.Add("一時停止", null, async (_, _) => await monitorService.StopAsync());
+        menu.Items.Add("ウィンドウ表示", null, (_, _) => showWindow());
         menu.Items.Add("終了", null, async (_, _) => await shutdownAsync());
 
         _notifyIcon.ContextMenuStrip = menu;
