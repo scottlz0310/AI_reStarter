@@ -1,0 +1,68 @@
+# AI reStarter v2 (C# PoC) 設定例
+
+[global]
+check_interval = 2.0           # 監視間隔（秒）
+cooldown_seconds = 15.0        # 連続一致後のクールダウン（秒）
+max_consecutive_matches = 2    # アクションを許容する連続一致回数
+action_delay_ms = 250          # 入力送出の間隔（ミリ秒）
+log_level = "Information"      # Verbose/Debug/Information/Warning/Error/Fatal
+
+[[templates]]
+name = "run_button"
+description = "IDEの実行ボタン検出"
+execution_mode = "click"
+monitor = ""                   # 特定モニター名がある場合は指定（空なら仮想スクリーン）
+
+[templates.monitor_region]
+x = 0.40
+y = 0.78
+width = 0.20
+height = 0.18
+
+[templates.matching]
+file = "templates/run_button.png"
+threshold = 0.82
+
+[templates.action]
+type = "click"
+offset = [0, 0]                # マッチ座標からの相対オフセット（px）
+retry_count = 3
+
+[[templates]]
+name = "chat_box"
+description = "チャット欄へのテキスト送信"
+execution_mode = "chat"
+
+[templates.monitor_region]
+x = 0.25
+y = 0.70
+width = 0.50
+height = 0.25
+
+[templates.matching]
+file = "templates/chat_box.png"
+threshold = 0.78
+
+[templates.action]
+type = "chat"
+command = "続行してください"
+target_element = "chat_input"
+
+[[templates]]
+name = "shortcut"
+description = "ショートカット送信用の例"
+execution_mode = "keyboard"
+
+[templates.monitor_region]
+x = 0.0
+y = 0.0
+width = 1.0
+height = 1.0
+
+[templates.matching]
+file = "templates/any.png"
+threshold = 0.90
+
+[templates.action]
+type = "keyboard"
+keys = ["Ctrl", "Shift", "P"]
