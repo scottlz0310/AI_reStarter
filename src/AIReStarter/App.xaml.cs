@@ -26,6 +26,7 @@ public partial class App : System.Windows.Application
     private HotKeyService? _hotKeyService;
     private MonitorService? _monitorService;
     private SystemTrayManager? _trayManager;
+    private bool _monitorStopped;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -33,7 +34,18 @@ public partial class App : System.Windows.Application
 
         DpiAwareness.EnsurePerMonitorV2();
 
-        var configPath = File.Exists("profiles.toml") ? "profiles.toml" : "profiles.example.toml";
+        var configPath = ResolveConfigPath();
+        if (configPath is null)
+        {
+            MessageBox.Show(
+                "profiles.toml または profiles.example.toml が見つかりません。アプリと同じ階層、またはリポジトリルートに配置してください。",
+                "AI reStarter (C# PoC)",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(-1);
+            return;
+        }
+
         var loader = new ConfigLoader();
         AppConfig config;
 
@@ -82,7 +94,7 @@ public partial class App : System.Windows.Application
         _hotKeyService.Register(Key.Q, ModifierKeys.Control | ModifierKeys.Alt, async () =>
         {
             Log.Information("停止ホットキーを検出しました。アプリケーションを終了します。");
-            await _monitorService.StopAsync();
+            await StopMonitorAsync();
             Shutdown();
         });
         _hotKeyService.Register(Key.P, ModifierKeys.Control | ModifierKeys.Alt, () =>
@@ -91,7 +103,12 @@ public partial class App : System.Windows.Application
         });
 
         _trayManager = _host.Services.GetRequiredService<SystemTrayManager>();
-        _trayManager.Bind(_monitorService, Shutdown);
+        _trayManager.Bind(_monitorService, async () =>
+        {
+            Log.Information("トレイから終了要求を受けました。監視を停止します。");
+            await StopMonitorAsync();
+            Shutdown();
+        });
 
         var window = _host.Services.GetRequiredService<MainWindow>();
         window.Show();
@@ -99,6 +116,7 @@ public partial class App : System.Windows.Application
 
     protected override async void OnExit(ExitEventArgs e)
     {
+        await StopMonitorAsync();
         _hotKeyService?.Dispose();
         _trayManager?.Dispose();
 
@@ -110,6 +128,80 @@ public partial class App : System.Windows.Application
 
         Log.CloseAndFlush();
         base.OnExit(e);
+    }
+
+    private async Task StopMonitorAsync()
+    {
+        if (_monitorStopped)
+        {
+            return;
+        }
+
+        if (_monitorService is not null)
+        {
+            try
+            {
+                await _monitorService.StopAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "監視停止処理でエラーが発生しましたが終了を継続します。");
+            }
+        }
+
+        _monitorStopped = true;
+    }
+
+    private static string? ResolveConfigPath()
+    {
+        var candidateFiles = new[]
+        {
+            "profiles.local.toml",
+            "profiles.toml",
+            "profiles.example.toml"
+        };
+
+        foreach (var file in candidateFiles)
+        {
+            var fromCurrent = Path.Combine(Directory.GetCurrentDirectory(), file);
+            if (File.Exists(fromCurrent))
+            {
+                return fromCurrent;
+            }
+        }
+
+        foreach (var file in candidateFiles)
+        {
+            var fromBase = Path.Combine(AppContext.BaseDirectory, file);
+            if (File.Exists(fromBase))
+            {
+                return fromBase;
+            }
+        }
+
+        // 開発時: bin/Debug/.../ からリポジトリルートを探す
+        var baseDir = AppContext.BaseDirectory;
+        for (var i = 0; i < 5; i++)
+        {
+            var parent = Directory.GetParent(baseDir);
+            if (parent is null)
+            {
+                break;
+            }
+
+            foreach (var file in candidateFiles)
+            {
+                var candidate = Path.Combine(parent.FullName, file);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            baseDir = parent.FullName;
+        }
+
+        return null;
     }
 
     private static void ConfigureLogging(string level)

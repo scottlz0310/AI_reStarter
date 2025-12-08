@@ -47,4 +47,14 @@ type = ""click""
         config.Templates[0].Matching.File.Should().Be(
             Path.Combine(tempDir, "templates", "run_button.png"));
     }
+
+    [Fact]
+    public void Load_ProfilesToml_ShouldSucceed()
+    {
+        var loader = new ConfigLoader();
+        var config = loader.Load(TestPathHelper.FindRepoFile("profiles.toml"));
+
+        config.Templates.Should().NotBeNull();
+        config.Templates.Should().NotBeEmpty();
+    }
 }

@@ -33,7 +33,7 @@ public sealed class ConfigLoader
 
         var global = ParseGlobal(root.TryGetValue("global", out var globalNode) ? globalNode as TomlTable : null);
         var templates = ParseTemplates(
-            root.TryGetValue("templates", out var templatesNode) ? templatesNode as TomlArray : null,
+            root.TryGetValue("templates", out var templatesNode) ? templatesNode : null,
             baseDirectory);
 
         if (templates.Count == 0)
@@ -65,46 +65,61 @@ public sealed class ConfigLoader
         };
     }
 
-    private static List<TemplateConfig> ParseTemplates(TomlArray? array, string baseDirectory)
+    private static List<TemplateConfig> ParseTemplates(object? templatesNode, string baseDirectory)
     {
         var templates = new List<TemplateConfig>();
-        if (array is null)
+        if (templatesNode is null)
         {
             return templates;
         }
 
-        foreach (var item in array)
+        if (templatesNode is TomlTableArray tableArray)
         {
-            if (item is not TomlTable table)
+            foreach (var item in tableArray)
             {
-                continue;
+                if (item is TomlTable table)
+                {
+                    templates.Add(ParseTemplate(table, baseDirectory));
+                }
             }
+            return templates;
+        }
 
-            var name = GetString(table, "name", "unnamed");
-            var region = ParseRegion(table.TryGetValue("monitor_region", out var regionNode) ? regionNode as TomlTable : null);
-            if (!region.IsValid())
+        if (templatesNode is TomlArray genericArray)
+        {
+            foreach (var item in genericArray.OfType<TomlTable>())
             {
-                throw new ConfigLoadException($"テンプレート '{name}' のmonitor_regionが0.0-1.0の範囲外です。");
+                templates.Add(ParseTemplate(item, baseDirectory));
             }
-
-            var matching = ParseMatching(
-                table.TryGetValue("matching", out var matchingNode) ? matchingNode as TomlTable : null,
-                baseDirectory);
-            var action = ParseAction(table.TryGetValue("action", out var actionNode) ? actionNode as TomlTable : null, name);
-
-            templates.Add(new TemplateConfig
-            {
-                Name = name,
-                Description = GetString(table, "description", string.Empty),
-                Monitor = GetString(table, "monitor", null),
-                ExecutionMode = ParseExecutionMode(GetString(table, "execution_mode", "click")),
-                MonitorRegion = region,
-                Matching = matching,
-                Action = action
-            });
         }
 
         return templates;
+    }
+
+    private static TemplateConfig ParseTemplate(TomlTable table, string baseDirectory)
+    {
+        var name = GetString(table, "name", "unnamed");
+        var region = ParseRegion(table.TryGetValue("monitor_region", out var regionNode) ? regionNode as TomlTable : null);
+        if (!region.IsValid())
+        {
+            throw new ConfigLoadException($"テンプレート '{name}' のmonitor_regionが0.0-1.0の範囲外です。");
+        }
+
+        var matching = ParseMatching(
+            table.TryGetValue("matching", out var matchingNode) ? matchingNode as TomlTable : null,
+            baseDirectory);
+        var action = ParseAction(table.TryGetValue("action", out var actionNode) ? actionNode as TomlTable : null, name);
+
+        return new TemplateConfig
+        {
+            Name = name,
+            Description = GetString(table, "description", string.Empty),
+            Monitor = GetString(table, "monitor", null),
+            ExecutionMode = ParseExecutionMode(GetString(table, "execution_mode", "click")),
+            MonitorRegion = region,
+            Matching = matching,
+            Action = action
+        };
     }
 
     private static MatchingConfig ParseMatching(TomlTable? table, string baseDirectory)

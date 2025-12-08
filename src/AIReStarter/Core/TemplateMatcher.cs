@@ -40,6 +40,15 @@ public sealed class TemplateMatcher
                 return null;
             }
 
+            if (templateImage.Width > capture.Frame.Width || templateImage.Height > capture.Frame.Height)
+            {
+                _logger.LogWarning(
+                    "テンプレートサイズがキャプチャ領域より大きいためスキップします: {TemplateSize} vs {CaptureSize}",
+                    $"{templateImage.Width}x{templateImage.Height}",
+                    $"{capture.Frame.Width}x{capture.Frame.Height}");
+                return null;
+            }
+
             using var result = new Mat();
             Cv2.MatchTemplate(capture.Frame, templateImage, result, TemplateMatchModes.CCoeffNormed);
             Cv2.MinMaxLoc(result, out _, out var maxVal, out _, out CvPoint maxLoc);

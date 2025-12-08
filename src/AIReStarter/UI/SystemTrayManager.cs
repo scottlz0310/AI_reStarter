@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using AIReStarter.Services;
 using Microsoft.Extensions.Logging;
@@ -25,12 +26,12 @@ public sealed class SystemTrayManager : IDisposable
         };
     }
 
-    public void Bind(MonitorService monitorService, Action shutdown)
+    public void Bind(MonitorService monitorService, Func<Task> shutdownAsync)
     {
         var menu = new ContextMenuStrip();
         menu.Items.Add("監視開始/再開", null, (_, _) => monitorService.Start());
         menu.Items.Add("一時停止", null, async (_, _) => await monitorService.StopAsync());
-        menu.Items.Add("終了", null, (_, _) => shutdown());
+        menu.Items.Add("終了", null, async (_, _) => await shutdownAsync());
 
         _notifyIcon.ContextMenuStrip = menu;
         _logger.LogInformation("システムトレイメニューを初期化しました。");
