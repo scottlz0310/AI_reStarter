@@ -37,13 +37,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install OSV Scanner
+        run: |
+          VERSION="1.8.2"
+          curl -sL "https://github.com/google/osv-scanner/releases/download/v${VERSION}/osv-scanner_$(uname -s)_$(uname -m).tar.gz" -o osv.tar.gz
+          tar -xzf osv.tar.gz
+          sudo mv osv-scanner /usr/local/bin/osv-scanner
+
       - name: Run OSV Scanner
-        uses: google/osv-scanner-action@v1.8.2
-        with:
-          scan-args: |-
-            --recursive
-            --skip-git
-            ./
+        run: |
+          osv-scanner --version
+          osv-scanner --recursive --skip-git .
 
   codeql:
     name: CodeQL Analysis

@@ -25,4 +25,4 @@ jobs:
       - name: Analyzer build
         run: dotnet build --no-restore --configuration Release /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=true
       - name: Unit tests (Debug quick)
-        run: dotnet test --no-build --configuration Debug --verbosity minimal
+        run: dotnet test --no-build --configuration Release --verbosity minimal
