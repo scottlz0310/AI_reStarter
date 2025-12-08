@@ -37,22 +37,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install OSV Scanner
-        run: |
-          set -e
-          VERSION="1.8.2"
-          OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-          ARCH_RAW=$(uname -m)
-          if [ "$ARCH_RAW" = "x86_64" ]; then ARCH="amd64"; elif [ "$ARCH_RAW" = "aarch64" ] || [ "$ARCH_RAW" = "arm64" ]; then ARCH="arm64"; else ARCH="$ARCH_RAW"; fi
-          FILE="osv-scanner_${VERSION}_${OS}_${ARCH}.tar.gz"
-          curl -sL "https://github.com/google/osv-scanner/releases/download/v${VERSION}/${FILE}" -o osv.tar.gz
-          tar -xzf osv.tar.gz
-          sudo mv osv-scanner /usr/local/bin/osv-scanner
-
       - name: Run OSV Scanner
-        run: |
-          osv-scanner --version
-          osv-scanner --recursive --skip-git .
+        uses: google/osv-scanner/actions/scanner@v1
+        with:
+          scan-args: |-
+            --recursive
+            --skip-git
+            .
 
   codeql:
     name: CodeQL Analysis
