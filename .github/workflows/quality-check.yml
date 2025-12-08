@@ -2,7 +2,7 @@ name: quality-check
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, master, develop]
 
 permissions:
   contents: read
