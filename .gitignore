@@ -309,3 +309,6 @@ vendor/
 .vscode/*
 PATCHES/
 out/
+
+# Auto-generated entries from templates
+.pyrightcache/
