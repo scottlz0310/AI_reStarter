@@ -4,7 +4,6 @@
     "github>scottlz0310/renovate-config",
     "github>scottlz0310/renovate-config:csharp",
     "github>scottlz0310/renovate-config:automerge",
-    "github>scottlz0310/renovate-config:security",
-    "github>scottlz0310/renovate-config:production"
+    "github>scottlz0310/renovate-config:security"
   ]
 }
