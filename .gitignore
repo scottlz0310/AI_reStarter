@@ -32,6 +32,9 @@ TestResult*/
 *.opencover.xml
 coverage.cobertura.xml
 
+# Python packaging metadata
+*.egg-info/
+
 # Generated files
 *.g.cs
 *.g.i.cs
