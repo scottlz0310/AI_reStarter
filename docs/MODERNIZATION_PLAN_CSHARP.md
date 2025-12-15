@@ -3,7 +3,7 @@
 ## プロジェクト概要
 Windows画面監視による汎用IDE自動復旧システム。特定パターン検出時の自動アクション実行を目的とする常駐型アプリケーション。
 
-## 言語選択: C# (.NET 8)
+## 言語選択: C# (.NET 10)
 
 ### 選択理由
 - ✅ **Windows統合**: ネイティブAPI、WinForms, WPF, Win32完全サポート
@@ -26,7 +26,7 @@ Windows画面監視による汎用IDE自動復旧システム。特定パター�
 ## 技術スタック
 
 ### パッケージ管理
-- **ビルドツール**: .NET SDK 8.0
+- **ビルドツール**: .NET SDK 10.0
 - **パッケージマネージャー**: NuGet
 - **依存関係更新**: Renovate（自動バージョン管理）
 - **ロックファイル**: packages.lock.json（再現可能なビルド）
@@ -36,7 +36,7 @@ Windows画面監視による汎用IDE自動復旧システム。特定パター�
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -530,7 +530,7 @@ public class ConfigLoader
 
 ## パフォーマンス最適化
 
-### .NET 8 最適化
+### .NET 10 最適化
 - **JIT最適化**: Dynamic PGO（Profile-Guided Optimization）
 - **AOTコンパイル**: ReadyToRun, NativeAOT
 - **SIMD**: Vector<T> による画像処理高速化
@@ -684,7 +684,7 @@ public class EndToEndTests
 1. **作業ブランチ作成**: `feature/v2-csharp-rewrite`
 2. **既存コード全削除**: クリーンな状態から開始
 3. **.csproj設定**: 全依存関係を定義
-4. **モダンなベストプラクティス適用**: .NET 8, C# 12
+4. **モダンなベストプラクティス適用**: .NET 10, C# 13
 5. **依存性注入**: Microsoft.Extensions.DependencyInjection
 
 ### Git ワークフロー戦略
@@ -724,7 +724,7 @@ git checkout feature/v2-csharp-rewrite -- .
 
 # 4. コミット
 git add .
-git commit -m "feat: complete rewrite in C# (.NET 8) (v2.0.0)"
+git commit -m "feat: complete rewrite in C# (.NET 10) (v2.0.0)"
 
 # 5. タグ付け
 git tag -a v2.0.0 -m "Version 2.0.0 - C# implementation"
@@ -798,7 +798,7 @@ dotnet publish -c Release -r win-x64 \
   /p:PublishTrimmed=true \
   /p:EnableCompressionInSingleFile=true
 
-# 出力: bin/Release/net8.0-windows/win-x64/publish/AIReStarter.exe
+# 出力: bin/Release/net10.0-windows/win-x64/publish/AIReStarter.exe
 # サイズ: 50-100MB（.NET Runtime込み）
 ```
 

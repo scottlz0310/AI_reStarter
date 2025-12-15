@@ -1,6 +1,6 @@
 # AI reStarter v2 (C# PoC)
 
-Windows専用の常駐アプリとして、停止した処理を自動検知し安全に再開するC#/.NET 8版のPoCです。Python版で課題だったDPIスケーリングとマルチモニター（負の座標含む）を優先的に解決します。
+Windows専用の常駐アプリとして、停止した処理を自動検知し安全に再開するC#/.NET 10版のPoCです。Python版で課題だったDPIスケーリングとマルチモニター（負の座標含む）を優先的に解決します。
 
 ## ゴール
 - DPIスケーリング対応（Per-Monitor v2 / SendInput 前提）
@@ -23,7 +23,7 @@ Windows専用の常駐アプリとして、停止した処理を自動検知し�
 - `src/AIReStarter/Config/AppConfig.cs` : アプリケーション設定の型定義
 
 ## セットアップ
-1) 前提: Windows + .NET 8 SDK
+1) 前提: Windows + .NET 10 SDK
 2) 依存関係取得
 ```
 dotnet restore

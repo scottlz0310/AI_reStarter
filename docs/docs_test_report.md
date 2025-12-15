@@ -5,7 +5,7 @@
 - 実施者: 
 - 版数: 
 - 対象ブランチ: feature/v2-csharp-rewrite
-- 実行環境: Windows 11 / .NET 8 / DPI ( ) / モニタ構成 ( )
+- 実行環境: Windows 11 / .NET 10 / DPI ( ) / モニタ構成 ( )
 
 ## サマリ
 - 合否: Pass / Fail
