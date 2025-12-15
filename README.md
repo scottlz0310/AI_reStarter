@@ -15,9 +15,12 @@ Windows専用の常駐アプリとして、停止した処理を自動検知し�
 - `src/AIReStarter/Core/TemplateMatcher.cs` : OpenCVテンプレートマッチング
 - `src/AIReStarter/Core/MatchGuard.cs` : 連続一致ガードとクールダウン
 - `src/AIReStarter/Services/MonitorService.cs` : 監視ループ、ガード判定、アクション実行
-- `src/AIReStarter/Services/ActionEngine.cs` : SendInputでのクリック/チャット/キーボード送出
+- `src/AIReStarter/Services/ActionEngine.cs` : アクション実行の制御
 - `src/AIReStarter/Services/HotKeyService.cs` : グローバルホットキー（安全停止用）
+- `src/AIReStarter/Input/InputSender.cs` : SendInput/SetCursorPosでのクリック・キー送出
 - `src/AIReStarter/UI/SystemTrayManager.cs` : トレイメニューによる開始/停止/終了
+- `src/AIReStarter/Config/ConfigLoader.cs` : TOML設定ファイルの読み込み
+- `src/AIReStarter/Config/AppConfig.cs` : アプリケーション設定の型定義
 
 ## セットアップ
 1) 前提: Windows + .NET 8 SDK

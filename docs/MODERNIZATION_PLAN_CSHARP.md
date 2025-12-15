@@ -31,57 +31,59 @@ Windows画面監視による汎用IDE自動復旧システム。特定パター�
 - **依存関係更新**: Renovate（自動バージョン管理）
 - **ロックファイル**: packages.lock.json（再現可能なビルド）
 
-### プロジェクト設定
+### プロジェクト設定（実装済み）
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- 静的解析 -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- デバッグ -->
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
 
     <!-- 配布設定 -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>false</PublishTrimmed>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-
-    <!-- 最適化 -->
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- 画像処理 -->
-    <PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.9.0.20240103" />
+    <!-- 依存性注入・ホスティング -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
 
-    <!-- システムトレイ -->
-    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <!-- 画像処理 (OpenCV) -->
+    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
 
-    <!-- 設定ファイル -->
-    <PackageReference Include="Tomlyn" Version="0.17.0" />
+    <!-- ログ (Serilog) -->
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 
-    <!-- ログ -->
-    <PackageReference Include="Serilog" Version="4.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-
-    <!-- 依存性注入 -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-
-    <!-- テスト -->
-    <PackageReference Include="xunit" Version="2.6.6" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6" />
-    <PackageReference Include="Moq" Version="4.20.70" />
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <!-- 設定ファイル (TOML) -->
+    <PackageReference Include="Tomlyn" Version="0.19.0" />
   </ItemGroup>
 </Project>
 ```
+
+> **注**: システムトレイには `System.Windows.Forms.NotifyIcon` を使用（Hardcodet.NotifyIcon.Wpf は不使用）。
 
 ### 開発ツール統一
 - **パッケージ管理**: NuGet + Renovate
@@ -91,58 +93,66 @@ Windows画面監視による汎用IDE自動復旧システム。特定パター�
 - **テスト**: xUnit + Moq + FluentAssertions
 - **ベンチマーク**: BenchmarkDotNet
 
-### 削除対象ファイル・ディレクトリ
+### プロジェクト構成（マイグレーション完了後）
 ```
-削除対象:
-├── src/                    # 既存Pythonソースコード
-├── playground/             # 開発・テスト用ファイル
-├── scripts/               # 開発・運用スクリプト
-├── tests/                 # 既存テストコード
-├── pyproject.toml         # Python設定
-├── .flake8               # Python設定
-├── .pylintrc             # Python設定
-├── Makefile              # Python設定
-└── .pre-commit-config.yaml # Python設定
+現在のディレクトリ構造:
+├── src/AIReStarter/        # C#ソースコード（WPF + WinForms）
+├── tests/AIReStarter.Tests/ # C#テストプロジェクト
+├── templates/              # テンプレート画像
+├── docs/                   # ドキュメント
+├── .github/workflows/      # CI/CD設定
+├── AIReStarter.sln         # ソリューションファイル
+├── README.md               # プロジェクト説明
+├── profiles.toml           # アプリケーション設定
+├── profiles.example.toml   # 設定例
+├── renovate.json           # Renovate設定
+└── icon.png                # アプリアイコン
 
-保持対象:
-├── AIReStarter.csproj     # C#プロジェクト設定
-├── README.md             # プロジェクト説明
-├── MODERNIZATION_PLAN_CSHARP.md # この計画書
-└── profiles.toml         # アプリケーション設定
+削除済み（Python版）:
+- pyproject.toml, .flake8, .pylintrc, Makefile, .pre-commit-config.yaml
+- 旧 src/, tests/, playground/, scripts/ ディレクトリ
 ```
 
 ## アーキテクチャ設計
 
-### プロジェクト構造
+### プロジェクト構造（実装済み）
 ```
-AIReStarter/
+src/AIReStarter/
 ├── AIReStarter.csproj
-├── Program.cs                    # エントリーポイント
+├── App.xaml                      # WPFアプリケーション定義
+├── App.xaml.cs                   # エントリーポイント・DI構成
+├── MainWindow.xaml               # メインウィンドウUI
+├── MainWindow.xaml.cs            # メインウィンドウロジック
+├── AssemblyInfo.cs               # アセンブリ情報
+├── app.manifest                  # DPI対応マニフェスト
 ├── Core/                         # コア機能
-│   ├── ExecutionModeManager.cs   # 実行モード管理
-│   ├── MonitorEngine.cs          # 画面監視・マッチング
-│   ├── ActionEngine.cs           # 自動アクション実行
-│   └── DisplayManager.cs         # マルチモニター・DPI対応
-├── UI/                           # ユーザーインターフェース
-│   ├── SystemTrayIcon.cs         # システムトレイ
-│   ├── SetupWizard.cs            # 設定ウィザード（WPF）
-│   └── ConfigViewer.cs           # 設定確認・デバッグ
+│   ├── DisplayManager.cs         # マルチモニター・DPI対応
+│   ├── ScreenCaptureService.cs   # DPI補正済み画面キャプチャ
+│   ├── TemplateMatcher.cs        # OpenCVテンプレートマッチング
+│   └── MatchGuard.cs             # 連続一致ガードとクールダウン
 ├── Config/                       # 設定管理
-│   ├── TemplateConfig.cs         # テンプレート設定
 │   ├── ConfigLoader.cs           # TOML読み込み
-│   └── AppSettings.cs            # アプリケーション設定
-├── Models/                       # データモデル
-│   ├── ExecutionMode.cs          # 実行モード列挙型
-│   ├── Template.cs               # テンプレート
-│   ├── MonitorRegion.cs          # 監視領域
-│   └── ActionConfig.cs           # アクション設定
-└── Tests/                        # テストプロジェクト
-    ├── Core/
-    ├── UI/
-    └── Config/
+│   └── AppConfig.cs              # 全設定型定義（ExecutionMode, MonitorRegion等）
+├── Input/                        # 入力送信
+│   └── InputSender.cs            # SendInput/SetCursorPosによる入力
+├── Services/                     # サービス層
+│   ├── MonitorService.cs         # 監視ループ管理
+│   ├── ActionEngine.cs           # アクション実行制御
+│   └── HotKeyService.cs          # グローバルホットキー
+├── UI/                           # ユーザーインターフェース
+│   └── SystemTrayManager.cs      # システムトレイ（NotifyIcon）
+└── Interop/                      # Windows API相互運用
+    └── DpiAwareness.cs           # DPI対応設定
+
+tests/AIReStarter.Tests/          # テストプロジェクト
+├── AIReStarter.Tests.csproj
+├── MatchGuardTests.cs
+├── ConfigLoaderPathTests.cs
+├── TomlParseTests.cs
+└── TestPathHelper.cs
 ```
 
-### 型設計（重要）
+### 型設計（実装済み）
 
 ```csharp
 // 実行モード
@@ -153,72 +163,65 @@ public enum ExecutionMode
     Keyboard
 }
 
-// テンプレート設定
-public record Template
+// 監視領域（相対座標 0.0-1.0）
+public sealed record MonitorRegion
 {
-    public required string Name { get; init; }
-    public required string Description { get; init; }
-    public required ExecutionMode ExecutionMode { get; init; }
-    public required MonitorRegion MonitorRegion { get; init; }
-    public required MatchingConfig Matching { get; init; }
-    public required ActionConfig Action { get; init; }
-}
+    public double X { get; init; }
+    public double Y { get; init; }
+    public double Width { get; init; }
+    public double Height { get; init; }
 
-// 監視領域（相対座標）
-public record MonitorRegion
-{
-    public required float X { get; init; }      // 0.0 - 1.0
-    public required float Y { get; init; }      // 0.0 - 1.0
-    public required float Width { get; init; }  // 0.0 - 1.0
-    public required float Height { get; init; } // 0.0 - 1.0
-
-    public bool IsValid() =>
-        X >= 0 && X <= 1 &&
-        Y >= 0 && Y <= 1 &&
-        Width > 0 && Width <= 1 &&
-        Height > 0 && Height <= 1;
+    public bool IsValid()
+    {
+        return X >= 0 && Y >= 0 &&
+               Width > 0 && Height > 0 &&
+               X <= 1 && Y <= 1 &&
+               X + Width <= 1 && Y + Height <= 1;
+    }
 }
 
 // マッチング設定
-public record MatchingConfig
+public sealed record MatchingConfig
 {
-    public required string File { get; init; }
-    public required float Threshold { get; init; }  // 0.0 - 1.0
+    public string File { get; init; } = string.Empty;
+    public double Threshold { get; init; } = 0.8;
 }
 
 // アクション設定（判別共用体パターン）
 public abstract record ActionConfig
 {
-    public record Click(
-        int OffsetX,
-        int OffsetY,
-        int RetryCount
-    ) : ActionConfig;
+    public sealed record Click(int OffsetX, int OffsetY, int RetryCount) : ActionConfig;
+    public sealed record Chat(string Command, string TargetElement) : ActionConfig;
+    public sealed record Keyboard(IReadOnlyList<string> Keys) : ActionConfig;
+}
 
-    public record Chat(
-        string Command,
-        string TargetElement
-    ) : ActionConfig;
-
-    public record Keyboard(
-        string[] Keys
-    ) : ActionConfig;
+// テンプレート設定
+public sealed record TemplateConfig
+{
+    public string Name { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
+    public string? Monitor { get; init; }
+    public ExecutionMode ExecutionMode { get; init; } = ExecutionMode.Click;
+    public MonitorRegion MonitorRegion { get; init; } = new();
+    public MatchingConfig Matching { get; init; } = new();
+    public ActionConfig Action { get; init; } = new ActionConfig.Click(0, 0, 1);
 }
 
 // グローバル設定
-public record GlobalConfig
+public sealed record GlobalConfig
 {
-    public required float CheckInterval { get; init; }
-    public required bool AdaptiveInterval { get; init; }
-    public required string LogLevel { get; init; }
-    public required ExecutionMode ActiveMode { get; init; }
+    public double CheckIntervalSeconds { get; init; } = 2.0;
+    public double CooldownSeconds { get; init; } = 15.0;
+    public int MaxConsecutiveMatches { get; init; } = 2;
+    public int ActionDelayMilliseconds { get; init; } = 250;
+    public string LogLevel { get; init; } = "Information";
 }
 
 // アプリケーション設定
-public record AppConfig
+public sealed record AppConfig
 {
-    public required GlobalConfig Global { get; init; }
-    public required List<Template> Templates { get; init; }
+    public GlobalConfig Global { get; init; } = new();
+    public IReadOnlyList<TemplateConfig> Templates { get; init; } = Array.Empty<TemplateConfig>();
 }
 ```
 
@@ -391,46 +394,40 @@ public partial class SetupWizard : Window
 }
 ```
 
-#### 2.2 SystemTrayIcon
+#### 2.2 SystemTrayManager（実装済み）
 ```csharp
-public class SystemTrayIcon : IDisposable
+public sealed class SystemTrayManager : IDisposable
 {
-    private readonly TaskbarIcon _notifyIcon;
-    private readonly ExecutionModeManager _modeManager;
+    private readonly ILogger<SystemTrayManager> _logger;
+    private readonly NotifyIcon _notifyIcon;
 
-    public SystemTrayIcon(ExecutionModeManager modeManager)
+    public SystemTrayManager(ILogger<SystemTrayManager> logger)
     {
-        _modeManager = modeManager;
-
-        _notifyIcon = new TaskbarIcon
+        _logger = logger;
+        _notifyIcon = new NotifyIcon
         {
-            Icon = new Icon("app.ico"),
-            ToolTipText = "AI reStarter"
+            Icon = SystemIcons.Application,
+            Visible = true,
+            Text = "AI reStarter v2 (C# PoC)"
         };
-
-        BuildContextMenu();
     }
 
-    private void BuildContextMenu()
+    public void Bind(MonitorService monitorService, Func<Task> shutdownAsync, Action showWindow)
     {
-        var contextMenu = new ContextMenu();
+        var menu = new ContextMenuStrip();
+        menu.Items.Add("監視開始/再開", null, (_, _) => monitorService.Start());
+        menu.Items.Add("一時停止", null, async (_, _) => await monitorService.StopAsync());
+        menu.Items.Add("ウィンドウ表示", null, (_, _) => showWindow());
+        menu.Items.Add("終了", null, async (_, _) => await shutdownAsync());
 
-        // 実行モード切り替え
-        var modeMenu = new MenuItem { Header = "実行モード" };
-        foreach (ExecutionMode mode in Enum.GetValues<ExecutionMode>())
-        {
-            var item = new MenuItem
-            {
-                Header = mode.ToString(),
-                IsCheckable = true,
-                IsChecked = mode == _modeManager.CurrentMode
-            };
-            item.Click += (s, e) => _modeManager.SwitchMode(mode);
-            modeMenu.Items.Add(item);
-        }
-        contextMenu.Items.Add(modeMenu);
+        _notifyIcon.ContextMenuStrip = menu;
+        _logger.LogInformation("システムトレイメニューを初期化しました。");
+    }
 
-        _notifyIcon.ContextMenu = contextMenu;
+    public void Dispose()
+    {
+        _notifyIcon.Visible = false;
+        _notifyIcon.Dispose();
     }
 }
 ```
@@ -440,35 +437,76 @@ public class SystemTrayIcon : IDisposable
 
 ## 設定ファイル構造
 
-### profiles.toml
+### profiles.toml（実際の設定例）
 ```toml
-# AI reStarter 設定
+# AI reStarter v2 (C# PoC) 設定例
 
 [global]
-check_interval = 3.0
-adaptive_interval = true
-log_level = "INFO"
-active_mode = "click"
+check_interval = 2.0           # 監視間隔（秒）
+cooldown_seconds = 15.0        # 連続一致後のクールダウン（秒）
+max_consecutive_matches = 2    # アクションを許容する連続一致回数
+action_delay_ms = 250          # 入力送出の間隔（ミリ秒）
+log_level = "Information"      # Verbose/Debug/Information/Warning/Error/Fatal
 
 [[templates]]
 name = "run_button"
-description = "実行ボタン検出用テンプレート"
+description = "IDEの実行ボタン検出"
 execution_mode = "click"
+monitor = ""                   # 特定モニター名（空なら仮想スクリーン）
 
 [templates.monitor_region]
-x = 0.1
-y = 0.2
-width = 0.8
-height = 0.6
+x = 0.40
+y = 0.78
+width = 0.20
+height = 0.18
 
 [templates.matching]
-file = "run_button.png"
-threshold = 0.8
+file = "templates/run_button.png"
+threshold = 0.82
 
 [templates.action]
 type = "click"
-offset = [0, 0]
+offset = [0, 0]                # マッチ座標からの相対オフセット（px）
 retry_count = 3
+
+[[templates]]
+name = "chat_box"
+description = "チャット欄へのテキスト送信"
+execution_mode = "chat"
+
+[templates.monitor_region]
+x = 0.25
+y = 0.70
+width = 0.50
+height = 0.25
+
+[templates.matching]
+file = "templates/chat_box.png"
+threshold = 0.78
+
+[templates.action]
+type = "chat"
+command = "続行してください"
+target_element = "chat_input"
+
+[[templates]]
+name = "shortcut"
+description = "ショートカット送信用の例"
+execution_mode = "keyboard"
+
+[templates.monitor_region]
+x = 0.0
+y = 0.0
+width = 1.0
+height = 1.0
+
+[templates.matching]
+file = "templates/any.png"
+threshold = 0.90
+
+[templates.action]
+type = "keyboard"
+keys = ["Ctrl", "Shift", "P"]
 ```
 
 ### TOML読み込み
