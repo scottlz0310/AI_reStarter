@@ -85,7 +85,7 @@
 
 ## Copilotへの追加指示
 - MVPの受け入れ基準を満たすまでがMVP。未達ならPoC扱い。
-- テストシナリオに基づく検証をdocs/test-report.mdに記録。
+- テストシナリオに基づく検証を `docs/docs_test_report.md` に記録。
 - 設定UIはMVP含む。最低限の構成（テンプレ管理、ROI、モニタ、閾値、ガード、ホットキー）。
 - ログ設計はローテーション前提。
-- secuorityの品質ルールがCIで通ること。
+- securityの品質ルールがCIで通ること。

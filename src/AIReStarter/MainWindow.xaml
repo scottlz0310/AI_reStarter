@@ -13,7 +13,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="AI reStarter v2 - C#/.NET 8 PoC"
+        <TextBlock Text="AI reStarter v2 - C#/.NET 10 PoC"
                    FontSize="18"
                    FontWeight="SemiBold" />
 
