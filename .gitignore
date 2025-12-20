@@ -30,6 +30,7 @@ TestResult*/
 *.coverage
 *.coveragexml
 *.opencover.xml
+coverage.xml
 coverage.cobertura.xml
 
 # Python packaging metadata
